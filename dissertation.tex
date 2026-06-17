@@ -1,0 +1,98 @@
+ 
+\RequirePackage{silence} % :-\
+    \WarningFilter{scrreprt}{Usage of package `titlesec'}
+    %\WarningFilter{scrreprt}{Activating an ugly workaround}
+    \WarningFilter{titlesec}{Non standard sectioning command detected}
+\documentclass[ twoside,openright,titlepage,numbers=noenddot,%1headlines,
+                headinclude,footinclude,cleardoublepage=empty,abstract=on,
+                BCOR=5mm,paper=a4,fontsize=11pt,
+                ]{scrbook}
+
+%********************************************************************
+% Note: Make all your adjustments in here
+%*******************************************************
+\input{classicthesis-config}
+\input{Notations.tex}
+
+%********************************************************************
+% Bibliographies
+%*******************************************************
+\addbibresource{Bibliography.bib}
+
+
+%********************************************************************
+% Hyphenation
+%*******************************************************
+%\hyphenation{put special hyphenation here}
+
+
+
+% ********************************************************************
+% Beginning of document
+%*******************************************************
+\begin{document}
+\frenchspacing
+\raggedbottom
+\selectlanguage{french} % american ngerman
+\pagenumbering{roman}
+\pagestyle{plain}
+%********************************************************************
+% Frontmatter
+%*******************************************************
+\include{FrontBackmatter/DirtyTitlepage}
+\include{FrontBackmatter/Titleback}
+% \cleardoublepage\include{FrontBackmatter/Dedication}
+\cleardoublepage\include{FrontBackmatter/Abstract}
+\cleardoublepage\include{FrontBackmatter/Acknowledgments}
+%********************************************************************
+% Mainmatter
+%*******************************************************
+\cleardoublepage
+\pagestyle{scrheadings}
+\pagenumbering{arabic}
+%\setcounter{page}{90}
+% use \cleardoublepage here to avoid problems with pdfbookmark
+\cleardoublepage
+
+
+\tableofcontents
+
+
+%******************************************************************
+% Part 1 - CV
+%*******************************************************
+\part{Curriculum Vitae}\label{pt:cv}
+\include{Chapters/0-CurriculumVitae}
+
+%******************************************************************
+% Part 2 - Scientific Content
+%*******************************************************
+\cleardoublepage
+\ctparttext{You can put some informational part preamble text here.
+Illo principalmente su nos. Non message \emph{occidental} angloromanic
+da. Debitas effortio simplificate sia se, auxiliar summarios da que,
+se avantiate publicationes via. Pan in terra summarios, capital
+interlingua se que. Al via multo esser specimen, campo responder que
+da. Le usate medical addresses pro, europa origine sanctificate nos se.}
+\part{Scientific content}\label{pt:science}
+\include{Chapters/1-Introduction}
+
+
+% ********************************************************************
+% Backmatter
+%*******************************************************
+\appendix
+%\renewcommand{\thechapter}{\alph{chapter}}
+\cleardoublepage
+\part{Appendix}
+%********************************************************************
+% Other Stuff in the Back
+%*******************************************************
+\pdfbookmark[-1]{Back Matter}{back} % Dummy part bookmark for back matter
+\cleardoublepage\include{FrontBackmatter/Bibliography}
+\cleardoublepage\include{FrontBackmatter/Declaration}
+\cleardoublepage\include{FrontBackmatter/Colophon}
+
+
+\end{document}
+

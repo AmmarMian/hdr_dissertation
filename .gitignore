@@ -1,0 +1,54 @@
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.log
+*.lof
+*.lot
+*.mw
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.nav
+*.snm
+*.vrb
+
+# backup
+backup*/
+
+# LaTeX build outputs
+*.pdf
+*.dvi
+*.ps
+
+# Output directory (contains temporary compilation files)
+output/
+
+# Build directory
+build/
+
+# Temporary files
+*~
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+
+# Editor backup files
+*.bak
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+

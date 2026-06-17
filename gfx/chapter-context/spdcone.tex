@@ -1,0 +1,26 @@
+\begin{tikzpicture}
+\begin{axis}[
+  view={60}{30},
+    xlabel=$\alpha$,
+    ylabel=$\beta$,
+    zlabel=$\gamma$,
+]
+    \addplot3 [
+        surf,
+        color=gray,
+        faceted color = teal,
+        opacity=0.5,
+        samples=15,
+        domain=0:2,y domain=0:2
+    ] {sqrt(x*y)};
+    \addplot3 [
+        surf,
+        color=gray,
+        opacity=0.5,
+        color=gray,
+        faceted color = teal,
+        samples=15,
+        domain=0:2,y domain=0:2
+    ] {-sqrt(x*y)};
+\end{axis}
+\end{tikzpicture}

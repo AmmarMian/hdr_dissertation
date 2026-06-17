@@ -1,0 +1,76 @@
+% This file was created with matplot2tikz v0.4.0.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{lightgray204}{RGB}{204,204,204}
+
+\begin{axis}[
+width=0.9\textwidth,
+height=5cm,
+legend cell align={left},
+legend style={
+  fill opacity=0.8,
+  draw opacity=1,
+  text opacity=1,
+  at={(0.03,0.97)},
+  anchor=north west,
+  draw=none},
+log basis x={10},
+log basis y={10},
+tick align=outside,
+tick pos=left,
+x grid style={darkgray176},
+xlabel={\(\Nvar\)},
+xmin=2.2437647322819, xmax=1337.03857487278,
+xmode=log,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={\( \Cond\left(\hat{\MCov}_\Variable\right)\)},
+ymin=0.225854452095551, ymax=3.30099856664732e+21,
+ymode=log,
+ytick style={color=black},
+axis lines=left,
+axis line style={-},
+]
+\addplot [draw=black, forget plot, mark=o, only marks]
+table{%
+x  y
+3 2.2978428462613
+4 2.97945355103619
+5 3.86999003629805
+6 4.739362197753
+8 6.8517104664444
+10 9.94038338050792
+12 13.7958903854635
+15 23.8311826021183
+18 46.2578859206427
+23 182.715432392685
+28 46549.0144705569
+34 3.94910195841309e+17
+41 1.1548838004477e+18
+50 7.52904084647483e+17
+62 2.25819976846186e+18
+75 3.09316405486303e+18
+92 3.03732540021619e+18
+112 1.02434296679373e+19
+137 3.20488772584623e+18
+167 2.83797422953448e+19
+204 3.92215518597766e+19
+249 4.35124981669872e+19
+303 1.93447226101422e+19
+370 4.23341397447877e+19
+452 2.26655494364205e+19
+551 5.79345192735285e+19
+672 7.6284315133936e+19
+819 1.90134903833613e+20
+1000 3.24454400287368e+20
+};
+\addplot [semithick, black, dashed]
+table {%
+30 0.225854452095551
+30 3.30099856664732e+21
+};
+\addlegendentry{$d=N$}
+\end{axis}
+
+\end{tikzpicture}

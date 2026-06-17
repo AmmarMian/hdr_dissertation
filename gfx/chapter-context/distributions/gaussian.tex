@@ -1,0 +1,36 @@
+% Pgfplots plot of isodensity of a 2D Gaussian distribution with scattered points
+
+
+% Function to compute the Gaussian density
+\newcommand{\gaussianDensity}[3]{%
+    \frac{1}{(2 \pi)^{#1/2} \sqrt{\det(#3)}} \exp\left(-\frac{1}{2} (#2 - #3)^\top #3^{-1} (#2 - #3)\right)
+}
+
+
+\begin{tikzpicture}
+    \begin{axis}[
+        xlabel={$x_1$},
+        ylabel={$x_2$},
+        axis equal,
+        grid=both,
+    ]
+
+    % Plot the isodensity contours of the Gaussian distribution in 2D
+    \addplot[
+        domain=-3:3,
+        samples=50,
+        contour gnuplot={
+            levels={0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5},
+            draw color=blue,
+        },
+    ]{1/2 * exp(-1/2 * (x^2 + y^2))}; % Standard normal distribution
+    
+    % Generate random samples
+    \foreach \i in {1,...,\Nobs} {
+        \pgfmathsetmacro{\x}{rand*6 - 3}
+        \pgfmathsetmacro{\y}{rand*6 - 3}
+        \addplot[only marks, mark=*, mark size=1pt, color=red] coordinates {(\x, \y)};
+    }
+
+    \end{axis}
+\end{tikzpicture}

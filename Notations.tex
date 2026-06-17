@@ -1,0 +1,168 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Mathematics Macros and Commands
+% Custom mathematical notation and shortcuts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	Formatting
+%----------------------------------------------------------------------------------------
+\newcommand{\deftitle}[1]{\emph{\textbf{ - (#1)}}\\}
+
+%----------------------------------------------------------------------------------------
+%	MATHEMATICAL OPERATORS AND SYMBOLS
+%----------------------------------------------------------------------------------------
+
+%  Expected value operator
+\DeclareMathOperator{\E}{\mathbb{E}}
+
+% Mean opertations
+\DeclareMathOperator{\Moy}{\operatorname{Moy}}
+
+% Covariance operator
+\DeclareMathOperator{\Var}{\operatorname{Var}}
+\DeclareMathOperator{\Cov}{\operatorname{Cov}}
+
+%  Probability operator (using different name to avoid conflict)
+\DeclareMathOperator{\Prob}{\mathbb{P}}
+\DeclareMathOperator{\Tr}{\operatorname{Tr}} %  Trace
+
+\newcommand{\T}{\mathrm{T}} % Transpose
+\DeclareMathOperator{\Diag}{\operatorname{diag}} % Determinant
+\DeclareMathOperator{\Cond}{\kappa} % Condition number
+
+
+\newcommand{\diff}{\mathrm{d}} % Differential
+\DeclareMathOperator{\Det}{\operatorname{det}} % Determinant
+
+% Linear algebra
+\newcommand{\inv}[1]{{#1}^{-1}}
+\newcommand{\quadratic}[2]{#1^\T \inv{#2} #1 }
+\newcommand{\q}[2]{\mathcal{q}\left(#1, #2\right)}
+
+
+%----------------------------------------------------------------------------------------
+%	MATHEMATICAL SHORTCUTS
+%----------------------------------------------------------------------------------------
+
+%  Real numbers set
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+%  Natural numbers set
+\newcommand{\N}{\mathbb{N}}
+
+%  Norm notation
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+%  Absolute value
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+
+%  Trace
+\newcommand{\trace}[1]{\Tr\left\{#1\right\}}
+
+
+% Hypothesis testing
+\newcommand{\detect}{\;\underset{\hypothesis_0}{\overset{\hypothesis_1}{\gtrless}}\; \DetectorTreshold}
+
+
+%----------------------------------------------------------------------------------------
+%	MATHEMATICAL FORMATTING
+%----------------------------------------------------------------------------------------
+%  Matrix notation shortcut
+\newcommand{\mat}[1]{\boldsymbol{#1}}
+
+%  Vector notation shortcut (renaming to avoid conflict)
+\renewcommand{\vector}[1]{\boldsymbol{#1}}
+
+
+
+%----------------------------------------------------------------------------------------
+%	Computer science
+%----------------------------------------------------------------------------------------
+\newcommand{\bigO}{\mathcal{O}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	COMMON DEFINITIONS IN THIS HDR DISSERTATION
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+% Vectors and matrix dimensions
+%----------------------------------------------------------------------------------------
+\newcommand{\vdim}{d}
+\newcommand{\matrixdimR}{M}
+\newcommand{\matrixdimC}{N}
+
+%----------------------------------------------------------------------------------------
+% Linear algebra
+%----------------------------------------------------------------------------------------
+\newcommand{\Id}[1]{\mat{I}_{#1}} % Identity matrix of given dimension
+\newcommand{\Orth}{\mat{O}} % Orthogonal matrix
+\newcommand{\eig}{\lambda} % Eigenvalues
+\newcommand{\eigset}{\Lambda} % Eigenvalues set
+\newcommand{\frob}{\mathbb{F}} % Frobenius norm text
+
+%----------------------------------------------------------------------------------------
+% Statistics
+%----------------------------------------------------------------------------------------
+\newcommand{\Variable}{\mathcal{X}} % underlying random variable. multivariate case
+\newcommand{\Variablebis}{\mathcal{Y}} % underlying random variable bis. multivariate case
+\newcommand{\variable}{X} % underlying random variable
+\newcommand{\variablebis}{X} % underlying random variable bis
+\newcommand{\x}{\vector{x}} % observed sample
+\newcommand{\y}{\vector{y}} % observed sample two
+\newcommand{\X}{\mat{X}} % observed data as a matrix : all samples
+\newcommand{\Xset}{\mathfrak{X}} % observed data as a set : all samples
+\newcommand{\moy}{\mu} % mean of a random variable
+\newcommand{\Vmoy}{\mat{\moy}} % mean of a random variable. multivariate case
+\newcommand{\var}{\sigma} % variance of a random variable
+\newcommand{\texture}{\tau} % texture parameter
+\newcommand{\MCov}{\mat{\Sigma}} % Covariance matrix
+\newcommand{\Nobs}{N}
+\newcommand{\Ntime}{T} % Number of time values in a temporal scenario
+\newcommand{\Nvar}{\vdim} % number of varaibles
+\newcommand{\Niter}{n_{\mathrm{iter}}} % Number of iterations of an algorithm
+\newcommand{\ivar}{i} % index on variables
+\newcommand{\ivarbis}{j} % index on variables bis
+\newcommand{\iobs}{k} % index on observations
+\newcommand{\igroup}{t} % index on group of observations
+\newcommand{\itime}{t} % time index
+\newcommand{\coefledoitwolf}{\alpha} % LedoitWolf estimator coef
+\newcommand{\targetledoitwolf}{\mat{T}} % LedoitWolf estimator target matrix
+\newcommand{\hypothesis}{\mathcal{H}} % Hypothesis in a Neyman-Pearson scheme
+\newcommand{\statistic}{\Lambda} % Some statistic over the data
+\newcommand{\DetectorStat}{\hat{\statistic}} % Some test statistic of a Neyman-Pearson problem
+\newcommand{\DetectorTreshold}{\lambda} % Detector tresholding value
+\newcommand{\Smat}{\mathbf{S}} % Sum of X@X.T
+\newcommand{\Tyler}{\widehat{\bm{\mathcal{T}}}} % Tyler estimator
+
+%----------------------------------------------------------------------------------------
+% Probabilities
+%----------------------------------------------------------------------------------------
+\newcommand{\p}[1]{p_{#1}} % ddp
+\newcommand{\Universe}{\Omega} % Univers en proba
+\newcommand{\event}{\omega} % Evenement élémentaire
+\newcommand{\param}{\theta} % Unspecified probability parameter
+\newcommand{\gaussian}{\mathcal{N}} % Gaussian distribution
+\newcommand{\compoundgaussian}{\mathcal{CG}} % Compound-Gaussian distribuion
+
+
+%----------------------------------------------------------------------------------------
+% Optimization
+%----------------------------------------------------------------------------------------
+\newcommand{\loss}{\mathcal{L}} % Loss function
+\newcommand{\risk}{\mathcal{R}} % Expected risk function
+\newcommand{\opt}{\star} % Optimal point
+
+
+%----------------------------------------------------------------------------------------
+% Remote Sensing
+%----------------------------------------------------------------------------------------
+\newcommand{\HH}{\mathrm{HH}}
+\newcommand{\VH}{\mathrm{VH}}
+\newcommand{\HV}{\mathrm{HV}}
+\newcommand{\VV}{\mathrm{VV}}
+
+
+

@@ -1,0 +1,621 @@
+\chapter{\'Etat des lieux sur la covariance}
+\label{ch:context}
+
+
+Ce premier chapitre développe et illustre la notion principale de cette dissertation : la matrice de covariance. Nous nous intéresserons dans un premier temps à donner une définition liée aux statistiques multivariées sous laquelle elle permet de mesurer une notion de correlation entre variables observées. On s'intéressera ensuite à l'estimation de cette quantité à partir d'observations en regardant également le cas où le nombre de variables peut être supérieur au nombre d'observations.
+
+Dans un deuxième temps, en ajoutant un à priori de distributions de probabilités nous montrons que cette matrice apparait naturellement comme un paramètre de lois de probabilités multivariées et nous aborderons la notion d'estimation par mle et la caractérisation statistique des estimateurs étant donné la distribution
+
+Dans un troisième temps, nous présentons un développement relativement récent, dans la communauté du traitement du signal, sur la géométrie des espaces de spd. Cette vision basée sur la notion de geometrie riemannienne apporte alors des outils qui sont utiles pour traiter les problèmes d'optimisations découlant de matrices de covariances.
+
+Enfin, nous faisons un lien entre la modélisation probabiliste et la géométrie des espaces de covariance en introduisant l'objet de la variété riemannienne statistique qui lie naturellement distributions de probabilité et géométrie différentielle à l'aide de la matrice d'information de Fisher.
+% TODO: vérifier la terminologie riemannienne statistiques en français
+
+\section{Définition et caractérisation statistique de l'objet covariance}
+\label{sec:context-definition-caracterisation}
+
+Intéressons nous d'abord à développer la notion de covariance entre des variables aléatoires, à partir de la quelle nous définirons la matrice de covariance comme une extension naturelle au cas d'une représentation de variable aléatoire multivariée. Il s'agit un survol de ces notions mais pour plus de détails et définitions plus rigoureuses, le lecteur peut se reporter par exemple aux excellentes ressources \cite[]{anderson1958introduction} et \cite[]{wasserman2004all}.
+
+
+\subsection{Contexte}
+\label{subsec:context-definition-contexte}
+
+
+Considérons un ensemble de variables aléatoires continues $\{ \variable_1, \dots, \variable_\vdim \}$ à valeurs réelles\footnote{\`A ce stade, nous considérons que toute observation $x_\ivar$ de $\variable_\ivar$ est réelle: $\forall \ivar\in\{1, \dots, \vdim\},\, x_\ivar \in \R$ mais une extension prenant en compte les données complexes sera vue en \ref{subsec:context-definition-complex}.}, correspondant à des quantités observables. Pour une variable $\variable_\ivar$, toute observation sera dénotée $x_\ivar$ pour un seul échantillon ou bien $x_{\ivar\iobs}$ lorsque plusieurs observations de la même variable sont effectuées, $\ivar$ étant l'indice de la variable et $\iobs$ étant l'indice sur les échantillons.
+
+Si l'on convient de modéliser\footnote{On se place ici dans l'espace $\R^\Nvar$ muni de sa topologie usuelle. Ainsi, les mesures de probabilité sont dominés par la mesure de Lesbesgue. Cette propriété garantit l'existence de densités de probabilité, permettant une représentation intégrale des probabilités sur l'espace des données.
+} les variables aléatoires par une distribution de probabilités (d.d.p) absolument continue: $\p{\variable_\ivar}:\R\mapsto[0,1]$ avec $\p{\variable_\ivar}(x)=\Prob(x_\ivar=x)$, on peut définir les quantités suivantes qui caractérisent statistiquement la variable $\variable_\ivar$:
+
+
+\begin{definition}{\deftitle{Moyenne d'une variable aléatoire continue}}
+\label{def:context-definition-moyenne}
+  On définit la moyenne statistique de la variable aléatoire $x_\ivar$ comme la quantité:
+\begin{equation}
+  \Moy(\variable_\ivar) = \moy_{\variable_\ivar} = \E_{\variable_\ivar}\{\variable_\ivar\} = \int_{x\in\R} x\p{\variable_\ivar}(x)\diff x.
+  \label{eq:context-definition-moyenne}
+\end{equation}
+\end{definition}
+
+\begin{definition}{\deftitle{Variance d'une variable aléatoire continue}}
+\label{def:context-definition-variance}
+  On définit la variance statistique de la variable aléatoire $x_\ivar$ comme la quantité:
+\begin{equation}
+  \Var(\variable_\ivar)=\var_{\variable_\ivar} = \E_{\variable_\ivar}\{(\variable_\ivar-\moy_{\variable_\ivar})^2\}.
+  \label{eq:context-definition-variance}
+\end{equation}
+\end{definition}
+
+
+Puisque nous considérons plusieurs variables aléatoires, on peut définir les probabilités jointes $\p{\variable_\ivar \variable_\ivarbis }:\R\times\R\mapsto[0,1]$ avec $\p{\variable_\ivar \variable_\ivarbis}(x, y)=\Prob(x_\ivar=x, x_\ivarbis=y)$ entre deux variables. Lorsque l'on considère deux variables comme ceci, il est alors possible de définir la notion de covariance entre celles-ci:
+
+\begin{definition}{\deftitle{Covariance}}
+\label{eq:context-definition-covariance}
+  On définit la covariance statistique de deux variables aléatoires $\variable_\ivar$, $\variable_\ivarbis$ comme la quantité:
+\begin{equation}
+  \begin{aligned}
+    \Cov(\variable_\ivar, \variable_\ivarbis)=\var_{\variable_\ivar \variable_\ivarbis} &= \E_{\variable_\ivar \variable_\ivarbis}\{(\variable_\ivar-\moy_{\variable_\ivar})(\variable_\ivarbis-\moy_{\variable_\ivarbis})\}\\
+    &=\int_{x_\ivar\in\R}\int_{x_\ivarbis\in\R} (x_\ivar-\moy_\ivar)(x_\ivarbis-\moy_\ivarbis)\p{\variable_\ivar}(x_\ivar)\p{\variable_\ivarbis}(x_\ivarbis)\diff x_\ivar x_\ivarbis.
+  \end{aligned}
+  \label{eq:context-definition-covariance-formula}
+\end{equation}
+\end{definition}
+
+La covariance quantifie la tendance d'une relation linéaire entre ces deux variables. En tirant aléatoirement sur deux variables $\variable_{\ivar}$ et $\variable_{\ivarbis}$ pour obtenir $(x_{\ivar},x_{\ivarbis})$ :
+\begin{itemize}
+  \item une covariance positive $\Cov(\variable_{\ivar},\variable_{\ivarbis})>0$ peut être interprétée comme une tendance à ce que $x_{\ivarbis}$ suive les variations de $x_{\ivar}$. Une valeur plus grande observée de $x_{\ivar}$ indique une valeur plus grande également sur $x_{\ivarbis}$.
+  \item une covariance positive $\Cov(\variable_{\ivar},\variable_{\ivarbis})<0$ peut être interprétée comme une tendance à ce que $x_{\ivarbis}$ suive l'opposé des variations de $x_{\ivar}$. Une valeur plus grande observée de $x_{\ivar}$ indique une valeur plus faible sur $x_{\ivarbis}$.
+  \item une covariance nulle $\Cov(\variable_{\ivar},\variable_{\ivarbis})=0$ peut être interprétée comme l'absence de relation linéaire entre les variables. Attention : cela n'implique pas nécessairement l'indépendance des variables (il peut exister des relations non-linéaires).
+\end{itemize}
+
+
+
+\begin{figure*}[h]
+  \centering
+  \input{./gfx/chapter-context/example-covariance.tex}
+  \caption{Illustration des différents types de covariance par des nuages de points correspondant à des tirage sur les deux variables.}
+  \label{covariance-types}
+\end{figure*}
+
+
+% CLAUDE : START HERE
+
+Ce principe est illustré à la \ref{fig:covariance-types} où l'on représente des données synthétiques avec différents valeurs de covariance correspondant ou non à des relations linéaires. Plus précisément on parle de relation linéaire entre les variables centrées : la relation serait d'ordre affine sur les variables de départ.
+
+
+%
+\subsection{Le cas multivarié et l'émergence de la matrice de covariance}
+\label{subsec:context-definition-multivariate}
+
+Dans le cas de plus que deux variables, on peut généraliser à un vecteur de variables aléatoires comme suit :
+
+\begin{definition}{\deftitle{Variable aléatoire multivariée}}
+\label{def:context-definition-vecteuraleatoire}
+  Soit un ensemble de variables aléatoires $\{\variable_1,\dots,\variable_\Nvar\}$, on définit $\Variable$, comme une \textbf{variable aléatoire multivariée} tel qu'une observation $\x_\iobs$ de $\Variable$ est un vecteur, de dimension $\Nvar$\footnote{\`A noter que dans une définition plus formelle, $\Variable:\Universe\mapsto\R^\Nvar$ est une fonction qui associe à un évènement élémentaire, $\event\in\Universe$, un vecteur de variable aléatoires: $\Variable(\event)=[\variable_1(\event),\dots,\variable_\Nvar(\event)]^\T$. C'est donc aussi un vecteur et l'on peut parler de sa transposée comme ce sera fait plus tard.}, correspondant à la concaténation d'observations $\{x_{1\iobs},\dots,x_{\Nvar\iobs}\}$: $\x_{\iobs} = [x_{1\iobs}, \dots, x_{\Nvar\iobs}]^\T$. On définit sa d.d.p dénotée $\p{\Variable}:\R^\vdim\mapsto[0, 1]$ comme:
+%TODO: mettre intervalle
+\begin{equation}
+  \p{\Variable}(\y) = \Prob\left(x_1=y_1, \dots, x_\Nvar=y_\Nvar\right),
+  \label{eq:context-definition-ddpmultivariee}
+\end{equation}
+  où $\y=[y_1,\dots,y_\Nvar]^\T$ est un vecteur dans $\R^\Nvar$.
+\end{definition}
+
+
+
+
+On peut alors définir la moyenne de cette variable aléatoire multivariée comme suit :
+
+\begin{definition}{\deftitle{Moyenne d'une variable aléatoire multivariée continue}}
+\label{def:context-definition-moyennemultivariee}
+  On définit la moyenne statistique de la variable aléatoire multivariée $\Variable$ comme la quantité:
+\begin{equation}
+  \Moy(\Variable) = \Vmoy_{\Variable_\ivar} = \E\{\Variable_\ivar\} = \int_{\x\in\R^\Nvar} \x\p{\Variable_\ivar}(\x)\diff \x.
+  \label{eq:context-definition-moyennemultivariee}
+\end{equation}
+\end{definition}
+
+\begin{remark}
+  On remarque évidemment que la moyenne est dans ce cas un vecteur : $\Vmoy_{\Variable}\in\R^\Nvar$ et on a la relation suivante:
+$$
+\Vmoy_{\Variable} = \left[ \moy_{\variable_1},\, \dots,\, \moy_{\variable_\Nvar}\right]^\T,
+$$
+  où les $\moy_{\variable_\ivar}$ sont définies en \ref{eq:context-definition-moyenne}.
+\end{remark}
+
+Nous pouvons enfin à partir de ces développements, définir notre sujet principal d'étude:
+
+\begin{definition}{\deftitle{Matrice de covariance}}
+\label{def:context-definition-covariance-matrix}
+  Pour une variable aléatoires multivariée $\x=[x_1,\dots,x_\vdim]^\T$ où chaque variable $x_\ivar$ a une variance finie, on définie la \textbf{matrice de covariance} dénotée $\MCov_\Variable$ par la quantité:
+\begin{equation}
+  \MCov_\Variable = \E\left\{(\Variable-\Vmoy_\Variable)(\Variable-\Vmoy_\Variable)^\T\right\}.
+  \label{eq:context-definition-matricecovariance}
+\end{equation}
+\end{definition}
+
+Intuitivement, cette quantité caractérise les variations simultanées de toutes les variables. En effet, en développant les termes de la matrice comme suit:
+\begin{equation}
+\begin{aligned}
+  \MCov_\Variable &=\left(\begin{array}{cccc}
+\Var\left(\variable_1\right) & \Cov\left(\variable_1, \variable_2\right) & \cdots & \Cov\left(\variable_1, \variable_\vdim\right) \\
+\Cov\left(\variable_2, \variable_1\right) & \ddots & \cdots & \vdots \\
+\vdots & \vdots & \ddots & \vdots \\
+\Cov\left(\variable_\vdim, \variable_1\right) & \cdots & \cdots & \Var\left(\variable_\vdim\right)
+\end{array}\right)\\
+&=\left(\begin{array}{cccc}
+\var_{\variable_1} & \var_{\variable_1 \variable_2} & \cdots & \var_{\variable_1 \variable_\vdim} \\
+\var_{\variable_2 \variable_1} & \ddots & \cdots & \vdots \\
+\vdots & \vdots & \ddots & \vdots \\
+\var_{\variable_\vdim \variable_1} & \cdots & \cdots & \var_{\variable_\vdim} 
+\end{array}\right) \in\R^{\Nvar\Nvar},
+\end{aligned}
+\end{equation}
+où les $\var_{\variable_\ivar}$ et $\var_{\variable_\ivar \variable_\ivarbis}$ sont définis en \ref{eq:context-definition-variance} et  \ref{eq:context-definition-covariance-formula}. On constate que la diagonale correspond à la variance de variables prises à part et que les termes non-diagonaux correspondent à la covariance entre toutes les paires de variables possibles. Différents régimes de matrices sont illustrées à la \ref{fig:context-covariance-regimes}.
+
+\begin{figure*}[h]
+  \centering
+  \input{gfx/chapter-context/example-covmatrices/all-matrices.tex}
+  \caption{Illustration de matrices pour des variables avec des relations différentes pour $\Nvar=7$: En haut une matrice identité indique que les variables ont une absence de relation linéaire. Au milieu, nous avons une structure de corrélation qui nous indique que les variables proches en terme d'indices sont plus corrélées. Il s'agit d'une structure toeplitz qui peut apparaître dans des problèmes liés à des réseaux d'antennes \cite{Pesavento2023}. En bas, on ne peut cibler un régime de corrélation précis mais on peut voir que certaines variables sont statistiquement liées. On peut reproduire ces figures avec le code à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/examples_covariances/main.py}.}
+  \label{fig:context-covariance-regimes}
+\end{figure*}
+
+Caractérisons alors les propriétés de cette matrice, ce qui nous sera utile plus tard dans la dissertation:
+
+\begin{property}{\deftitle{SPD}}
+\label{prop:context-prop-covariance}
+  De par sa définition en \ref{eq:context-definition-covariance-formula}, $\MCov_\Variable$ est une matrice avec les propriétés suivantes:
+  \begin{itemize}
+    \item Symmétrique : $\MCov_\Variable=\MCov_\Variable^\T$,
+    \item Semi-positive définie: $\forall \y\in\R^\Nvar,\, \y^\T\MCov_\Variable\y\geq 0$.
+  \end{itemize}
+\end{property}
+
+%TODO: verifier quand spd ou bien semi-definie positive
+
+\begin{remark}
+De par cette caractérisation, on comprends alors que l'espace de toutes les matrices de covariances correspond à un cône et son intérieur. Pour s'en rendre compte, on peut s'intéresser au cas $\Nvar=2$, où une matrice de covariance aura la forme\footnote{En vertu de la symétrie. Celle-ci est dûe au fait que l'opérator $\Cov$ est un opérateur commutatif.}:
+$$
+\MCov_\Variable = \begin{bmatrix} \alpha & \gamma \\ \gamma & \beta \end{bmatrix}.
+$$
+En utilisant la deuxième propriété, on en déduit alors que $\Det(\MCov_\Variable) = \alpha\beta - \gamma^2 \geq 0$. En représentant la bordure $\alpha\beta=\gamma^2$ à la \ref{fig:context-figure-spdcone}, on voit apparaître naturellement la structure en cône.
+
+
+\begin{figure}[h]
+    \begin{center}
+    \input{gfx/chapter-context/spdcone.tex}
+  \end{center}
+  \caption{Illustration du cône SPD pour une matrice $2\times 2$. L'ensemble des matrices de covariance vis à l'intérieur ou sur le bord du cône représenté. On peut effectuer une visualisation similaire en utilisant le code à l'adresse: \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/cone_spd/main.py}.}\label{fig:context-figure-spdcone}
+  \end{figure}
+
+\end{remark}
+
+Une caractérisation géométrique de cet espace sera développé dans la section \ref{sec:context-riemann} d'où nous tirerons des outils prenant en compte la structure intrinsèque de cet espace.
+
+% TODO: Regarder si d'autres propriétés sont intéressantes à ce stade
+
+On peut également citer les propriétés suivantes, qui sont utiles pour les démonstrations de propriétés statistiques :
+\begin{property}{\deftitle{Lien à la moyenne}}
+  \label{prop:context-definition-linkmoy}
+  On a la relation suivante avec la moyenne:
+  \begin{equation}
+    \MCov_\Variable = \E_\Variable\left\{ \Variable\Variable^\T \right\} - \Vmoy_\Variable\Vmoy_\Variable^\T.
+    \label{eq:context-definition-linkmoy}
+  \end{equation}
+
+\end{property}
+
+\begin{property}{\deftitle{Transformation linéaire}}
+  \label{prop:context-definition-lineartraonsformation}
+  Soit un opérateur linéaire $\mat{A}\in\R^{\Nvar\times p}$, et la variable aléatoire $\Variablebis=\mat{A}\Variable$, on a alors:
+  \begin{equation}
+    \MCov_\Variablebis = \mat{A}\MCov_\Variable\mat{A}^\T \in \R^{pp}.
+    \label{eq:context-definition-lineartraonsformation}
+  \end{equation}
+
+\end{property}
+
+\begin{property}{\deftitle{Diagonalisation}}
+  \label{prop:context-definition-diagonalisation}
+  Puisque $\MCov_\Variable$ est symmétrique réelle, alors en vertu du théorème spectral, il existe un opérateur orthogonal $\Orth\in\R^{\Nvar\Nvar}$, i.e $\Orth=\Orth^\T$ et $\Orth^{-1}=\Orth^\T$, tel que :
+  \begin{equation}
+    \Orth\MCov_\Variable\Orth^\T = \Diag(\eig_1\dots,\eig_\Nvar),
+    \label{eq:context-definition-diagonalisation}
+  \end{equation}
+  où $\Diag$ est l'opérateur qui construit une matrice diagonale à partir des éléments en argument et $\{\eig_1,\dots\eig_\Nvar\}$ sont les valeurs propres de $\MCov_\Variable$.
+
+\end{property}
+
+\subsection{Estimation}
+\label{subsec:context-covariance-estimation}
+
+Une fois le cadre posé, un problème naturel qui émerge est l'estimation de la matrice de covariance étant donné un ensemble de données observées. Il s'agit alors à partir de mesures/observations d'estimer les tendances des variables présentes en termes de corrélations\footnote{On s'intéresse dans ce paragraphe à l'estimation sans à priori sur la loi de probabilités sous-jacente. Si l'on connait la loi à priori des données, on peut proposer le cadre de l'estimation au sens du maximum de vraisemblance comme ce sera fait en \ref{sec:context-distributions}.}.
+
+Supposons une variable aléatoire multivariée $\Variable=[\variable_1,\dots,\variable_\Nvar]^\T$. Il est usuel d'observer ces variables sur un ensemble d'individus, ce qui nous amène à traiter un ensemble de données que l'on dénote $\Xset = \{\x_\iobs:1\leq\iobs\leq\Nobs\}$ ou bien sous forme de matrice :
+\begin{equation}
+  \X = \left[\x_1,\, \dots,\, \x_\Nobs \right]^\T = \left[ \begin{array}{ccc} x_{11} & \dots & x_{1\Nvar} \\ \vdots & \ddots & \vdots \\ x_{\Nvar 1} & \dots & x_{\Nvar \Nobs}   \end{array}  \right]\in\R^{\Nvar\Nobs}.
+  \label{eq:context-definition-observed_data}
+\end{equation}
+
+On suppose également que ces observations sont iid. Pour pouvoir calculer la covariance, il est d'abord nécessaire de s'intéresser à la moyenne:
+\begin{proposition}
+  \deftitle{Estimation de la moyenne d'un vecteur aléatoire}
+  \'Etant donné un ensemble d'observations $\X$ de la variable $\Variable$, un estimateur consistant et non-biaisé\footnote{Soit $\hat{\param}=f(\Variable)$ un estimateur d'une quantité $\param$ découlant de la variable $\Variable$. On dit que $\hat{\param}$ est \textbf{non-biaisé} si $\E_\Variable\{\hat{\param}\} = \param$. De même, on dit que l'estimateur est \textbf{consistant} si $\forall \epsilon>0,\, \displaystyle\lim_{\Nobs\to\infty} \Prob\left(|\hat{\param}-\param|>\epsilon\right)=0$.\\En d 'autres termes un estimateur non-biaisé est en moyenne autour de la vraie valeur cherchée et un estimateur consistant converge vers la vraie valeur avec suffisamment d'observations.} de la moyenne est:
+  \begin{equation}
+    \hat{\Vmoy}_\Variable = \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs} \x_\iobs.
+    \label{eq:context-estimation-moyenne}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  Il est facile de montrer, en vertu de la loi des grands nombres que pour $\Nobs\to\infty$:
+  $$
+  \hat{\Vmoy}_\Variable \approx \E_\Variable\{\Variable\}=\Vmoy_\Variable.
+  $$
+\end{remark}
+
+
+\begin{remark}
+  On peut retrouver le côté non-biaisé en prenant l'espérance de l'estimateur\footnote{On se permettra à partir de maintenant d'utiliser par simplification l'opérateur espérance sur les valeurs observées des variables sans aller chercher la variable aléatoire sous-jacente. On comprends que l'on regarde l'espérance d'une fonction des variables aléatoires et non de valeurs précises observées.}:
+  $$
+  \E_\Variable\left\{\hat{\Vmoy}_\Variable\right\} = \E_\Variable\left\{\frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\x_\iobs\right\} = \Vmoy_\Variable.
+  $$
+\end{remark}
+
+Afin d'estimer la matrice de covariance, on peut en partant de cette première estimation avoir l'estimateur suivant:
+\begin{proposition}
+\deftitle{Estimateur de la matrice de covariance}
+  \'Etant donné un ensemble d'observations $\X$ de la variable $\Variable$, un estimateur consistant et non-biaisé de la matrice de covariance est la scm:
+  \begin{equation}
+    \hat{\MCov}_\Variable =  \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs} \left(\x_\iobs-\hat{\Vmoy}_x\right)\left(\x_\iobs-\hat{\Vmoy}_x\right)^\T.
+    \label{eq:context-estimation-covariance}
+  \end{equation}
+\end{proposition}
+
+
+\begin{remark}
+  \deftitle{Caractère non-biaisé}
+  On remarque que le coefficient $(N-1)$ et non $N$ dans la fraction. Cela permet à notre estimateur d'être non biaisé. en effet, on peut montrer que:
+$$
+  E_\Variable\left\{\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T\right\} = \frac{N-1}{N}\MCov_\Variable.
+$$
+Il est ainsi nécessaire de compenser par le facteur $\frac{N}{N-1}$ pour obtenir un estimateur non-biaisé:
+
+
+%  \vspace{-2em}
+%   \begin{proof}
+%   En effet, calculons l'espérance de celui-ci:
+%   \begin{align*}
+%     \E_\Variable\left\{ \hat{\MCov}_\Variable \right \} & =  \frac{1}{\Nobs-1}\sum_{\iobs=1}^{\Nobs} \E_\Variable\left\{\left(\x_\iobs-\hat{\Vmoy}_x\right)\left(\x_\iobs-\hat{\Vmoy}_x\right)^\T\right\}.
+%   \end{align*}
+%
+% Développons l'expression à l'intérieur de l'espérance :
+%   \begin{align*}
+%     \left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T &= \x_\iobs\x_\iobs^\T - \x_\iobs\hat{\Vmoy}_\Variable^\T - \hat{\Vmoy}_\Variable\x_\iobs^\T + \hat{\Vmoy}_\Variable\hat{\Vmoy}_\Variable^\T.
+%   \end{align*}
+%
+%   En prenant l'espérance terme par terme et en utilisant le fait que les observations sont i.i.d :
+%
+%     \textbf{Terme 1 :} $\E_\Variable\left\{\x_\iobs\x_\iobs^\T\right\} = \MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T$ en vertu de la \ref{prop:context-definition-linkmoy}.
+%
+%   \textbf{Terme 2 :} Sachant que $\hat{\Vmoy}_\Variable = \frac{1}{\Nobs}\sum_{j=1}^{\Nobs} \x_j$ :
+%   \begin{align*}
+%     \E_\Variable\left\{\x_\iobs\hat{\Vmoy}_\Variable^\T\right\} &= \E_\Variable\left\{\x_\iobs \cdot \frac{1}{\Nobs}\sum_{j=1}^{\Nobs} \x_j^\T\right\} = \frac{1}{\Nobs}\sum_{j=1}^{\Nobs} \E_\Variable\left\{\x_\iobs\x_j^\T\right\}
+%   \end{align*}
+%
+%   Comme les observations sont i.i.d :
+%   \begin{itemize}
+%     \item Si $\iobs = j$ : $\E_\Variable\left\{\x_\iobs\x_j^\T\right\} = \MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T$
+%     \item Si $\iobs \neq j$ : $\E_\Variable\left\{\x_\iobs\x_j^\T\right\} = \Vmoy_\Variable\Vmoy_\Variable^\T$
+%   \end{itemize}
+%
+%   \begin{align*}
+%     \text{Donc :} \E_\Variable\left\{\x_\iobs\hat{\Vmoy}_\Variable^\T\right\} &= \frac{1}{\Nobs}\left[(\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T) + (\Nobs-1)\Vmoy_\Variable\Vmoy_\Variable^\T\right] = \frac{1}{\Nobs}\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T
+%   \end{align*}
+%
+%   \textbf{Terme 3 :} Par symétrie : $\E_\Variable\left\{\hat{\Vmoy}_\Variable\x_\iobs^\T\right\} = \frac{1}{\Nobs}\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T$
+%
+%
+%   \begin{align*}
+%     \text{\bfseries Terme 4 :} \E_\Variable\left\{\hat{\Vmoy}_\Variable\hat{\Vmoy}_\Variable^\T\right\} &= \E_\Variable\left\{\frac{1}{\Nobs^2}\sum_{j=1}^{\Nobs}\sum_{\iobs=1}^{\Nobs} \x_j\x_\iobs^\T\right\} = \frac{1}{\Nobs^2}\sum_{j=1}^{\Nobs}\sum_{\iobs=1}^{\Nobs} \E_\Variable\left\{\x_j\x_\iobs^\T\right\}
+%   \end{align*}
+%
+%   Il y a $\Nobs$ termes avec $j = \iobs$ et $\Nobs^2 - \Nobs$ termes avec $j \neq \iobs$, d'où :
+%   \begin{align*}
+%     \E_\Variable\left\{\hat{\Vmoy}_\Variable\hat{\Vmoy}_\Variable^\T\right\} &= \frac{1}{\Nobs^2}\left[\Nobs(\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T) + (\Nobs^2-\Nobs)\Vmoy_\Variable\Vmoy_\Variable^\T\right] = \frac{1}{\Nobs}\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T
+%   \end{align*}
+%
+%   \begin{align*}
+%     \text{Donc} &\E_\Variable\left\{\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T\right\} \\
+%     &= (\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T) - 2\left(\frac{1}{\Nobs}\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T\right) + \left(\frac{1}{\Nobs}\MCov_\Variable + \Vmoy_\Variable\Vmoy_\Variable^\T\right) \\
+%     &= \MCov_\Variable - \frac{1}{\Nobs}\MCov_\Variable = \frac{\Nobs-1}{\Nobs}\MCov_\Variable\\
+%     \text{Conclusion :} & \E_\Variable\left\{ \hat{\MCov}_\Variable \right \} = \frac{1}{\Nobs-1}\sum_{\iobs=1}^{\Nobs} \frac{\Nobs-1}{\Nobs}\MCov_\Variable \\
+%     &= \frac{1}{\Nobs-1} \cdot \Nobs \cdot \frac{\Nobs-1}{\Nobs}\MCov_\Variable = \MCov_\Variable.
+%   \end{align*}
+%
+%   L'estimateur est donc bien non-biaisé, ce qui justifie l'utilisation du coefficient $\frac{1}{\Nobs-1}$ plutôt que $\frac{1}{\Nobs}$.
+% \end{proof}
+\end{remark}
+
+
+\begin{remark}
+Une fois que l'on connait $E_\Variable\left\{\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T\right\}$, on peut utiliser la loi des grands nombres pour dire que lorsque $\Nobs\to\infty$\footnote{il ne s'agit pas d'une démonstration de la consistance théorique, qui requiert des conditions de régularité sur la d.d.p sous-jacente mais cela illustre un comportement en ce sens.}:
+  \begin{align*}
+    \hat{\MCov}_\Variable &= \frac{\Nobs}{\Nobs-1}\times\frac{1}{\Nobs} \sum_{\iobs=1}^\Nobs\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T \\
+    & \approx  \frac{\Nobs}{\Nobs-1} E_\Variable\left\{\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable\right)^\T\right\}  = \MCov_\Variable.
+\end{align*}
+\end{remark}
+
+
+Il est intéressant de regarder à travers une simulation numérique, la convergence de nos deux estimateurs dans le régime $\Nobs\to\infty$. Pour ce faire, nous simulons des données de moyenne $\Vmoy_\Variable = [1,\dots,1]^\T$ et de matrice de covariance $\MCov_\Variable=\Id{\Nvar}$ en générant des données gaussiennes de moyenne $1$ et variance $1$ pour chaque observation $x_{\ivar\iobs}$. On représente alors en \ref{fig:context-estimation-errorscm}, l'erreur d'estimation\footnote{On utilise pour cela la norme euclidienne d'ordre 2 mais nous verrons dans la \ref{sec:context-riemann} que ce choix peut être discuté.} en fonction du nombre d'observations $\Nobs$. Même si ces simulations ne suffisent pas à elles seules à montrer la consistance et la convergence de nos estimateurs aux vraies paramètres de nos variables aléatoires, on peut observer à la fois une baisse de l'erreur en moyenne mais également que la variance de l'erreur diminue. On caractérisera ces deux comportements en section\ref{sec:context-distributions} dans un cadre où l'on ajoute un à priori sur la distribution sous-jacente des données.
+% TODO: ne pas oublier de faire consistance avec à-priori gaussien et elliptique si possible.
+
+\begin{figure*}[h]
+    \begin{center}
+    \input{gfx/chapter-context/error_estimation_scm/mean}
+    \input{gfx/chapter-context/error_estimation_scm/cov}
+  \end{center}
+    \caption{\'Evolution de l'erreur d'estimation de la moyenne et de la matrice de covariance en fonction de $\Nobs$ pour $\Nvar=7$. Les marqueurs correspondent à la moyenne de l'erreur d'estimation et les barres correspondent à la déviation standard de cette même erreur. Le nombre de tirages de monte-carlo est de $ 10^4$. Le code python de cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/scm_grandnombres.py}.}
+  \label{fig:context-estimation-errorscm}
+\end{figure*}
+
+
+
+\subsection{Estimation régularisée}
+\label{subsec:context-covariance-regularized-estimation}
+
+  
+
+
+L'estimateur classique de la matrice de covariance donné par l'équation \ref{eq:context-definition-covariance-formula} présente des limitations importantes dans certains régimes dimensionnels. En effet, lorsque le nombre de variables $\Nvar$ devient comparable ou supérieur au nombre d'observations $\Nobs$, cet estimateur souffre de plusieurs défauts majeurs qui compromettent sa fiabilité pratique.
+
+Le premier problème concerne le rang de la matrice estimée. Dans le cas extrême où $\Nvar > \Nobs$, la matrice $\hat{\MCov}_\Variable$ est nécessairement singulière, car elle est construite comme une somme de $\Nobs$ matrices de rang 1. Plus précisément, son rang est au plus $\min(\Nvar, \Nobs-1)$\footnote{Le facteur $N-1$ plutôt que $N$ est dû au fait que l'on additionne des matrices construites à partir d'observations dont on a soustrait la moyenne et donc introduit une relation linéaire d'ordre 1.}, ce qui la rend non-inversible lorsque $\Nvar \geq \Nobs$. Cette singularité pose des difficultés majeures pour de nombreuses applications statistiques nécessitant l'inversion de la matrice de covariance, comme l'analyse discriminante ou certaines méthodes de classification. Au-delà de ce problème de rang, même dans le régime sous-déterminé où $\Nvar < \Nobs$ mais où le rapport $\Nvar/\Nobs$ n'est pas négligeable\footnote{Ce qui sera le cas dans de nombreuses approches basé sur une estimation de la covariance en apprentissage profond. Voir pour cela le \ref{ch:spdnet}.}, l'estimateur empirique souffre d'une grande variabilité. Cette variabilité se manifeste notamment par une dispersion importante des valeurs propres de $\hat{\MCov}_\Variable$ autour de celles de la vraie matrice $\MCov_\Variable$. Cela peut être analysé au travers de la notion de conditionnement:
+
+\begin{figure}
+  \begin{center}
+        \input{gfx/chapter-context/condition_number/poor_conditionned}
+    \input{gfx/chapter-context/condition_number/well_conditionned}
+      \end{center}
+  \caption{Illustration visuelle du conditionnement d'un système linéaire dans le cas où $\mat{A}\in\R^{2\times 2}$. La solution correspond à l'intersection des droites continues (-) et en pointillés (- -). Une perturbation sur $\vector{b}$ déplace la droite (- -) en (..). En haut: le cas d'une matrice mal conditionnée car la solution bouge beaucoup à cause de la perturbation. En bas: la perturbation a moins d'effet sur la solution.}\label{fig:context-estimation-condition}
+\end{figure}
+
+  \begin{definition}
+    \deftitle{Conditionnement d'une matrice à l'inversion}
+    Le conditionnement d'une matrice $\mat{A}\in\R^{pq}$  est donné par :
+    \begin{equation}
+      \Cond(\mat{A}) = \|\mat{A}\|_2\|\mat{A}^{-1}\|_2.
+      \label{eq:context-estimation-condition}
+    \end{equation}
+    
+  \end{definition}
+
+  \begin{remark}
+Il correspond à un nombre quantifiant la sensibilité de la solution au système linéaire:
+$$
+    \mat{A}\x = \vector{b},
+$$
+    où $\x\in\R^q$ est la solution cherchée et $\vector{b}\in\R^q$ est un vecteur de constantes. En effet, supposant une erreur d'approximation $\vector{e}\in\R^q$ sur le vecteur $\vector{b}$, résoudre en pratique le système :
+  $$
+      \mat{A}\x = \vector{b}+\vector{e},
+  $$
+    provoque une erreur sur la solution de l'ordre $\mat{A}^{-1}\vector{e}$. En quantifiant le ratio entre l'erreur relative sur la solution et sur $\vector{b}$ :
+    $$
+     \epsilon(\vector{e}) =  \left. \frac{\|\mat{A}^{-1}\vector{e}\|_2}{\| \mat{A}^{-1}\vector{b}\|_2} \displaystyle \middle/ \frac{\|\vector{e}\|_2}{\| \vector{b}\|_2} \right. ,
+    $$
+
+    on a pour $\vector{e}\neq \vector{0}$ et $\vector{b}\neq\vector{0}$, $\max_{\vector{e}}\epsilon(\vector{e})=\Cond(\mat{A})$.
+
+    Ainsi, ce nombre nous donne une information sur la praticabilité d'une matrice obtenue par estimation vis à vis de problèmes nécessitant son inversion. Ce principe est illustré en \ref{fig:context-estimation-condition}.
+  \end{remark}
+
+Notamment dans le cas de matrices carrée symétriques, on a le résultat suivant :
+
+\begin{proposition}
+  \deftitle{Conditionnement d'une matrice symmétrique}
+  Soit une matrice $\mat{A}\in\R^{\Nvar\Nvar}$ tel que $\mat{A}=\mat{A}^\T$, on peut calculer le conditionnement de cette matrice vis-à-vis de l'inversion \ref{eq:context-estimation-condition} avec:
+    \begin{equation}
+      \Cond(\mat{A}) = \frac{\max |\eigset(\mat{A})|}{\min |\eigset(\mat{A})|},
+      \label{eq:context-estimation-conditionspd}
+    \end{equation}
+  où $\eigset(\mat{A})$ est l'ensemble des valeurs propres de $\mat{A}$.
+\end{proposition}
+
+
+
+
+Si l'on revient à l'estimation de notre matrice de covariance, on peut quantifier la dispersion en pratique : en simulant des données aléatoires de la même façon que précédemment en\ref{subsec:context-covariance-estimation} avec une moyenne et matrice covariance connues. Plutôt que de regarder l'erreur d'estimation, on s'intéresse au conditionnement de la matrice estimée en \ref{fig:context-estimation-cond}. On s'aperçoit alors que dés que la taille de la matrice approche ou dépasse le nombre d'observations, le conditionnement de la matrice explose, i.e, les valeurs propres ont une très grande dispersion, ce qui est problématique pour un certain nombre d'applications dépendant d'une SVD de cette matrice, tel que l'analyse en composantes principales par exemple.
+
+\begin{figure}[h]
+  \begin{center}
+        \input{gfx/chapter-context/error_estimation_scm/cond}
+      \end{center}
+  \caption{\'Evolution du conditionnement de la matrice estimée  par SCM pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. Le code pour reproduire cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/scm_underregime.py}. }
+  \label{fig:context-estimation-cond}
+\end{figure}
+
+
+
+Pour pallier les défauts de l'estimateur empirique en haute dimension, \cite{LedoitWolf2004} proposent un estimateur régularisé de la forme :
+\begin{definition}
+\deftitle{Estimateur de Ledoit-Wolf}
+\begin{equation}
+  \hat{\MCov}_\Variable^{\text{LW}}(\coefledoitwolf) = (1-\coefledoitwolf) \hat{\MCov}_\Variable + \coefledoitwolf \targetledoitwolf
+\label{eq:context-ledoit-wolf}
+\end{equation}
+où $\coefledoitwolf \in [0,1]$ est un coefficient de régularisation et $\targetledoitwolf$ est une matrice cible (\textit{target}) de même dimension que $\hat{\MCov}_\Variable$.
+\end{definition}
+
+L'idée fondamentale de cette approche consiste à contracter l'estimateur empirique vers une matrice cible $\targetledoitwolf$ possédant de meilleures propriétés de conditionnement. Le choix le plus courant pour cette matrice cible est la matrice identité mise à l'échelle : $\targetledoitwolf = \frac{\Tr(\hat{\MCov}_\Variable)}{\Nvar} \mathbf{I}_\Nvar$. Cette cible correspond à l'hypothèse que toutes les variables ont la même variance (égale à la variance moyenne) et sont non corrélées entre elles. Ainsi, l'estimateur se veut être un compromis entre l'estimation SCM et une hypothèse de variables faiblement corrélées.
+
+Le choix du coefficient $\coefledoitwolf$ est fait à priori mais si l'on définit un critère de eqm sur la qualité de l'estimation:
+\begin{equation}
+  \loss(\hat{\MCov}_\Variable(\coefledoitwolf), \MCov_\Variable) = \| \hat{\MCov}_\Variable(\coefledoitwolf) - \MCov_\Variable \|_\frob^2
+  \label{eq:context-estimation-losslwf}
+\end{equation}
+sous le modèle \ref{eq:context-ledoit-wolf} alors on peut vouloir trouver l'optimal au sens statistique.
+%TODO: Verify this loss, notably squared
+
+Pour ce faire, nous nous intéressons à l'espérance du critère \ref{eq:context-estimation-losslwf}:
+$$
+  \risk(\coefledoitwolf) = \E_\Variable\left\{\loss(\hat{\MCov}_\Variable(\coefledoitwolf), \MCov_\Variable)\right\},
+$$
+
+et l'on veut résoudre:
+\begin{equation}
+  \coefledoitwolf^\star = \arg\min_\coefledoitwolf \risk(\coefledoitwolf).
+\end{equation}
+
+% On peut alors montrer en développant les termes de la norme et solvant $\frac{\partial\risk(\coefledoitwolf) }{\partial\coefledoitwolf}=0$ que la solution optimale est atteinte en:
+%
+% $$\coefledoitwolf^\opt = \frac{\E\left\{\|\hat{\MCov}_\Variable - \MCov_\Variable\|_\frob^2\right\} - \E\left\{\Tr\left((\hat{\MCov}_\Variable - \MCov_\Variable)(\targetledoitwolf - \MCov_\Variable)^T\right)\right\}}{\|\targetledoitwolf - \MCov_\Variable\|_\frob^2}$$
+% %TODO: verify this
+%
+% En exprimant cette solution en termes des éléments matriciels individuels et en utilisant les propriétés d'espérance des estimateurs empiriques, cette expression se reformule sous la forme pratique suivante:
+%
+%
+% \begin{proposition}
+% \deftitle{Estimation optimale du coefficient de régularisation}
+% Le coefficient optimal $\coefledoitwolf^*$ au sens de la minimisation de l'erreur quadratique moyenne est donné par :
+% \begin{equation}
+% \coefledoitwolf^* = \frac{\sum_{i,j} \text{Var}(\hat{\sigma}_{ij})}{\sum_{i,j} (\hat{\sigma}_{ij} - t_{ij})^2}
+% \label{eq:context-alpha-optimal}
+% \end{equation}
+% où $\hat{\sigma}_{ij}$ et $t_{ij}$ désignent respectivement les éléments $(i,j)$ des matrices $\hat{\MCov}_\Variable$ et $\targetledoitwolf$.
+% \end{proposition}
+%
+
+
+
+\begin{figure}
+  \input{gfx/chapter-context/lwf_bias_var}
+  \caption{biais-variance pour la régularisation de Ledoit-Wolf. La régularisation optimale balance la variance décroissante avec l'augmentation du biais introduit qui argument. Inspiré de \cite{LedoitWolf2004}.}
+  \label{fig:context-estimation-lwfbiasvar}
+
+\end{figure}
+
+
+L'estimation pratique de $\coefledoitwolf^*$ nécessite une connaisance de la d.d.p des variables aléatoires dû à l'opérateur espérance dans le critère à minimiser. Sous l'hypothèse de normalité multivariée des données, ces variances peuvent être exprimées analytiquement en fonction des moments empiriques d'ordre supérieur comme on le verra par la suite. Pour le moment, on considère la valeur $\coefledoitwolf$ comme un choix de l'utilisateur.
+
+En introduisant cet estimateur, nous avons nécéssairement biaisé notre estimation en vertu de la contraction vers une matrice cible $\targetledoitwolf$ fixée\footnote{Sauf si on a par chance pris la vraie matrice mais l'on conviendra que ce scénario est très rare en pratique.}. Mais en permettant ce conditionnement de baisser, nous avons réduit la variance de notre estimateur. Ainsi on peut interpréter $\coefledoitwolf$ comme une valeur qui contrebalance le biais et la variance de l'estimateur, ce qui est détaillé dans le travail initial \cite{LedoitWolf2004}. Une Illustration de ce principe est donné en \ref{fig:context-estimation-lwfbiasvar}.
+
+
+
+
+% TODO: references pour chaque matrice cible.
+\begin{remark}
+\deftitle{Variants de régularisation}
+Plusieurs variantes de l'lw ont été développées selon le choix de la matrice cible $\targetledoitwolf$. Outre la cible identité, on peut citer : (i) la cible diagonale $\targetledoitwolf = \text{diag}(\hat{\MCov}_\Variable)$ qui préserve les variances individuelles tout en annulant les corrélations, (ii) la cible à corrélation constante qui suppose une structure de corrélation équicorrélée, et (iii) des cibles adaptatives construites à partir de connaissances a priori sur la structure des données.
+\end{remark}
+
+
+L'estimateur de Ledoit-Wolf présente l'avantage théorique fondamental d'être toujours inversible dès lors que la matrice cible $\targetledoitwolf$ l'est, ce qui résout le problème de singularité inhérent à l'estimateur empirique en haute dimension. De plus, le choix optimal du coefficient $\coefledoitwolf^*$ garantit une réduction systématique de l'erreur quadratique moyenne par rapport à l'estimateur non régularisé, particulièrement prononcée dans les régimes où $\Nvar/\Nobs$ est élevé.
+
+Regardons enfin, le même problème d'estimation qu'en \ref{fig:context-estimation-errorscm} en ajoutant l'estimateur régularisé avec un coefficient $\coefledoitwolf=0.1$. Les résultats présentés en \ref{fig:context-estimation-condlwf} montrent comment la matrice obtenue a un bien meilleur conditionnement\footnote{\'Evidemment, cela se fait au prix d'un biais de l'estimateur en pratique sauf dans le cas d'une covariance théorique égale à la matrice $\targetledoitwolf$.}.
+
+
+\begin{figure}[h]
+  \begin{center}
+        \input{gfx/chapter-context/error_estimation_lwf/cond_1e-1}
+      \end{center}
+  \caption{\'Evolution du conditionnement de la matrice estimée par SCM et Ledoit-Wolf pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$, $\coefledoitwolf=0.1$ et $\targetledoitwolf=\Id{\Nvar}$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. Le code pour reproduire cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/lwf_underregime.py}. }
+  \label{fig:context-estimation-condlwf}
+\end{figure}
+
+
+
+Nous nous sommes intéressés ici uniquement à la régularisation de Ledoit-Wolf car elle nous sera utile par la suite mais plusieurs approches alternatives existent. Pour un état de l'art sur le sujet, on peut se référer par exemple à \cite{Mohsen_Pourahmadi_2013}.
+
+\newpage
+
+\section{Distribution de probabilités à paramètre de covariance}
+\label{sec:context-distributions}
+
+Considérons maintenant un apriori supplémentaire sur nos variables aléatoires: la connaissance de la d.d.p $\p{\Variable}$ qui régit leur comportement et essayons de préciser la notion de covariance comme un paramètre de la distribution puis intéressons nous à l'estimation de celle-ci à l'aide de la connaissance supplémentaire que l'on introduit.
+
+\subsection{Distribution gaussienne}
+\label{subsec:context-distributions-gaussian}
+
+La première distribution que l'on considère, de par sa simplicité et son omniprésence, est la gaussienne dont la d.d.p est donnée par:
+\begin{equation}
+  \p{\Variable}(\x; \param) = (\pi\Nobs)^{-\Nvar}\Det(\MCov_\Variable)^{-1}\exp\left\{ (\x-\Vmoy_\Variable)^\T \MCov_\Variable^{-1} (\x-\Vmoy_\Variable) \right\},
+  \label{eq:context-definition-gaussian}
+\end{equation}
+
+où $\param = (\Vmoy_\Variable, \MCov_\Variable)$ sont les paramètres de la distribution. On notera que la matrice de covariance doit être définie positive pour que la d.d.p soit bien définie\footnote{Ce sera par ailleurs le cas pour toutes les distributions que l'on considérera par la suite.}.
+
+\begin{definition}
+  \deftitle{Vecteur aléatoire gaussien}
+  On dit qu'une variable aléatoire $\Variable\in\R^\Nvar$ suit une distribution gaussienne multivariée de moyenne $\Vmoy_\Variable$ et de matrice de covariance $\MCov_\Variable$, et on note $\Variable\sim\gaussian(\Vmoy_\Variable, \MCov_\Variable)$ si sa d.d.p est donnée par \ref{eq:context-definition-gaussian}.
+\end{definition}
+
+% TODO: Dessin isocontour gaussienne en 2D pour l'exemple
+% \begin{figure}[h]
+%   \begin{center}
+%     \input{gfx/chapter-context/distributions/gaussian.tex}
+%   \end{center}
+%   \caption{}\label{fig:}
+% \end{figure}
+
+
+
+\subsection{Distributions elliptiques}
+\label{subsec:context-distributions-elliptical}
+
+
+
+
+\subsection{Estimation robuste: M-estimation}
+\label{subsec:context-robust-m-estimation}
+
+
+\subsection{Le cas complexe}
+\label{subsec:context-definition-complex}
+
+\section{Une vision riemannienne : géométrie du cône SPD et des matrices orthogonales}
+\label{sec:context-riemann}
+
+
+\subsection{Notion de géomérie riemannienne}
+\label{subsec:context-riemann-notion}
+
+\subsection{Les matrices symmétriques déinifes positives}
+\label{subsec:context-riemann-spd}
+
+\subsection{Les matrices orthogonales}
+\label{subsec:context-riemann-orthogonal}
+
+
+\subsection{Optimization en contexte riemannien}
+\label{subsec:context-riemann-optimization}
+
+\footnote{This is an example of a margin note in the kaobook class. These are very useful for commentary and additional information.}
+
+The central problem addressed in this dissertation can be formally stated as follows:
+
+\section*{Research Problem}
+Given a set of constraints $\mathcal{C} = \{c_1, c_2, \ldots, c_n\}$ and an objective function $f: \mathbb{R}^d \rightarrow \mathbb{R}$, find an optimal solution $x^* \in \mathbb{R}^d$ such that:
+
+\begin{equation}
+\label{eq:main_problem}
+x^* = \arg\min_{x \in \mathcal{D}} f(x)
+\end{equation}
+
+where $\mathcal{D}$ is the feasible domain defined by the constraints in $\mathcal{C}$.
+
+
+
+This problem is challenging due to:
+\begin{enumerate}
+    \item The high-dimensional nature of the solution space
+    \item Non-convexity of the objective function
+    \item Dynamic constraints that change over time
+\end{enumerate}
+
+\section{Une géométrie de l'information pour la covariance}
+\label{sec:context-information-geometry}
+
+
+\subsection{Géométrie sous modèles Gaussien}
+\label{subsec:context-geometry-gaussian}
+
+
+\subsection{Géométrie du modèle de gaussienne-composée déterministe}
+\label{subsec:context-geometry-compound-gaussian}

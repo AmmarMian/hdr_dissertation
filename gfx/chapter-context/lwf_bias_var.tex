@@ -1,0 +1,96 @@
+\begin{tikzpicture}
+\begin{axis}[
+    width=8cm,
+    height=4cm,
+    xlabel={$\coefledoitwolf$},
+    ylabel={$\risk(\coefledoitwolf)$},
+    xmin=0, xmax=1,
+    ymin=0, ymax=3,
+    grid=none,
+    grid style={gray!30},
+    legend style={
+        fill=none,
+        draw=none,
+        at={(0,1.1)},
+        anchor=south west,
+    },
+    legend cell align={left},
+    % Custom axis labels
+    xtick={0,1},
+    ymajorticks=false,
+    axis lines=left,
+    axis line style={-},
+]
+
+
+% Variance curve - matches the dashed line in your figure
+% Decreases from 1.8 to 1.2 with gentle quadratic curvature
+\addplot[
+    thick,
+    dashed,
+    domain=0.001:1,
+    samples=100
+] {.2-ln(.25+x)};
+\addlegendentry{Variance}
+
+% Squared Bias curve - matches the dotted line in your figure  
+% Increases from 0.3 to 1.3 with accelerating quadratic growth
+\addplot[
+    thick,
+    dotted,
+    domain=0:1,
+    samples=100
+] {0.01 - 0.2*x + 2.4*x^2};
+\addlegendentry{Bias$^2$}
+
+% Mean Squared Error - matches the solid U-shaped curve in your figure
+% Sum of variance and bias: (1.8-0.9x+0.3x²) + (0.3-0.7x+1.7x²) = 2.1-1.6x+2.0x²
+% Minimum at x=0.4 with value 1.78
+\addplot[
+    thick,
+    solid,
+    domain=0:1,
+    samples=100
+] {3*(x-0.4)^2+1.1};
+\addlegendentry{EQM}
+
+% Key estimation points with geometric markers
+
+% Sample covariance matrix (left endpoint, λ=0)
+% Square symbol represents the unregularized estimator
+\addplot[
+    only marks,
+    mark=square*,
+    mark size=2pt,
+    mark options={fill=black}
+] coordinates {(0, 1.6)};
+
+% Identity target matrix (right endpoint, λ=1) 
+% Diamond symbol represents the fully shrunk estimator
+\addplot[
+    only marks,
+    mark=diamond*,
+    mark size=2pt,
+    mark options={fill=black}
+] coordinates {(1, 2.2)};
+
+% Optimal Ledoit-Wolf estimator (minimum of MSE curve at λ=0.4)
+% Circle symbol represents the optimal compromise
+\addplot[
+    only marks,
+    mark=*,
+    mark size=2pt,
+    mark options={fill=black}
+] coordinates {(0.4, 1.1)};
+
+% Annotations for the key estimation points
+% Using axis coordinates ensures precise positioning relative to data points
+\node[above, anchor=south west] at (axis cs:0, 1.65) {\tiny$\hat{\MCov}_\Variable$};  % Sample covariance at λ=0
+\node[above, anchor=south east] at (axis cs:1, 2) {\tiny$\frac{\Tr(\hat{\MCov}_\Variable)}{\Nvar}\Id{\Nvar}$};  % Identity target at λ=1  
+\node[above,] at (axis cs:0.4, 1.15) {\tiny $\hat{\MCov}_\Variable^{LW}$};  % Optimal Ledoit-Wolf at λ=0.4
+
+
+\end{axis}
+
+
+\end{tikzpicture}
