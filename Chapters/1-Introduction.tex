@@ -14,7 +14,7 @@ Enfin, nous faisons un lien entre la modélisation probabiliste et la géométri
 \section{Définition et caractérisation statistique de l'objet covariance}
 \label{sec:context-definition-caracterisation}
 
-Intéressons nous d'abord à développer la notion de covariance entre des variables aléatoires, à partir de la quelle nous définirons la matrice de covariance comme une extension naturelle au cas d'une représentation de variable aléatoire multivariée. Il s'agit un survol de ces notions mais pour plus de détails et définitions plus rigoureuses, le lecteur peut se reporter par exemple aux excellentes ressources \cite[]{anderson1958introduction} et \cite[]{wasserman2004all}.
+Intéressons nous d'abord à développer la notion de covariance entre des variables aléatoires, à partir de la quelle nous définirons la matrice de covariance comme une extension naturelle au cas d'une représentation de variable aléatoire multivariée. Il s'agit un survol de ces notions mais pour plus de détails et définitions plus rigoureuses, le lecteur peut se reporter par exemple aux excellentes ressources \sidecite[-2cm]{anderson1958introduction,wasserman2004all}.
 
 
 \subsection{Contexte}
@@ -73,7 +73,7 @@ La covariance quantifie la tendance d'une relation linéaire entre ces deux vari
   \centering
   \input{./gfx/chapter-context/example-covariance.tex}
   \caption{Illustration des différents types de covariance par des nuages de points correspondant à des tirage sur les deux variables.}
-  \label{covariance-types}
+  \label{fig:covariance-types}
 \end{figure*}
 
 
@@ -153,8 +153,9 @@ où les $\var_{\variable_\ivar}$ et $\var_{\variable_\ivar \variable_\ivarbis}$ 
 
 \begin{figure*}[h]
   \centering
-  \input{gfx/chapter-context/example-covmatrices/all-matrices.tex}
-  \caption{Illustration de matrices pour des variables avec des relations différentes pour $\Nvar=7$: En haut une matrice identité indique que les variables ont une absence de relation linéaire. Au milieu, nous avons une structure de corrélation qui nous indique que les variables proches en terme d'indices sont plus corrélées. Il s'agit d'une structure toeplitz qui peut apparaître dans des problèmes liés à des réseaux d'antennes \cite{Pesavento2023}. En bas, on ne peut cibler un régime de corrélation précis mais on peut voir que certaines variables sont statistiquement liées. On peut reproduire ces figures avec le code à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/examples_covariances/main.py}.}
+  \input{gfx/generated/context_example_covariances/covmatexamples/plot.tex}
+  \provCovmatexamplesQR[1cm]
+  \caption{Illustration de matrices pour des variables avec des relations différentes pour $\Nvar=7$: À gauche : une matrice identité indique que les variables ont une absence de relation linéaire. Au milieu, nous avons une structure de corrélation qui nous indique que les variables proches en terme d'indices sont plus corrélées. Il s'agit d'une structure toeplitz qui peut apparaître dans des problèmes liés à des réseaux d'antennes \sidecite{Pesavento2023}. À droite, on ne peut cibler un régime de corrélation précis mais on peut voir que certaines variables sont statistiquement liées. \provCovmatexamples}
   \label{fig:context-covariance-regimes}
 \end{figure*}
 
@@ -350,10 +351,11 @@ Il est intéressant de regarder à travers une simulation numérique, la converg
 
 \begin{figure*}[h]
     \begin{center}
-    \input{gfx/chapter-context/error_estimation_scm/mean}
-    \input{gfx/chapter-context/error_estimation_scm/cov}
+    \input{gfx/generated/context_scm_grandnombres/scmmean/plot.tex}
+    \input{gfx/generated/context_scm_grandnombres/scmcov/plot.tex}
   \end{center}
-    \caption{\'Evolution de l'erreur d'estimation de la moyenne et de la matrice de covariance en fonction de $\Nobs$ pour $\Nvar=7$. Les marqueurs correspondent à la moyenne de l'erreur d'estimation et les barres correspondent à la déviation standard de cette même erreur. Le nombre de tirages de monte-carlo est de $ 10^4$. Le code python de cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/scm_grandnombres.py}.}
+  \provScmmeanQR[.5cm]
+    \caption{\'Evolution de l'erreur d'estimation de la moyenne et de la matrice de covariance en fonction de $\Nobs$ pour $\Nvar=7$. Les marqueurs correspondent à la moyenne de l'erreur d'estimation et les barres correspondent à la déviation standard de cette même erreur. Le nombre de tirages de monte-carlo est de $ 10^4$. \provScmcov}
   \label{fig:context-estimation-errorscm}
 \end{figure*}
 
@@ -371,10 +373,15 @@ Le premier problème concerne le rang de la matrice estimée. Dans le cas extrê
 
 \begin{figure}
   \begin{center}
+      \begin{minipage}{0.45\textwidth}
         \input{gfx/chapter-context/condition_number/poor_conditionned}
-    \input{gfx/chapter-context/condition_number/well_conditionned}
+      \end{minipage}
+      \begin{minipage}{0.45\textwidth}
+        \input{gfx/chapter-context/condition_number/well_conditionned}
+      \end{minipage}
+      \vspace{-2em}
       \end{center}
-  \caption{Illustration visuelle du conditionnement d'un système linéaire dans le cas où $\mat{A}\in\R^{2\times 2}$. La solution correspond à l'intersection des droites continues (-) et en pointillés (- -). Une perturbation sur $\vector{b}$ déplace la droite (- -) en (..). En haut: le cas d'une matrice mal conditionnée car la solution bouge beaucoup à cause de la perturbation. En bas: la perturbation a moins d'effet sur la solution.}\label{fig:context-estimation-condition}
+  \caption{Illustration visuelle du conditionnement d'un système linéaire dans le cas où $\mat{A}\in\R^{2\times 2}$. La solution correspond à l'intersection des droites continues (-) et en pointillés (- -). Une perturbation sur $\vector{b}$ déplace la droite (- -) en (..). À gauche: le cas d'une matrice mal conditionnée car la solution bouge beaucoup à cause de la perturbation. À droite: la perturbation a moins d'effet sur la solution.}\label{fig:context-estimation-condition}
 \end{figure}
 
   \begin{definition}
@@ -425,15 +432,16 @@ Si l'on revient à l'estimation de notre matrice de covariance, on peut quantifi
 
 \begin{figure}[h]
   \begin{center}
-        \input{gfx/chapter-context/error_estimation_scm/cond}
+        \input{gfx/generated/context_scm_underregime/scmcond/plot.tex}
       \end{center}
-  \caption{\'Evolution du conditionnement de la matrice estimée  par SCM pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. Le code pour reproduire cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/scm_underregime.py}. }
+  \provScmcondQR[.5cm]
+  \caption{\'Evolution du conditionnement de la matrice estimée  par SCM pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. \provScmcond}
   \label{fig:context-estimation-cond}
 \end{figure}
 
 
 
-Pour pallier les défauts de l'estimateur empirique en haute dimension, \cite{LedoitWolf2004} proposent un estimateur régularisé de la forme :
+Pour pallier les défauts de l'estimateur empirique en haute dimension, \sidecite{LedoitWolf2004} proposent un estimateur régularisé de la forme :
 \begin{definition}
 \deftitle{Estimateur de Ledoit-Wolf}
 \begin{equation}
@@ -486,7 +494,7 @@ et l'on veut résoudre:
 
 \begin{figure}
   \input{gfx/chapter-context/lwf_bias_var}
-  \caption{biais-variance pour la régularisation de Ledoit-Wolf. La régularisation optimale balance la variance décroissante avec l'augmentation du biais introduit qui argument. Inspiré de \cite{LedoitWolf2004}.}
+  \caption{biais-variance pour la régularisation de Ledoit-Wolf. La régularisation optimale balance la variance décroissante avec l'augmentation du biais introduit qui argument. Inspiré de (\cite{LedoitWolf2004}).}
   \label{fig:context-estimation-lwfbiasvar}
 
 \end{figure}
@@ -494,7 +502,7 @@ et l'on veut résoudre:
 
 L'estimation pratique de $\coefledoitwolf^*$ nécessite une connaisance de la d.d.p des variables aléatoires dû à l'opérateur espérance dans le critère à minimiser. Sous l'hypothèse de normalité multivariée des données, ces variances peuvent être exprimées analytiquement en fonction des moments empiriques d'ordre supérieur comme on le verra par la suite. Pour le moment, on considère la valeur $\coefledoitwolf$ comme un choix de l'utilisateur.
 
-En introduisant cet estimateur, nous avons nécéssairement biaisé notre estimation en vertu de la contraction vers une matrice cible $\targetledoitwolf$ fixée\footnote{Sauf si on a par chance pris la vraie matrice mais l'on conviendra que ce scénario est très rare en pratique.}. Mais en permettant ce conditionnement de baisser, nous avons réduit la variance de notre estimateur. Ainsi on peut interpréter $\coefledoitwolf$ comme une valeur qui contrebalance le biais et la variance de l'estimateur, ce qui est détaillé dans le travail initial \cite{LedoitWolf2004}. Une Illustration de ce principe est donné en \ref{fig:context-estimation-lwfbiasvar}.
+En introduisant cet estimateur, nous avons nécéssairement biaisé notre estimation en vertu de la contraction vers une matrice cible $\targetledoitwolf$ fixée\footnote{Sauf si on a par chance pris la vraie matrice mais l'on conviendra que ce scénario est très rare en pratique.}. Mais en permettant ce conditionnement de baisser, nous avons réduit la variance de notre estimateur. Ainsi on peut interpréter $\coefledoitwolf$ comme une valeur qui contrebalance le biais et la variance de l'estimateur, ce qui est détaillé dans le travail initial \sidecite{LedoitWolf2004}. Une Illustration de ce principe est donné en \ref{fig:context-estimation-lwfbiasvar}.
 
 
 
@@ -513,15 +521,16 @@ Regardons enfin, le même problème d'estimation qu'en \ref{fig:context-estimati
 
 \begin{figure}[h]
   \begin{center}
-        \input{gfx/chapter-context/error_estimation_lwf/cond_1e-1}
+        \input{gfx/generated/context_lwf_underregime/lwfcond/plot.tex}
       \end{center}
-  \caption{\'Evolution du conditionnement de la matrice estimée par SCM et Ledoit-Wolf pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$, $\coefledoitwolf=0.1$ et $\targetledoitwolf=\Id{\Nvar}$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. Le code pour reproduire cette simulation est disponible à l'adresse : \url{https://github.com/AmmarMian/simulations_hdr/blob/main/1-context/lwf_underregime.py}. }
+  \provLwfcondQR[.5cm]
+  \caption{\'Evolution du conditionnement de la matrice estimée par SCM et Ledoit-Wolf pour une taille croissante de variables $\Nvar$ avec $\Nobs=30$, $\coefledoitwolf=0.1$ et $\targetledoitwolf=\Id{\Nvar}$. Les marqueurs indique la moyenne du conditionnement sur 50 tirages de monte-carlo. \provLwfcond}
   \label{fig:context-estimation-condlwf}
 \end{figure}
 
 
 
-Nous nous sommes intéressés ici uniquement à la régularisation de Ledoit-Wolf car elle nous sera utile par la suite mais plusieurs approches alternatives existent. Pour un état de l'art sur le sujet, on peut se référer par exemple à \cite{Mohsen_Pourahmadi_2013}.
+Nous nous sommes intéressés ici uniquement à la régularisation de Ledoit-Wolf car elle nous sera utile par la suite mais plusieurs approches alternatives existent. Pour un état de l'art sur le sujet, on peut se référer par exemple à \sidecite{Mohsen_Pourahmadi_2013}.
 
 \newpage
 
