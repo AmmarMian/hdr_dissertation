@@ -30,6 +30,7 @@ backup*/
 
 # Output directory (contains temporary compilation files)
 output/
+ext-tikz/
 
 # Build directory
 build/

@@ -1,0 +1,49 @@
+\begin{tikzpicture}
+    \begin{axis}[
+        width=0.7\textwidth,
+        height=7cm,
+        view={30}{40},
+        xlabel={$x$},
+        ylabel={$y$},
+        zlabel={$f(x,y)$},
+        title={Himmelblau's Function},
+        colormap name=viridis,
+        colorbar,
+        domain=-6:6,
+        y domain=-6:6,
+        samples=35,
+        mesh/ordering=y varies,
+        ]
+        
+        % Plot the surface with flat shading (compatible with dvisvgm)
+        \addplot3[
+            surf,
+            shader=flat,
+            opacity=0.8,
+            faceted color=black!5,
+            line width=0.05pt,
+        ] {(x^2 + y - 11)^2 + (x + y^2 - 7)^2};
+        
+        % Simplified contour plot - fewer levels
+        % \addplot3[
+        %     contour gnuplot={levels={10,100,500}},
+        %     samples=30,
+        %     z filter/.code={\def\pgfmathresult{0}},
+        %     black!40,
+        % ] {(x^2 + y - 11)^2 + (x + y^2 - 7)^2};
+        %
+        % Mark the four minima - simplified
+        \addplot3[only marks, mark=*, red, mark size=1.5] coordinates {
+            (3.0, 2.0, 0)
+            (-2.8, 3.1, 0)
+            (-3.8, -3.3, 0)
+            (3.6, -1.8, 0)
+        };
+        
+        % Simplified labels for the minima
+        \node[font=\tiny] at (axis cs:3.0, 2.0, 10) {$(3,2)$};
+        \node[font=\tiny] at (axis cs:-2.8, 3.1, 10) {$(-2.8,3.1)$};
+        \node[font=\tiny] at (axis cs:-3.8, -3.3, 10) {$(-3.8,-3.3)$};
+        \node[font=\tiny] at (axis cs:3.6, -1.8, 10) {$(3.6,-1.8)$};
+    \end{axis}
+\end{tikzpicture}

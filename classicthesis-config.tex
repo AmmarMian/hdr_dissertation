@@ -93,7 +93,8 @@
     \usepackage{biblatex}
 
 \PassOptionsToPackage{fleqn}{amsmath}       % math environments and more by the AMS
-  \usepackage{amsmath, amsfonts}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{bm}
 
 % ********************************************************************
 % General useful packages
@@ -116,6 +117,7 @@
 \usepgfplotslibrary{groupplots}
 \usetikzlibrary{external}
 \tikzexternalize[mode=list and make, prefix=ext-tikz/]
+\usepackage{qrcode}
 % ****************************************************************************************************
 
 
@@ -127,6 +129,34 @@
 \newcommand{\tableheadline}[1]{\multicolumn{1}{l}{\spacedlowsmallcaps{#1}}}
 \newcommand{\myfloatalign}{\centering} % to be used with each float for alignment
 \usepackage{subfig}
+\usepackage{marginnote}
+\usepackage{etoolbox}
+\usepackage{xparse}
+\makeatletter
+\NewDocumentCommand{\formatmargincitation}{m}{\leavevmode\vbox{\fontsize{7.5pt}{8.5pt}\selectfont\baselineskip=8.5pt\noindent\raggedright\citeauthor{#1}, \citefield{#1}{year}. \mkbibemph{\citefield{#1}{title}}\par}}
+\newcommand{\sidecite@shift}{0pt}
+\NewDocumentCommand{\sidecite}{o o o m}{%
+  \IfNoValueTF{#1}%
+    {\renewcommand{\sidecite@shift}{0pt}}%
+    {\renewcommand{\sidecite@shift}{#1}}%
+  \DeclareCiteCommand{\sidecite@content}[\sidecite@wrapper]{%
+  }{%
+    \formatmargincitation{\thefield{entrykey}}%
+  }{%
+    \\[4pt]%
+  }{%
+  }%
+  \IfNoValueTF{#2}%
+    {\parencite{#4}\sidecite@content{#4}}%
+    {\IfNoValueTF{#3}%
+      {\parencite{#4}\sidecite@content{#4}}%
+      {\parencite[#2][#3]{#4}\sidecite@content{#4}}%
+    }%
+}
+\newcommand{\sidecite@wrapper}[1]{%
+  \marginnote{#1}[\sidecite@shift]%
+}
+\makeatother
 % ****************************************************************************************************
 
 
@@ -195,19 +225,105 @@
 % ********************************************************************
 \usepackage{amsthm}
 \usepackage{thmtools}
+\usepackage{mdframed}
+
+% ---------- Theorem style: full box ----------
+\mdfdefinestyle{classicthesisbox}{
+  linewidth=0.5pt,
+  linecolor=black!45,
+  backgroundcolor=white,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  innerleftmargin=10pt,
+  innerrightmargin=10pt,
+  skipabove=12pt,
+  skipbelow=12pt,
+  roundcorner=2pt
+}
+
+
 \declaretheoremstyle[
   headfont=\normalfont\bfseries,
-  notefont=\normalfont,
-  bodyfont=\itshape,
-  headpunct={.}
+  bodyfont=\normalfont,
+  mdframed={style=classicthesisbox}
 ]{thmstyle}
 
-\declaretheorem[style=thmstyle, numberwithin=chapter]{theorem}
-\declaretheorem[style=thmstyle, sibling=theorem]{proposition}
-\declaretheorem[style=thmstyle, sibling=theorem]{lemma}
-\declaretheorem[style=definition, numberwithin=chapter]{definition}
-\declaretheorem[style=property, numberwithin=chapter]{property}
-\declaretheorem[style=remark, numbered=no]{remark}
+
+
+% ---------- Definition/property style: left rule ----------
+\mdfdefinestyle{classicthesisline}{
+  linewidth=1.2pt,
+  linecolor=black!45,
+  topline=false,
+  bottomline=false,
+  rightline=false,
+  backgroundcolor=white,
+  innertopmargin=4pt,
+  innertopmargin=8pt,
+  innerbottommargin=8pt,
+  innerleftmargin=12pt,
+  skipabove=10pt,
+  skipbelow=10pt
+}
+
+
+\declaretheoremstyle[
+  headfont=\normalfont\scshape,
+  bodyfont=\normalfont,
+  mdframed={style=classicthesisline}
+]{definitionstyle}
+
+
+
+% ---------- Remark style: nothing ----------
+\declaretheoremstyle[
+  headfont=\normalfont\itshape,
+  bodyfont=\normalfont\itshape,
+  spaceabove=10pt,
+  spacebelow=10pt
+]{remarkstyle}
+
+
+
+% ---------- Environments ----------
+
+\declaretheorem[
+  style=thmstyle,
+  numberwithin=chapter,
+  name=Théorème
+]{theorem}
+
+\declaretheorem[
+  style=thmstyle,
+  sibling=theorem,
+  name=Proposition
+]{proposition}
+
+\declaretheorem[
+  style=thmstyle,
+  sibling=theorem,
+  name=Lemme
+]{lemma}
+
+
+\declaretheorem[
+  style=definitionstyle,
+  numberwithin=chapter,
+  name=Définition
+]{definition}
+
+\declaretheorem[
+  style=definitionstyle,
+  sibling=definition,
+  name=Propriété
+]{property}
+
+
+\declaretheorem[
+  style=remarkstyle,
+  numbered=no,
+  name=Remarque
+]{remark}
 
 % ********************************************************************
 % Setup autoreferences (hyperref and babel)
@@ -267,9 +383,9 @@
 % Changing the text area
 % ********************************************************************
 %\areaset[current]{312pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip
-%\setlength{\marginparwidth}{7em}%
 %\setlength{\marginparsep}{2em}%
-\areaset[current]{370pt}{761pt}
+\areaset[current]{355pt}{761pt}
+\setlength{\marginparwidth}{6em}%
 
 % ********************************************************************
 % Using different fonts

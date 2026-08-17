@@ -28,7 +28,7 @@
 
 \newcommand{\T}{\mathrm{T}} % Transpose
 \DeclareMathOperator{\Diag}{\operatorname{diag}} % Determinant
-\DeclareMathOperator{\Cond}{\kappa} % Condition number
+\DeclareMathOperator{\Cond}{k} % Condition number
 
 
 \newcommand{\diff}{\mathrm{d}} % Differential
@@ -116,7 +116,8 @@
 \newcommand{\Xset}{\mathfrak{X}} % observed data as a set : all samples
 \newcommand{\moy}{\mu} % mean of a random variable
 \newcommand{\Vmoy}{\mat{\moy}} % mean of a random variable. multivariate case
-\newcommand{\var}{\sigma} % variance of a random variable
+\newcommand{\var}{\sigma^2} % variance of a random variable
+\newcommand{\std}{\sigma} % Standard deviation
 \newcommand{\texture}{\tau} % texture parameter
 \newcommand{\MCov}{\mat{\Sigma}} % Covariance matrix
 \newcommand{\Nobs}{N}
@@ -140,7 +141,8 @@
 %----------------------------------------------------------------------------------------
 % Probabilities
 %----------------------------------------------------------------------------------------
-\newcommand{\p}[1]{p_{#1}} % ddp
+\newcommand{\p}[1]{p_{#1}} % legacy for ddp
+\newcommand{\ddp}[1]{f_{#1}}
 \newcommand{\Universe}{\Omega} % Univers en proba
 \newcommand{\event}{\omega} % Evenement élémentaire
 \newcommand{\param}{\theta} % Unspecified probability parameter

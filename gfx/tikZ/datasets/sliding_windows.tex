@@ -1,0 +1,82 @@
+  \begin{tikzpicture}[scale=1]
+
+% -------------------------------------------------
+% parameters
+% -------------------------------------------------
+\pgfmathsetmacro{\cubex}{3}
+\pgfmathsetmacro{\cubey}{2}
+\pgfmathsetmacro{\cubez}{1}
+\pgfmathsetmacro{\wf}{0.45}
+
+% window size
+\pgfmathsetmacro{\wx}{\wf*\cubex}
+\pgfmathsetmacro{\wy}{\wf*\cubey}
+
+% -------------------------------------------------
+% cube drawing macro
+% #1 = label index (1 or T)
+% -------------------------------------------------
+\newcommand{\DrawCube}[1]{
+
+% ---- cube ----
+\draw [every edge/.append style={densely dashed, opacity=.5}]
+  (0,0,0) coordinate (o) -- ++(-\cubex,0,0) coordinate (a)
+  -- ++(0,-\cubey,0) coordinate (b)
+  edge coordinate[pos=1] (g) ++(0,0,-\cubez)
+  -- ++(\cubex,0,0) coordinate (c) -- cycle
+  (o) -- ++(0,0,-\cubez) coordinate (d)
+  -- ++(0,-\cubey,0) coordinate (e)
+  edge (g) -- (c) -- cycle
+  (o) -- (a) -- ++(0,0,-\cubez) coordinate (f)
+  edge (g) -- (d) -- cycle;
+
+% ---- face center ----
+\coordinate (Fc) at (-0.5*\cubex,-0.5*\cubey,0);
+
+% window corners (robust)
+\coordinate (W1) at ($(Fc)+(-\wx/2,\wy/2,0)$);
+\coordinate (W2) at ($(Fc)+(\wx/2,-\wy/2,0)$);
+
+% filled window
+\fill[gray!20] (W1) rectangle (W2);
+
+% 3x3 grid
+% --- outer border ---
+\draw (W1) rectangle (W2);
+
+% --- vertical grid lines ---
+\foreach \i in {1,2}{
+  \draw ($(W1)+(\i*\wx/3,0,0)$) --
+        ($(W1)+(\i*\wx/3,-\wy,0)$);
+}
+
+% --- horizontal grid lines ---
+\foreach \i in {1,2}{
+  \draw ($(W1)+(0,-\i*\wy/3,0)$) --
+        ($(W1)+(\wx,-\i*\wy/3,0)$);
+}
+
+
+% annotation
+\node[above=11pt] at (Fc) {$ \mathcal{X}_{\iobs #1}=\x_{\iobs #1}$};
+
+% time label
+\node at (-4,-1,0) {$t=#1$};
+
+}
+
+% -------------------------------------------------
+% DRAW BOTH CUBES (HORIZONTAL)
+% -------------------------------------------------
+
+\foreach \label/\xshift in {1/0, T/7}{
+  \begin{scope}[xshift=\xshift cm]
+    \DrawCube{\label}
+  \end{scope}
+}
+
+% vertical dots
+\node at (-1.5,-2.25) {$\dots$};
+
+\end{tikzpicture}
+

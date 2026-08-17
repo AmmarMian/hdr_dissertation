@@ -1,10 +1,13 @@
 \begin{tikzpicture}
 \begin{axis}[
-    width=8cm,
+    width=\textwidth,
+    height=5cm,
     xlabel={$x_1$},
     ylabel={$x_2$},
     axis lines=left,
     axis line style={-},
+    yticklabel=\empty,
+    xticklabel=\empty,
 ]
 \addplot[red, thick] coordinates {(-1, -0.8) (2, 2.8)};
 \addplot[blue, thick, dashed] coordinates {(-1, -0.25) (2.2, 2.55)};
