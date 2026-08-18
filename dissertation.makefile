@@ -80,3 +80,15 @@ ext-tikz/dissertation-figure16.pdf:
 	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure16" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
 
 ext-tikz/dissertation-figure16.pdf: ext-tikz/dissertation-figure16.md5
+ext-tikz/dissertation-figure17.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure17" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure17.pdf: ext-tikz/dissertation-figure17.md5
+ext-tikz/dissertation-figure18.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure18" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure18.pdf: ext-tikz/dissertation-figure18.md5
+ext-tikz/dissertation-figure19.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure19" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure19.pdf: ext-tikz/dissertation-figure19.md5

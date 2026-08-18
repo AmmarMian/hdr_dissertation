@@ -6,7 +6,6 @@
 %----------------------------------------------------------------------------------------
 %	Formatting
 %----------------------------------------------------------------------------------------
-\newcommand{\deftitle}[1]{\emph{\textbf{ - (#1)}}\\}
 
 %----------------------------------------------------------------------------------------
 %	MATHEMATICAL OPERATORS AND SYMBOLS
@@ -38,6 +37,8 @@
 \newcommand{\inv}[1]{{#1}^{-1}}
 \newcommand{\quadratic}[2]{#1^\T \inv{#2} #1 }
 \newcommand{\q}[2]{\mathcal{q}\left(#1, #2\right)}
+\newcommand{\eqdef}{\triangleq} % Definition equality
+\newcommand{\intrange}[2]{\{#1,\dots,#2\}} % Integer range
 
 
 %----------------------------------------------------------------------------------------
@@ -102,6 +103,7 @@
 \newcommand{\eig}{\lambda} % Eigenvalues
 \newcommand{\eigset}{\Lambda} % Eigenvalues set
 \newcommand{\frob}{\mathbb{F}} % Frobenius norm text
+\newcommand{\SPD}[1]{\mathcal{S}_{#1}^{++}} % Set of SPD matrices of given dimension
 
 %----------------------------------------------------------------------------------------
 % Statistics
@@ -148,6 +150,40 @@
 \newcommand{\param}{\theta} % Unspecified probability parameter
 \newcommand{\gaussian}{\mathcal{N}} % Gaussian distribution
 \newcommand{\compoundgaussian}{\mathcal{CG}} % Compound-Gaussian distribuion
+\newcommand{\elliptical}{\mathcal{E}} % Elliptical distribution
+\newcommand{\angular}{\mathcal{AE}} % Angular elliptical distribution
+\newcommand{\studentdist}{\mathcal{T}} % t-distribution
+\newcommand{\kdist}{\mathcal{K}} % K-distribution
+\newcommand{\gengaussian}{\mathcal{GG}} % Generalized Gaussian distribution
+\newcommand{\gammadist}{\mathcal{G}} % Gamma distribution
+\newcommand{\chisquared}{\chi^2} % Chi-squared distribution
+\newcommand{\uniform}{\mathcal{U}} % Uniform distribution
+\newcommand{\wishart}{\mathcal{W}} % Wishart distribution
+\newcommand{\likelihood}{\ell} % Log-likelihood function
+
+%----------------------------------------------------------------------------------------
+% Elliptical distributions
+%----------------------------------------------------------------------------------------
+\newcommand{\densgen}{g} % Density generator of an elliptical distribution
+\newcommand{\densgenmoment}[1]{\mathfrak{m}_{#1,\densgen}} % Finite moment of the density generator
+\newcommand{\densgenconst}[1]{\mathfrak{c}_{#1,\densgen}} % Normalisation constant of the d.d.p
+\newcommand{\sphere}[1]{\mathbb{S}^{#1}} % Unit sphere
+\newcommand{\spherearea}[1]{\mathfrak{s}_{#1}} % Surface area of the unit sphere
+\newcommand{\modvar}{\mathcal{R}} % Modular variate
+\newcommand{\quadvar}{\mathcal{Q}} % Quadratic form random variable
+\newcommand{\dof}{\nu} % Degrees of freedom / texture shape parameter
+\newcommand{\MScatter}{\mat{S}} % Scatter matrix
+\newcommand{\MShape}{\mat{\xi}} % Shape matrix
+
+%----------------------------------------------------------------------------------------
+% Robust estimation
+%----------------------------------------------------------------------------------------
+\newcommand{\weight}{u} % Weight function of an M-estimator
+\newcommand{\Mestim}{\tilde{\MScatter}} % M-estimator of scatter
+\newcommand{\iiter}{n} % Index on the iterations of an algorithm
+\DeclareMathOperator{\vecop}{vec} % Vectorisation operator
+\newcommand{\Kmat}{\mat{K}} % Commutation matrix
+\newcommand{\scorefun}{\psi} % psi(t) = t u(t)
 
 
 %----------------------------------------------------------------------------------------

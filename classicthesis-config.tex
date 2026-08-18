@@ -53,7 +53,7 @@
 \newcommand{\myUni}{Université Savoie Mont-Blanc\xspace}
 \newcommand{\myLocation}{Annecy, France\xspace}
 \newcommand{\myTime}{2026\xspace}
-\newcommand{\myVersion}{v0.0.1}
+\newcommand{\myVersion}{v0.0.2}
 
 % ********************************************************************
 % Setup, finetuning, and useful commands
@@ -115,7 +115,7 @@
 \usepackage{tikz}
 \usepackage{pgfplots} % External TikZ/PGF support (thanks to Andreas Nautsch)
 \usepgfplotslibrary{groupplots}
-\usetikzlibrary{external}
+\usetikzlibrary{external,calc}
 \tikzexternalize[mode=list and make, prefix=ext-tikz/]
 \usepackage{qrcode}
 % ****************************************************************************************************
@@ -225,62 +225,124 @@
 % ********************************************************************
 \usepackage{amsthm}
 \usepackage{thmtools}
-\usepackage{mdframed}
+\usepackage[framemethod=tikz]{mdframed}
 
-% ---------- Theorem style: full box ----------
-\mdfdefinestyle{classicthesisbox}{
-  linewidth=0.5pt,
-  linecolor=black!45,
-  backgroundcolor=white,
-  innertopmargin=8pt,
-  innerbottommargin=8pt,
-  innerleftmargin=10pt,
-  innerrightmargin=10pt,
+% Sans-serif family for the margin labels of theorem-like blocks (see
+% \ctmarginhead below): it is what tells them apart from a \sidecite entry
+% without relying on colour. Lato is a humanist sans that sits well next to
+% Palatino and stays legible at the 7pt of a margin label; it is scaled to
+% match Palatino's x-height.
+% NB: the option is "defaultsans" (redefines \sfdefault) and *not* "default",
+% which redefines \familydefault and would set the whole thesis in sans.
+\usepackage[defaultsans,scaled=0.95]{lato}
+
+% ---------- Theorem-like blocks: head in the margin ----------
+% The label ("Definition 1.14" + its optional title) is set in the outer
+% margin, the one already used by \sidecite. The body carries no frame and no
+% background: only two hairlines, above and below, so that the start and the
+% end of the block are unambiguous without boxing it in.
+% nobreak stops a block from being split across two pages, which mdframed did
+% badly whenever the body held a numbered equation (frame closed mid-page,
+% rest of the page left blank). \raggedbottom keeps the resulting gap clean,
+% and this replaces the \newpage that had to be added by hand.
+% Each block is set on a very light wash of its own colour rather than being
+% ruled or framed: it marks the start and the end unambiguously, survives a
+% page break, and needs no left/right decision (the earlier dashed rule had to
+% guess which side the outer margin was on, and got it wrong often enough).
+% \ctblockbg is redefined globally by \ctmarginhead before mdframed draws.
+\newcommand{\ctblockbg}{white}
+
+% NB: framemethod=tikz must be a *package* option. Setting it inside the style
+% makes mdframed \input md-frame-1.mdf at first use, i.e. after
+% \begin{document}, which errors out with "Can be used only in preamble".
+\mdfdefinestyle{classicthesisplain}{
+  hidealllines=true,
+  backgroundcolor=\ctblockbg,
+  innertopmargin=7pt,
+  innerbottommargin=7pt,
+  innerleftmargin=8pt,
+  innerrightmargin=8pt,
   skipabove=12pt,
   skipbelow=12pt,
-  roundcorner=2pt
+  nobreak=true
 }
 
+% \marginnote is silently dropped when issued from thmtools' headformat (the
+% head is typeset in a box that is measured but never shipped out), so the
+% label is emitted from the post-head hook instead, where it survives.
+% \thmt@thmname holds the environment name and \thmt@optarg its optional
+% title; #1 is the environment, used to reach its counter via \the<env>.
+% One colour per family: the red ones state what an object *is*, the blue ones
+% what is *true* of it. The colour is carried by the margin label and by the
+% dashed rule, so a block is identifiable at a glance.
+\definecolor{ctdefinition}{RGB}{150,40,40}
+\definecolor{ctproperty}{RGB}{175,95,45}
+\definecolor{cttheorem}{RGB}{30,60,120}
+\definecolor{ctproposition}{RGB}{40,70,140}
+\definecolor{ctlemma}{RGB}{50,110,120}
+\definecolor{ctremark}{RGB}{110,110,110}
+
+\makeatletter
+% \marginnote is silently dropped when issued from thmtools' headformat (the
+% head is typeset in a box that is measured but never shipped out), so the
+% label is emitted from the post-head hook instead, where it survives.
+% \thmt@thmname holds the environment name and \thmt@optarg its optional
+% title; #1 is the environment, used to reach its counter via \the<env>
+% (unnumbered environments such as remark simply have none).
+% The margin holds two very different things: these labels and the \sidecite
+% entries, and colour alone did not tell them apart (it vanishes in greyscale
+% and on a printed copy). Two non-chromatic signals are added, both carried by
+% the label only: a short rule above it, and a sans-serif uppercase name set
+% against the serif of a citation. The optional title stays serif italic, so
+% the discriminating line is the first one.
+% The label line must not hyphenate ("PROPOSI-TION"); letterspacing is kept low
+% (\textls[30], not the [80] of \spacedlowsmallcaps) so that the widest name
+% still fits the 6em margin. The title keeps hyphenation on, otherwise long
+% words ("CONDITIONNEMENT") overflow the margin.
+\newcommand{\ctmarginhead}[1]{%
+  \gdef\ctblockbg{ct#1!8}%
+  \leavevmode
+  \marginnote{%
+    \raggedright\hbadness=10000
+    \color{ct#1}%
+    % The rule is set on its own line: \par before it kills the indent, \par
+    % after closes the (0.9pt tall) line box before the vertical skip.
+    {\par\noindent\rule{1.6em}{0.9pt}\par\vskip2.5pt}%
+    {\sffamily\bfseries\fontsize{7.2pt}{8.6pt}\selectfont
+     \hyphenpenalty=10000\exhyphenpenalty=10000
+     \textls[30]{\MakeTextUppercase{\thmt@thmname}}%
+     \@ifundefined{the#1}{}{~\csname the#1\endcsname}\par}%
+    \ifx\thmt@optarg\@empty\else
+      \vspace{2.5pt}\normalfont\fontsize{7.5pt}{8.5pt}\selectfont\itshape\thmt@optarg
+    \fi\par}%
+  \ignorespaces}
+\makeatother
 
 \declaretheoremstyle[
-  headfont=\normalfont\bfseries,
+  headfont=\normalfont,
   bodyfont=\normalfont,
-  mdframed={style=classicthesisbox}
+  headformat={},
+  headpunct={},
+  mdframed={style=classicthesisplain}
 ]{thmstyle}
 
-
-
-% ---------- Definition/property style: left rule ----------
-\mdfdefinestyle{classicthesisline}{
-  linewidth=1.2pt,
-  linecolor=black!45,
-  topline=false,
-  bottomline=false,
-  rightline=false,
-  backgroundcolor=white,
-  innertopmargin=4pt,
-  innertopmargin=8pt,
-  innerbottommargin=8pt,
-  innerleftmargin=12pt,
-  skipabove=10pt,
-  skipbelow=10pt
-}
-
-
+% Definitions and properties share the very same treatment; the style is kept
+% as a separate name so the two families can be told apart again later.
 \declaretheoremstyle[
-  headfont=\normalfont\scshape,
+  headfont=\normalfont,
   bodyfont=\normalfont,
-  mdframed={style=classicthesisline}
+  headformat={},
+  headpunct={},
+  mdframed={style=classicthesisplain}
 ]{definitionstyle}
-
-
 
 % ---------- Remark style: nothing ----------
 \declaretheoremstyle[
-  headfont=\normalfont\itshape,
+  headfont=\normalfont,
   bodyfont=\normalfont\itshape,
-  spaceabove=10pt,
-  spacebelow=10pt
+  headformat={},
+  headpunct={},
+  mdframed={style=classicthesisplain}
 ]{remarkstyle}
 
 
@@ -325,6 +387,18 @@
   name=Remarque
 ]{remark}
 
+% Emit the margin label for each theorem-like environment (remark is unnumbered
+% and keeps its plain italic look).
+\BeforeBeginEnvironment{mdframed}{\tikzexternaldisable}
+\AfterEndEnvironment{mdframed}{\tikzexternalenable}
+
+\addtotheorempostheadhook[theorem]{\ctmarginhead{theorem}}
+\addtotheorempostheadhook[proposition]{\ctmarginhead{proposition}}
+\addtotheorempostheadhook[lemma]{\ctmarginhead{lemma}}
+\addtotheorempostheadhook[definition]{\ctmarginhead{definition}}
+\addtotheorempostheadhook[property]{\ctmarginhead{property}}
+\addtotheorempostheadhook[remark]{\ctmarginhead{remark}}
+
 % ********************************************************************
 % Setup autoreferences (hyperref and babel)
 % ********************************************************************
@@ -363,7 +437,68 @@
 
 % (Better) alternative to \autoref is \cref via the cleveref package
 \usepackage{cleveref}
-\crefformat{part}{Part #2\MakeUppercase{#1}#3}
+\crefformat{part}{partie~#2#1#3}
+
+% babel-french makes `:' an active character (thin space before the colon).
+% babel protects \ref, \label and \cite from this via its \@safe@actives
+% switch, but it knows nothing about cleveref: \cref{sec:foo} then expands the
+% active `:' inside a \csname ... \endcsname and the compilation errors out.
+% We therefore wrap the cleveref user commands in that same switch. Removing
+% this block requires either dropping the colons in all label names or turning
+% off the french shorthand, which would lose the spacing before `:' everywhere.
+\makeatletter
+\@ifundefined{@safe@activestrue}{}{%
+  % NB: cleveref declares these commands with \DeclareRobustCommand. They are
+  % used inside \caption, i.e. in a moving argument written to the .lof, so the
+  % redefinitions below MUST stay robust as well -- \renewcommand would make
+  % them fragile and break the .lof/.aux writing.
+  % The originals must be grabbed as cleveref's internal `\cref ' (with the
+  % trailing space) and not as `\cref': the latter is only the \protect shell,
+  % which would point back at the new definition and loop forever.
+  \protected\def\ct@safeactives#1{\@safe@activestrue#1\@safe@activesfalse}%
+  \expandafter\let\expandafter\ct@orig@cref\csname cref \endcsname
+  \expandafter\let\expandafter\ct@orig@Cref\csname Cref \endcsname
+  \expandafter\let\expandafter\ct@orig@crefrange\csname crefrange \endcsname
+  \expandafter\let\expandafter\ct@orig@Crefrange\csname Crefrange \endcsname
+  \expandafter\let\expandafter\ct@orig@cpageref\csname cpageref \endcsname
+  \expandafter\let\expandafter\ct@orig@Cpageref\csname Cpageref \endcsname
+  \DeclareRobustCommand*{\cref}[1]{\ct@safeactives{\ct@orig@cref{#1}}}%
+  \DeclareRobustCommand*{\Cref}[1]{\ct@safeactives{\ct@orig@Cref{#1}}}%
+  \DeclareRobustCommand*{\crefrange}[2]{\ct@safeactives{\ct@orig@crefrange{#1}{#2}}}%
+  \DeclareRobustCommand*{\Crefrange}[2]{\ct@safeactives{\ct@orig@Crefrange{#1}{#2}}}%
+  \DeclareRobustCommand*{\cpageref}[1]{\ct@safeactives{\ct@orig@cpageref{#1}}}%
+  \DeclareRobustCommand*{\Cpageref}[1]{\ct@safeactives{\ct@orig@Cpageref{#1}}}%
+}
+\makeatother
+
+% cleveref is loaded after the thmtools declarations above, so the theorem-like
+% environments are not hooked automatically: their names are declared by hand.
+% The remaining names are set explicitly as well, to keep control on the
+% abbreviations used throughout the dissertation.
+\crefname{chapter}{chapitre}{chapitres}
+\Crefname{chapter}{Chapitre}{Chapitres}
+\crefname{section}{section}{sections}
+\Crefname{section}{Section}{Sections}
+\crefname{subsection}{section}{sections}
+\Crefname{subsection}{Section}{Sections}
+\crefname{subsubsection}{section}{sections}
+\Crefname{subsubsection}{Section}{Sections}
+\crefname{figure}{figure}{figures}
+\Crefname{figure}{Figure}{Figures}
+\crefname{table}{tableau}{tableaux}
+\Crefname{table}{Tableau}{Tableaux}
+\crefname{equation}{\'eq.}{\'eqs.}
+\Crefname{equation}{\'Eq.}{\'Eqs.}
+\crefname{theorem}{th\'eor\`eme}{th\'eor\`emes}
+\Crefname{theorem}{Th\'eor\`eme}{Th\'eor\`emes}
+\crefname{proposition}{proposition}{propositions}
+\Crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{lemme}{lemmes}
+\Crefname{lemma}{Lemme}{Lemmes}
+\crefname{definition}{d\'efinition}{d\'efinitions}
+\Crefname{definition}{D\'efinition}{D\'efinitions}
+\crefname{property}{propri\'et\'e}{propri\'et\'es}
+\Crefname{property}{Propri\'et\'e}{Propri\'et\'es}
 
 
 % ********************************************************************
