@@ -92,3 +92,7 @@ ext-tikz/dissertation-figure19.pdf:
 	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure19" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
 
 ext-tikz/dissertation-figure19.pdf: ext-tikz/dissertation-figure19.md5
+ext-tikz/dissertation-figure20.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure20" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure20.pdf: ext-tikz/dissertation-figure20.md5

@@ -14,7 +14,32 @@ def to_camel(fig_id: str) -> str:
 
 
 def tex_escape(s: str) -> str:
-    return s.replace("_", r"\_")
+    """Make an arbitrary provenance value safe to typeset.
+
+    Values come from experiment CLI args, so they can hold anything a shell
+    would accept -- including a backslash, when a parameter carries a LaTeX
+    length such as "0.45\\textwidth". Left as-is, that would be expanded as a
+    macro inside the caption and break the build, so every TeX-special
+    character is neutralised here.
+    """
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "{": r"\{",
+        "}": r"\}",
+        "_": r"\_",
+        "$": r"\$",
+        "&": r"\&",
+        "#": r"\#",
+        "%": r"\%",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+    # The backslash is substituted first, and its replacement contains braces,
+    # so the remaining rules are applied to the untouched parts only.
+    out = []
+    for char in s:
+        out.append(replacements.get(char, char))
+    return "".join(out)
 
 
 def main():

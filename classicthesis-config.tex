@@ -132,8 +132,43 @@
 \usepackage{marginnote}
 \usepackage{etoolbox}
 \usepackage{xparse}
+\usepackage{fontawesome5} % the book glyph marking a margin citation
+
+% ---------- Which margin are we in? ----------
+% marginnote calls \raggedleftmarginnote when it \llap's the note, i.e. when the
+% note lands in the *left* margin, and \raggedrightmarginnote otherwise. Both
+% keep marginnote's own alignment -- ragged left in a left margin, ragged right
+% in a right one -- so that margin material always hugs the text block instead
+% of the paper edge, and they additionally record which side we are on.
+% \ctmarginragged is what the margin blocks below use, since issuing a bare
+% \raggedright inside the note would undo that choice on verso pages.
+\newif\ifctmarginleft
+\renewcommand*{\raggedleftmarginnote}{\ctmarginlefttrue\raggedleft}
+\renewcommand*{\raggedrightmarginnote}{\ctmarginleftfalse\raggedright}
+\newcommand{\ctmarginragged}{\ifctmarginleft\raggedleft\else\raggedright\fi}
+
+% The rule that opens a margin block. It is set on its own line: \par before it
+% kills the indent, \par after closes the (0.9pt tall) line box before the skip.
+% \makebox is needed rather than a bare \hfill because \raggedright already
+% puts infinite glue at the right, which would share the space with it.
+\newlength{\ctmarginrulewidth}
+\setlength{\ctmarginrulewidth}{1.6em}
+\newcommand{\ctmarginrule}{%
+  \par\noindent
+  \ifctmarginleft
+    \makebox[\linewidth][r]{\rule{\ctmarginrulewidth}{0.9pt}}%
+  \else
+    \makebox[\linewidth][l]{\rule{\ctmarginrulewidth}{0.9pt}}%
+  \fi
+  \par\vskip2.5pt}
+
+% Margin citations carry the same rule as the theorem-like blocks, plus a book
+% glyph on the author line. Colour alone did not separate the two families
+% (it goes on a greyscale print), and the glyph is the non-chromatic signal
+% that says "this is a reference" and not "this is a definition".
+\definecolor{ctcite}{RGB}{120,120,120}
 \makeatletter
-\NewDocumentCommand{\formatmargincitation}{m}{\leavevmode\vbox{\fontsize{7.5pt}{8.5pt}\selectfont\baselineskip=8.5pt\noindent\raggedright\citeauthor{#1}, \citefield{#1}{year}. \mkbibemph{\citefield{#1}{title}}\par}}
+\NewDocumentCommand{\formatmargincitation}{m}{\leavevmode\vbox{\fontsize{7.5pt}{8.5pt}\selectfont\baselineskip=8.5pt\noindent\ctmarginragged\hbadness=10000{\color{ctcite}\ctmarginrule}{\color{ctcite}\fontsize{6pt}{6pt}\selectfont\faBook}\hspace{0.4em}\citeauthor{#1}, \citefield{#1}{year}. \mkbibemph{\citefield{#1}{title}}\par}}
 \newcommand{\sidecite@shift}{0pt}
 \NewDocumentCommand{\sidecite}{o o o m}{%
   \IfNoValueTF{#1}%
@@ -303,11 +338,9 @@
   \gdef\ctblockbg{ct#1!8}%
   \leavevmode
   \marginnote{%
-    \raggedright\hbadness=10000
+    \ctmarginragged\hbadness=10000
     \color{ct#1}%
-    % The rule is set on its own line: \par before it kills the indent, \par
-    % after closes the (0.9pt tall) line box before the vertical skip.
-    {\par\noindent\rule{1.6em}{0.9pt}\par\vskip2.5pt}%
+    \ctmarginrule
     {\sffamily\bfseries\fontsize{7.2pt}{8.6pt}\selectfont
      \hyphenpenalty=10000\exhyphenpenalty=10000
      \textls[30]{\MakeTextUppercase{\thmt@thmname}}%

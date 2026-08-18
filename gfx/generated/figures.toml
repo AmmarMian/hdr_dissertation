@@ -1,6 +1,13 @@
 # figures.toml — registered figures for the HDR dissertation
 # Auto-generated from prov.json files — do not edit by hand.
 
+[figures.circularity]
+exp       = "context_complex_circularity"
+sha       = "7812a73"
+run_date  = "2026-08-18"
+seed      = "42"
+embed_npy = false
+
 [figures.ellipticaltails]
 exp       = "context_elliptical_examples"
 sha       = "7dfc9eb"

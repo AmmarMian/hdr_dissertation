@@ -1405,8 +1405,17 @@ Le cas où cette pseudo-covariance s'annule est celui que nous retiendrons, et i
 \begin{remark}
   L'équivalence des trois conditions se lit directement sur \cref{eq:context-complex-blocs}. La circularité stricte entraîne la circularité au second ordre dès lors que les moments existent, puisque $\E\{e^{j\alpha}\Variable(e^{j\alpha}\Variable)^\T\} = e^{2j\alpha}\MPCov_\Variable$ doit être indépendant de $\alpha$; la réciproque est fausse en général, mais nous verrons qu'elle est vraie dans le cas gaussien.
 
-  Sur le plan de la modélisation, la circularité traduit l'absence de référence de phase privilégiée. Elle est physiquement légitime pour un signal à bande étroite après démodulation, la phase absolue de l'écho résultant d'un trajet de propagation dont la longueur est très grande devant la longueur d'onde et pouvant être tenue pour uniforme: c'est le cas du fouillis radar, de l'écho RSO d'une cellule de résolution comportant de nombreux diffuseurs, et du bruit ambiant SONAR. Elle cesse en revanche de l'être en présence d'un déséquilibre entre les voies $I$ et $Q$, d'un signal réel modulé, ou de certaines modulations numériques. Nous supposerons la circularité acquise dans toute la suite de cette dissertation, mais il s'agit bien d'une hypothèse de modélisation et non d'une commodité d'écriture; le lecteur intéressé par le cas général se reportera à \sidecite[-1cm]{Picinbono1994,SchreierScharf2010}.
+  Sur le plan de la modélisation, la circularité traduit l'absence de référence de phase privilégiée. Elle est physiquement légitime pour un signal à bande étroite après démodulation, la phase absolue de l'écho résultant d'un trajet de propagation dont la longueur est très grande devant la longueur d'onde et pouvant être tenue pour uniforme: c'est le cas du fouillis radar, de l'écho RSO d'une cellule de résolution comportant de nombreux diffuseurs, et du bruit ambiant SONAR. La \cref{fig:context-complex-circularity} montre ce que l'hypothèse recouvre exactement: à covariance fixée, la pseudo-covariance déforme librement le nuage, et c'est bien elle, et non la covariance, qui porte l'information de forme dans le plan complexe. La circularité cesse en revanche d'être légitime en présence d'un déséquilibre entre les voies $I$ et $Q$, d'un signal réel modulé, ou de certaines modulations numériques. Nous supposerons la circularité acquise dans toute la suite de cette dissertation, mais il s'agit bien d'une hypothèse de modélisation et non d'une commodité d'écriture; le lecteur intéressé par le cas général se reportera à \sidecite[-1cm]{Picinbono1994,SchreierScharf2010}.
 \end{remark}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{gfx/generated/context_complex_circularity/circularity/plot.tex}
+  \end{center}
+  \provCircularityQR[.5cm]
+  \caption{Nuages de points d'une variable aléatoire complexe scalaire partageant tous la \emph{même} covariance $\MCov=1$ et ne différant que par leur pseudo-covariance $\MPCov$, dont le module parcourt le segment d'admissibilité $\abs{\MPCov}\leq\MCov$ de la \cref{prop:context-complex-picinbono}. En pointillés: la courbe de concentration à $90\%$ que prédirait la covariance seule, identique dans les quatre panneaux. En trait plein: la courbe de concentration effective. Les deux coïncident uniquement dans le premier panneau, i.e, sous circularité. Le module de $\MPCov$ contrôle l'excentricité et son argument l'orientation, cette dernière valant $\arg(\MPCov)/2$. \provCircularity}
+  \label{fig:context-complex-circularity}
+\end{figure}
 
 \subsubsection{La distribution gaussienne complexe}
 
