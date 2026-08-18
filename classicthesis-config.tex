@@ -53,7 +53,7 @@
 \newcommand{\myUni}{Université Savoie Mont-Blanc\xspace}
 \newcommand{\myLocation}{Annecy, France\xspace}
 \newcommand{\myTime}{2026\xspace}
-\newcommand{\myVersion}{v0.0.2}
+\newcommand{\myVersion}{v0.0.3}
 
 % ********************************************************************
 % Setup, finetuning, and useful commands
@@ -126,6 +126,8 @@
 % ****************************************************************************************************
 \usepackage{tabularx} % better tables
   \setlength{\extrarowheight}{3pt} % increase table row height
+\usepackage{enumitem} % list spacing, needed by the CV chapter's dense lists
+\usepackage{needspace} % keep CV rubric rules with the heading they introduce
 \newcommand{\tableheadline}[1]{\multicolumn{1}{l}{\spacedlowsmallcaps{#1}}}
 \newcommand{\myfloatalign}{\centering} % to be used with each float for alignment
 \usepackage{subfig}
@@ -557,6 +559,156 @@
 % ****************************************************************************************************
 % 7. Further adjustments (experimental)
 % ****************************************************************************************************
+% Curriculum vitae chapter
+% ****************************************************************************************************
+% The CV chapter trades running prose for dense, dated entries, and needs a
+% typographic hierarchy the body text does not: a reader scanning it must be
+% able to tell a block heading from an entry from a labelled datum at a glance.
+% Three distinct registers do that work, from loudest to quietest:
+%
+%   \cvrubric  -- spaced small caps under a hairline: a block of the CV
+%   \cventry   -- bold roman head, optional italic sub-head: one item
+%   cvfields   -- small caps label in a fixed column: one datum of an item
+%
+% Millesimes never appear in the text block at all; they go in the margin
+% column, which already carries the side citations and is otherwise idle here.
+
+\makeatletter
+
+% ---------- Margin tags ----------
+% \cvdate{2016--2019} -- millesime in the margin, aligned with the entry it
+% dates. The optional argument shifts it vertically, exactly like \sidecite.
+\definecolor{cvmarginal}{RGB}{110,110,110}
+\NewDocumentCommand{\cvdate}{o m}{%
+  \IfNoValueTF{#1}%
+    {\marginnote{\cv@datestyle{#2}}}%
+    {\marginnote{\cv@datestyle{#2}}[#1]}%
+}
+\newcommand{\cv@datestyle}[1]{%
+  \vbox{\footnotesize\color{cvmarginal}\ctmarginragged\hbadness=10000
+        \spacedlowsmallcaps{#1}\par}}
+
+% ---------- Block headings ----------
+% \cvrubric{...} -- a hairline plus spaced small caps. Loud enough to chunk the
+% chapter without entering the table of contents, which \subsubsection would.
+\newcommand{\cvrubric}[1]{%
+  \par\addvspace{1.5\baselineskip}%
+  % Keep the rule, its heading and the first lines under it on one page: a rule
+  % stranded at the foot of a page reads as a section that never arrives.
+  \needspace{5\baselineskip}%
+  \noindent{\color{cvmarginal}\rule{\linewidth}{0.4pt}}%
+  \par\nopagebreak\vspace{0.35\baselineskip}%
+  \noindent{\spacedlowsmallcaps{#1}}%
+  \par\nobreak\addvspace{0.45\baselineskip}\nopagebreak}
+
+% ---------- Entries ----------
+% \cventry{head}{sub-head} -- one item of a rubric. The sub-head carries the
+% affiliation, the funding, the venue: everything that situates the head without
+% being the head. Leave it empty when there is nothing to situate.
+\definecolor{cvsub}{RGB}{90,90,90}
+\NewDocumentCommand{\cventry}{o m m}{%
+  \par\addvspace{0.75\baselineskip}%
+  % The millesime is emitted here, after the vertical skip, so that it sits on
+  % the head's own line rather than drifting up into the gap above it.
+  \IfNoValueF{#1}{\marginnote{\cv@datestyle{#1}}}%
+  \noindent\textbf{#2}%
+  \notblank{#3}{\newline{\color{cvsub}\itshape #3}}{}%
+  \par\nobreak\vspace{0.1\baselineskip}\nobreak\noindent\ignorespaces}
+
+% ---------- Labelled data ----------
+% cvfields -- the quietest register: a fixed label column so that the eye can
+% run down the labels of an entry, or skip them entirely and read the values.
+% The label sits in a parbox of labelwidth, so a label too long for that width
+% wraps inside it and its second line prints over the next item -- the column
+% has to be wide enough for the longest label in the chapter ("École doctorale").
+\newlist{cvfields}{description}{1}
+\setlist[cvfields]{style=multiline, leftmargin=8.5em, labelwidth=8em,
+                   labelsep=0.5em, font=\normalfont\footnotesize\color{cvsub}\spacedlowsmallcaps,
+                   itemsep=0.12\baselineskip, parsep=0pt,
+                   topsep=0.25\baselineskip}
+
+% cvcompact -- plain enumeration of facts, where no label is needed.
+\newlist{cvcompact}{itemize}{2}
+\setlist[cvcompact]{label=\textendash, leftmargin=1.2em, labelsep=0.4em,
+                    itemsep=0.25\baselineskip, parsep=0pt,
+                    topsep=0.35\baselineskip}
+
+% ---------- Placeholders ----------
+% \cvtodo{...} -- information not yet collected. Deliberately loud: these must
+% not survive into the defended manuscript. Grep for `cvtodo` to find them all.
+\definecolor{cvtodo}{RGB}{176,48,48}
+\newcommand{\cvtodo}[1]{{\color{cvtodo}\normalfont\bfseries[à compléter :\ #1]}}
+
+% ---------- The classified publication list ----------
+% Names to single out in the CV bibliography: mine in bold, those of the
+% students and post-docs I supervised underlined, as the dossier convention has
+% it. Add a family name here when a new supervisee first appears in print.
+\newcommand{\cvselfname}{Mian}
+\forcsvlist{\listadd\cv@supervised}{%
+  Jafuno,Lerda,Verlynde,Gallet,Shi,Petellat,Pautrel,Ndiaye,Brehier,%
+  Wild,Duss,Molière}
+
+% biblatex hands \mkbibnamefamily the macro \namepartfamily, not the name it
+% holds, so the name has to be expanded to a string before it can be compared
+% against the lists above -- comparing the unexpanded macro always fails.
+\newcommand{\cv@markfamily}[1]{%
+  \begingroup\protected@edef\cv@tmp{\endgroup
+    \noexpand\cv@markfamily@i{#1}}\cv@tmp}
+\newcommand{\cv@markfamily@i}[1]{%
+  \ifinlist{#1}{\cv@supervised}%
+    {\underline{#1}}%
+    {\ifdefstring{\cvselfname}{#1}{\textbf{#1}}{#1}}}
+
+% \cvcite{JOE24,ICML24} -- cites my own work by its mnemonic key rather than by
+% author and year. Author-year would be noise here: in a CV every entry is mine,
+% and the key is what the reader needs in order to find it in the list below.
+\DeclareCiteCommand{\cvcite}
+  {\usebibmacro{prenote}}
+  {\bibhyperref{\mkbibbrackets{\textsc{\MakeLowercase{\thefield{entrykey}}}}}}
+  {\addcomma\space}
+  {\usebibmacro{postnote}}
+
+% cvpublist -- the classified publication list. The entries are written out one
+% by one rather than filtered out of the .bbl, because the bibtex8 backend sorts
+% once, globally, and cannot sort a single list by descending date the way this
+% chapter needs. Ordering by hand also keeps a category in the order I want to
+% argue it, not the order a sorting scheme happens to produce.
+%
+% The label is the mnemonic key, so a reader who meets \cvcite{JOE24} in a later
+% chapter finds the entry here without an intermediate lookup.
+\newcommand{\cv@pubsetup}{%
+  % \mkbibnamefamily is declared robust by biblatex, so it must be redefined
+  % robustly too; \renewcommand would silently lose the markup. The URL is
+  % dropped because HAL is announced once above the list, and repeating it on
+  % every entry buries the reference under its own metadata.
+  \renewrobustcmd*{\mkbibnamefamily}[1]{\cv@markfamily{##1}}%
+  \renewbibmacro*{url+urldate}{}}
+
+% \cvfullcite -- \fullcite is a cite command, so it truncates the author list at
+% maxcitenames; a publication list has to name every co-author. The limit cannot
+% be raised from inside the list (the options and hooks that would do it are
+% preamble-only), so the raise is baked into a cite command of its own.
+\DeclareCiteCommand{\cvfullcite}
+  {\defcounter{maxnames}{99}%
+   \defcounter{minnames}{99}%
+   \usebibmacro{prenote}}
+  {\usedriver
+     {\DeclareNameAlias{sortname}{default}}
+     {\thefield{entrytype}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+\newlist{cvpublist}{description}{1}
+\setlist[cvpublist]{before=\cv@pubsetup, style=multiline,
+                    leftmargin=7em, labelwidth=6.5em, labelsep=0.5em,
+                    font=\normalfont\footnotesize\color{cvmarginal}\spacedlowsmallcaps,
+                    itemsep=0.55\baselineskip, parsep=0pt,
+                    topsep=0.4\baselineskip}
+
+\newcommand{\cvpub}[1]{\item[#1]\cvfullcite{#1}}
+
+\makeatother
+
 % ********************************************************************
 % Changing the text area
 % ********************************************************************

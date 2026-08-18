@@ -1,1 +1,859 @@
-Lorem ipsum dolor amet
+\chapter{Curriculum vitae}
+\label{ch:cv}
+
+Ce premier chapitre dresse le bilan de mon activité depuis la thèse : parcours,
+recherche, encadrement, rayonnement, enseignement et responsabilités
+collectives. Il se termine par la liste classée de ma production scientifique et
+par deux annexes détaillant le service d'enseignement et les encadrements
+doctoraux.
+
+
+
+% ============================================================================
+\section{Identification et parcours}
+\label{sec:cv-identification}
+% ============================================================================
+
+\begin{cvfields}
+  \item[Nom] Ammar Mian
+  \item[Corps] Maître de conférences, classe normale, échelon 5
+  \item[Section \textsc{cnu}] 61 --- Génie informatique, automatique et
+    traitement du signal
+  \item[Établissement] Université Savoie Mont-Blanc, Polytech Annecy-Chambéry
+  \item[Laboratoire] \textsc{listic} (\textsc{ea}~3703)
+  \item[Contact] \href{mailto:ammar.mian@univ-smb.fr}{ammar.mian@univ-smb.fr}
+    \quad ---\quad \url{https://ammarmian.fr}
+\end{cvfields}
+
+
+\subsection{Parcours professionnel}
+\label{subsec:cv-carriere}
+
+\cventry[à partir de 2026]{Délégation \textsc{cnrs}}{\textsc{gipsa}-lab,
+  équipe \textsc{gaia}, Grenoble}
+À compter de septembre 2026. Cette délégation prolonge mes travaux sur la
+géométrie des données multivariées vers la polarimétrie et l'interférométrie
+radar, en collaboration avec Nicolas Le Bihan et Pierre-Olivier Amblard.
+
+\cventry[depuis 2020]{Maître de conférences}{Université Savoie Mont-Blanc ---
+  \textsc{listic} et Polytech Annecy-Chambéry}
+Recherche au \textsc{listic}, enseignement à Polytech Annecy-Chambéry.
+Responsable du thème AFUTE (Apprentissage, Fusion, Télédétection)
+depuis mars 2024 ; chargé de mission « intelligence artificielle dans les
+formations » depuis 2023.
+
+\cventry[2019--2020]{Post-doctorant}{Université Aalto, Helsinki, Finlande}
+\emph{Géométrie riemannienne pour l'apprentissage statistique}, sous la
+responsabilité du \textsc{pr}~Esa Ollila.
+
+\cventry[2016--2019]{Doctorant}{Laboratoire \textsc{sondra}
+  (CentraleSupélec) et université Paris-Saclay}
+\emph{Contributions à l'analyse de séries temporelles d'images
+\textsc{sar}}~\cvcite{THESE19}.
+
+\cventry[2016]{Enseignant vacataire}{\textsc{iut} d'Orsay, département informatique}
+Programmation C++ et Java, projet de robotique.
+
+
+\subsection{Formation}
+\label{subsec:cv-formation}
+
+\cventry[2019]{Doctorat de l'université Paris-Saclay}{Spécialité traitement du
+  signal, préparé au laboratoire \textsc{sondra} (CentraleSupélec)}
+
+\begin{cvfields}
+  \item[Titre] \emph{Contributions to \textsc{sar} Image Time Series
+    Analysis}~\cvcite{THESE19}
+  \item[Soutenance] 26 septembre 2019
+  \item[Direction] Guillaume Ginolhac et Jean-Philippe Ovarlez ;
+    encadrement : Abdourahmane Atto
+  \item[Jury]     
+    \begin{itemize}[label=$\bullet$]
+        \item Jean-Yves Tourneret, Professeur INP-ENSEIHHT  (rapporteur)
+        \item André Ferrari, PU Université de Nice (rapporteur)
+        \item Frédéric Pascal, Professeur CentraleSupélec (président)
+        \item Maria Greco, PU Université de Pise (Examinatrice)
+    \end{itemize}
+  \item[Distinction] Prix de la meilleure contribution scientifique, école
+    doctorale \textsc{stic}, 2019
+\end{cvfields}
+
+\cventry[2016]{Diplôme d'ingénieur}{Grenoble \textsc{inp} --- Phelma, spécialité
+  traitement du signal}
+
+\cvrubric{Formation pédagogique}
+
+J'ai suivi le cycle de formation à la pédagogie pour l'enseignement supérieur du
+département \textsc{apprendre} de l'université Savoie Mont-Blanc, soit 32~h
+équivalent \textsc{td}. Dans ce cadre, j'ai développé pour le module
+\textsc{info}501 une évaluation automatisée des travaux pratiques qui donne aux
+étudiants un retour immédiat et les fait progresser par itérations successives ;
+ce développement a été reconnu par une décharge de 32~h équivalent \textsc{td}.
+
+
+% ============================================================================
+\section{Activités de recherche}
+\label{sec:cv-recherche}
+% ============================================================================
+
+\subsection{Thématiques}
+\label{subsec:cv-thematiques}
+
+\begin{cvfields}
+  \item[Mots-clés] Télédétection, imagerie satellitaire, apprentissage
+    statistique, géométrie riemannienne, statistiques robustes, optimisation
+    sur variétés, science reproductible
+\end{cvfields}
+
+\medskip
+
+Ma recherche articule deux versants complémentaires : le développement théorique
+d'estimateurs et de détecteurs d'une part, la mise en pratique d'algorithmes
+rapides et robustes pour de grands volumes de données de télédétection d'autre
+part. Le fil conducteur en est la matrice de covariance --- objet de ce mémoire
+--- prise comme descripteur des données, et la géométrie riemannienne de
+l'espace des matrices symétriques définies positives comme cadre naturel pour
+l'estimer et l'exploiter. Mes contributions se répartissent sur quatre axes.
+
+\begin{cvfields}
+  \item[Télédétection] Traitement et classification d'images satellitaires,
+    radar et géophysiques : séries temporelles \textsc{sar}, détection de
+    changements, classification d'objets enfouis à partir de radargrammes
+    \textsc{gpr}, analyse de texture par ondelettes adaptées. C'est le versant
+    applicatif de mes travaux, mené avec des partenaires
+    industriels~\cvcite{JSTARS25,TGRS23,TGRS19,JSTARS20,CHAP21a,CHAP22,ICASSP24,IGARSS24}.
+  \item[Géométrie riemannienne] Estimation et apprentissage sur la variété des
+    matrices symétriques définies positives : moyenne de Fréchet corrigée en
+    grande dimension, lois sur variétés et estimation robuste, apprentissage de
+    modèles graphiques factoriels, structures de Kronecker, et plus récemment
+    apprentissage profond sur variété
+    \textsc{sdp}~\cvcite{ICML24,SP20,EUSIPCO21,ECML23,GRETSI23c,EUSIPCO22,IGARSS22,EUSIPCO26a}.
+  \item[Estimation et détection] Détection de cibles multivariées pour réseaux
+    d'antennes sous hypothèse non gaussienne, en imagerie \textsc{sar} puis en
+    milieu sous-marin --- sonar à croix de
+    Mills~\cvcite{TSP19,GRSL19,JOE24,SP24,JOE26}.
+  \item[Frugalité] Outils de gestion et d'archivage d'expériences
+    scientifiques, mesure de la frugalité des algorithmes, apprentissage
+    fédéré décentralisé~\cvcite{EUSIPCO25,MEAS25,IGARSS25}.
+\end{cvfields}
+
+
+\subsection{Cinq publications significatives}
+\label{subsec:cv-publications-significatives}
+
+\cventry[JSTARS25]{Classification of Buried Objects From Ground Penetrating Radar Images
+  by Using Second-Order Deep Learning Models}{\underline{D.~Jafuno},
+  \textbf{A.~Mian}, G.~Ginolhac, N.~Stelzenmuller. \emph{\textsc{ieee} Journal
+  of Selected Topics in Applied Earth Observations and Remote Sensing}, 2025}
+Aboutissement de la thèse de Douba Jafuno. L'article montre qu'un modèle profond
+du second ordre --- où la couche de représentation produit une matrice de
+covariance traitée dans sa géométrie propre --- classe les objets enfouis à
+partir de radargrammes \textsc{gpr} plus finement qu'une architecture
+convolutive standard, sur des données industrielles acquises en conditions
+réelles.
+
+\cventry[ICML24]{Random Matrix Theory Improved Fréchet Mean of Symmetric Positive
+  Definite Matrices}{F.~Bouchard, \textbf{A.~Mian}, M.~Tiomoko, G.~Ginolhac,
+  F.~Pascal. \emph{\textsc{icml}}, Vienne, 2024. Conférence de rang
+  \textsc{a}$^\ast$}
+Contribution théorique : la moyenne de Fréchet, estimateur central de tout
+traitement riemannien de matrices \textsc{sdp}, est biaisée en grande dimension
+lorsque le nombre d'échantillons est du même ordre que la dimension. Nous en
+donnons une correction issue de la théorie des matrices aléatoires, et montrons
+le gain qu'elle procure sur des tâches de classification.
+
+\cventry[JOE24]{Robust Detection for Mills Cross Sonar}{\underline{O.~Lerda},
+  \textbf{A.~Mian}, G.~Ginolhac, J.-P.~Ovarlez, D.~Charlot.
+  \emph{\textsc{ieee} Journal of Oceanic Engineering}, 2024}
+Issu de la thèse d'Olivier Lerda, en partenariat avec iXBlue. Transposition au
+sonar à croix de Mills des détecteurs robustes développés en radar : la prise en
+compte du caractère non gaussien du fouillis sous-marin et de la structure de la
+matrice de covariance améliore nettement la détection lorsque les données
+secondaires sont peu nombreuses.
+
+\cventry[ECML23]{Learning Graphical Factor Models with Riemannian
+  Optimization}{A.~Hippert-Ferrer, F.~Bouchard, \textbf{A.~Mian}, T.~Vayer,
+  A.~Breloy. \emph{\textsc{ecml-pkdd}}, Turin, 2023. Conférence de rang
+  \textsc{a}}
+Apprentissage de modèles graphiques dont la matrice de précision se décompose en
+un terme de faible rang et un terme structuré. La formulation riemannienne
+permet d'optimiser conjointement les deux composantes sous contrainte de définie
+positivité.
+
+\cventry[TGRS23]{New Robust Sparse Convolutional Coding Inversion Algorithm for Ground
+  Penetrating Radar Images}{\underline{M.~Gallet}, \textbf{A.~Mian},
+  G.~Ginolhac, E.~Ollila, N.~Stelzenmuller. \emph{\textsc{ieee} Transactions on
+  Geoscience and Remote Sensing}, 2023}
+Issu du stage de master~2 de Matthieu Gallet. Nouvel algorithme d'inversion pour le
+codage convolutif parcimonieux appliqué au \textsc{gpr}, robuste aux aberrations
+et aux hétérogénéités du sous-sol.
+
+
+\subsection{Encadrement doctoral et scientifique}
+\label{subsec:cv-encadrement}
+
+À ce jour j'ai co-encadré deux thèses soutenues et j'encadre deux thèses en
+cours, auxquelles s'ajoutera celle de Roman Wild à partir de 2026, soit un taux
+d'encadrement cumulé de \textbf{204~\%}. S'y ajoutent deux post-doctorants, un
+ingénieur de recherche et sept stagiaires de master~2. Le détail de chaque
+encadrement --- financement, jury, devenir professionnel --- figure en
+\cref{sec:cv-annexe-encadrements}.
+
+\cvrubric{Thèses soutenues}
+
+\cventry[2022--2025]{Douba Jafuno}{Classification de signaux \textsc{gpr} ---
+  \textsc{cifre} Géolithe}
+\begin{cvfields}
+  \item[Soutenance] 4 novembre 2025
+  \item[Encadrement] 45~\%, avec Guillaume Ginolhac et Nickolas Stelzenmuller
+  \item[Publications] \cvcite{JSTARS25,IGARSS24,GRETSI23b}
+\end{cvfields}
+
+\cventry[2021--2024]{Olivier Lerda}{Détection robuste pour un sonar à croix de
+  Mills --- ingénieur iXBlue à mi-temps}
+\begin{cvfields}
+  \item[Calendrier] Début en avril 2021, soutenance le 17 décembre 2024
+  \item[Encadrement] 33~\%, avec Guillaume Ginolhac et Jean-Philippe Ovarlez
+  \item[Particularité] Thèse menée à mi-temps, en parallèle de son poste
+    d'ingénieur chez iXBlue
+  \item[Publications] \cvcite{JOE24,JOE26,GRETSI23a}
+  \item[Devenir] Ingénieur de recherche chez Exail
+\end{cvfields}
+
+\cvrubric{Thèses en cours}
+
+\cventry[depuis 2024]{Matthieu Verlynde}{Apprentissage frugal pour la télédétection ---
+  bourse ministérielle}
+\begin{cvfields}
+  \item[Calendrier] Début octobre 2024, soutenance prévue en 2027
+  \item[Encadrement] 60~\%, avec Yajing Yan
+  \item[Publications] \cvcite{IGARSS25,EUSIPCO25}
+\end{cvfields}
+
+\cventry[depuis 2025]{Wenli Shi}{Réseaux de diffusion parcimonieux sur données non
+  textuelles --- \textsc{cifre} Givaudan}
+\begin{cvfields}
+  \item[Calendrier] Début décembre 2025, soutenance prévue en 2028
+  \item[Encadrement] Co-direction à 33~\%, avec Frédéric Pascal (\textsc{l2s},
+    université Paris-Saclay) et Matthieu Jonckheere (\textsc{dr cnrs},
+    \textsc{laas})
+\end{cvfields}
+
+\cventry[à partir de 2026]{Roman Wild}{Phase géométrique en \textsc{polinsar}
+  --- chaire \textsc{miai}}
+\begin{cvfields}
+  \item[Calendrier] Début en octobre 2026
+  \item[Encadrement] 33~\%, avec Nicolas Le Bihan et Pierre-Olivier Amblard
+  \item[Laboratoire] \textsc{gipsa}-lab, équipe \textsc{gaia}
+\end{cvfields}
+
+\cvrubric{Post-doctorants}
+
+J'encadre deux post-doctorants accueillis au laboratoire \textsc{l2s}
+(CentraleSupélec).
+
+\cventry{Hugo Brehier}{Mécanismes d'attention et transformers pour données sur
+  la variété \textsc{sdp}}
+Avec Florent Bouchard et Sylvain Chevallier entre Octobre 2024 et Décembre 2025.
+
+\cventry{Thibault Pautrel}{Apprentissage fédéré par géométrie riemannienne}
+Avec Florent Bouchard et Guillaume Ginolhac avec un début Septembre 2025 pour une fin Aout 2027.
+
+\cvrubric{Ingénieur de recherche}
+
+Dans le cadre de ma mission « intelligence artificielle », j'encadre un
+ingénieur de recherche dédié au développement d'une plateforme d'\textsc{ia}
+souveraine hébergée par l'école.
+
+\cvrubric{Stages de master 2}
+
+\cventry[2026]{Robin Duss}{Phase géométrique en \textsc{polinsar}}
+Avril à septembre 2026, encadrement à 33~\%, avec Nicolas Le Bihan et
+Pierre-Olivier Amblard au \textsc{gipsa}-lab. Stage préparatoire à la thèse de
+R.~Wild sur le même sujet.
+
+\cventry[2025]{Thibault Pautrel}{Apprentissage fédéré par géométrie riemannienne}
+Encadrement à 33~\%, avec F.~Bouchard et G.~Ginolhac. Devenu post-doctorant.
+
+\cventry[2025]{Mamour Ndiaye}{Pansharpening par variation totale}
+Encadrement à 33~\%, avec Y.~Mhiri et A.~Bhanot.
+
+\cventry[2025]{Thomas Petellat}{Détection de fissures volcaniques par apprentissage
+  automatique}
+Encadrement à 33~\%, avec C.~Lin-Kwong-Chon et Y.~Yan. Publication :
+\cvcite{RSV25}.
+
+\cventry[2024]{Matthieu Verlynde}{Apprentissage frugal en télédétection}
+Encadrement à 100~\%. Devenu doctorant sous ma direction.
+
+\cventry[2024]{Emma Molière}{Apprentissage frugal en télédétection}
+Encadrement à 50~\% avec Argheesh Bhanot. Devenue doctorante.
+
+\cventry[2020]{Matthieu Gallet}{Inversion robuste de signaux \textsc{gpr}}
+Encadrement à 50~\%, avec G.~Ginolhac. Devenu doctorant ; publication
+associée : \cvcite{TGRS23}.
+
+\label{subsec:cv-projets}
+
+\cvrubric{Appels à projets financés}
+
+\cventry[2025]{ATROCE --- Apprentissage fédéré décentralisé et frugal sur
+  des données continues}{\textsc{aap} Recherche \textsc{usmb},
+  10~k\texteuro{} --- \underline{co-porteur}}
+Avec S.~Monnet, A.~Benoit, M.~Bettineli, S.~Plassart, G.~Ginolhac.
+
+\cventry[2024]{AFREU --- Apprentissage fédéré riemannien résilient et
+  dynamique}{\textsc{aap} Recherche \textsc{usmb}, 15~k\texteuro{} ---
+  \underline{co-porteur}}
+Avec S.~Monnet, A.~Benoit, M.~Bettineli, S.~Plassart, G.~Ginolhac.
+
+\cventry[2021]{ELABORATE --- Plateforme ouverte pour la classification
+  géométrique robuste de signaux \textsc{eeg}}{\textsc{aap} Recherche
+  \textsc{usmb}, 3~k\texteuro{}, et appel exploratoire \textsc{gdr-iasis},
+  7~k\texteuro{} --- \underline{co-porteur} des deux}
+Avec F.~Bouchard et S.~Fortunati. Publication associée : \cvcite{EUSIPCO22}.
+
+\cventry[2020]{SMGA --- Stratigraphie de montagne aéroportée}{\textsc{aap}
+  Recherche et montagne \textsc{usmb}, 11~k\texteuro{} ---
+  \underline{porteur}}
+Avec G.~Ginolhac, A.~Atto et E.~Trouvé. Algorithmes d'inversion de données
+\textsc{gpr} géophysiques.
+
+\cvrubric{Contrats de gré à gré}
+
+\cventry[2025--2028]{Accompagnement de thèse \textsc{cifre}, CentraleSupélec}{25~k\texteuro{}
+  --- \underline{porteur}}
+Réseaux de diffusion parcimonieux, thèse de W.~Shi.
+
+\cventry[2022--2025]{Contrat \textsc{cifre}, Géolithe}{24~k\texteuro{} ---
+  \underline{porteur}}
+Stratigraphie de montagne aéroportée, thèse de D.~Jafuno.
+
+\cventry[2021--2024]{Contrat \textsc{cifre}, iXBlue}{30~k\texteuro{} ---
+  \underline{participant}}
+Détection robuste pour sonar à croix de Mills, thèse d'O.~Lerda.
+
+\cventry[2020--2021]{Contrat Géolithe}{12~k\texteuro{} --- \underline{participant}}
+Apprentissage automatique pour le traitement de données géoradar aéroportées.
+
+
+\subsection{Collaborations}
+\label{subsec:cv-collaborations}
+
+\begin{cvfields}
+  \item[Aalto] Université Aalto, Finlande (Esa Ollila). Collaboration
+    entretenue depuis mon post-doctorat par des séjours réciproques : j'ai
+    invité E.~Ollila un mois en 2023 et une semaine en 2024, et effectué
+    plusieurs séjours de recherche à Helsinki. Publications :
+    \cvcite{SP26,TGRS23}.
+  \item[\textsc{l2s}] CentraleSupélec (Frédéric Pascal, Florent Bouchard).
+    Co-encadrement des deux post-doctorants et de la thèse de W.~Shi, projets
+    communs en géométrie riemannienne : \cvcite{ICML24,ECML23,CHAP21a,CHAP22}.
+  \item[\textsc{sondra}] Université Paris-Saclay (Jean-Philippe Ovarlez).
+    Collaboration continue depuis la thèse, en détection robuste radar et
+    sonar : \cvcite{TSP19,JOE24,JOE26}.
+  \item[\textsc{cedric}] \textsc{cnam} (Arnaud Breloy). Apprentissage de
+    modèles graphiques et optimisation riemannienne, ainsi que l'estimation en
+    ligne sous structure de Kronecker :
+    \cvcite{ECML23,GRETSI23c,SP24,CHAP22}.
+  \item[\textsc{ign}] Alexandre Hippert-Ferrer. Apprentissage de graphes
+    structurés et classification riemannienne en présence de données
+    manquantes : \cvcite{ECML23,GRETSI23c,EUSIPCO22}.
+  \item[Industriels] Géolithe (\textsc{gpr}), iXBlue (sonar), Givaudan
+    (réseaux de diffusion).
+\end{cvfields}
+
+
+% ============================================================================
+\section{Rayonnement scientifique}
+\label{sec:cv-rayonnement}
+% ============================================================================
+
+\subsection{Animation et responsabilités scientifiques}
+\label{subsec:cv-animation}
+
+\cventry[depuis 2024]{Responsable du thème AFUTE}{Apprentissage, Fusion,
+  Télédétection --- \textsc{listic}, 17 permanents et 8 doctorants}
+J'organise les réunions et séminaires de l'équipe, définis ses orientations
+scientifiques et ai mis en place ses outils de travail collaboratif.
+
+\cventry[2022--2024]{Co-animateur de l'action « Télédétection »}{\textsc{gdr-iasis},
+  groupement de recherche \textsc{cnrs}}
+Le \textsc{gdr-iasis} fédère la communauté nationale du traitement du signal et
+des images ; sa restructuration en 2024 a mis fin à cette organisation par
+actions.
+
+\cvrubric{Organisation de journées scientifiques}
+
+Dans le cadre du \textsc{gdr-iasis}, j'ai organisé deux journées thématiques
+--- contact avec les intervenants, logistique, communication, animation ---
+réunissant chacune une centaine de participants.
+
+\begin{cvfields}
+  \item[Janvier 2023] Apprentissage faiblement supervisé en télédétection,
+    co-labellisée \textsc{comet cnes}
+  \item[Décembre 2024] Télédétection et climat, co-labellisée \textsc{comet
+    cnes} et \textsc{gdr} Climat
+\end{cvfields}
+
+\cvrubric{Responsabilités au sein de conférences internationales}
+
+\cventry[2027]{Local chair de \textsc{ssp}~2027}{\textsc{ieee} Statistical Signal
+  Processing Workshop, Annecy}
+Point de contact principal avec le centre de congrès d'Annecy pour l'ensemble
+des aspects logistiques --- réservation des salles, gestion des espaces,
+coordination technique. J'ai également établi le budget prévisionnel initial
+avec le comité d'organisation international.
+
+\cventry[2027]{Équipe de communication d'\textsc{eusipco}~2027}{}
+
+\cventry[2023]{Social media chair d'\textsc{eusipco}~2023}{}
+
+
+\subsection{Diffusion et valorisation}
+\label{subsec:cv-diffusion}
+
+\cvrubric{Activités éditoriales et expertise}
+
+\begin{cvfields}
+  \item[Édition] Éditeur associé du \emph{Springer Journal of Applied Signal
+    Processing} (\textsc{jasp}) de janvier à décembre 2025. J'ai mis fin à
+    cette fonction après le changement de politique éditoriale de Springer
+    intervenu en décembre 2025.
+  \item[Revues] Relecteur régulier --- une dizaine d'articles par an --- pour
+    \emph{\textsc{ieee} Transactions on Signal Processing},
+    \emph{\textsc{ieee} Journal of Selected Topics in Signal Processing},
+    \emph{\textsc{ieee} Signal Processing Letters}, \emph{Signal Processing}
+    (Elsevier), \emph{\textsc{ieee} Transactions on Geoscience and Remote
+    Sensing}, \emph{\textsc{ieee} Journal of Selected Topics in Applied Earth
+    Observations and Remote Sensing} et \emph{\textsc{ieee} Geoscience and
+    Remote Sensing Letters}.
+  \item[Conférences] Relecteur pour \textsc{eusipco}, \textsc{icassp},
+    \textsc{gretsi} et \textsc{ssp}.
+  \item[Expertises] Un projet \textsc{anr}~--- \textsc{astrid}
+    (Accompagnement spécifique des travaux de recherches et d'innovation
+    défense) et un projet \textsc{anr} Bienvenüe (programme régional Bretagne).
+\end{cvfields}
+
+\cvrubric{Sessions spéciales et tutoriaux}
+
+\cventry[2024]{Graph Learning in Signal Processing \& Machine Learning}{Tutoriel de
+  3~h à \textsc{eusipco}~2024, avec A.~Breloy, F.~Bouchard et
+  A.~Hippert-Ferrer}
+
+\cventry[2023]{Géométrie riemannienne}{Session spéciale \textsc{ss}12 à
+  \textsc{eusipco}~2023 --- organisateur}
+J'ai par ailleurs animé la session « Traitements multi-capteurs » au
+\textsc{gretsi}~2023.
+
+\cventry[2022]{Riemannian and Information Geometry in Signal Processing and Machine
+  Learning}{Tutoriel de 6~h à \textsc{eusipco}~2022, avec A.~Breloy et
+  F.~Bouchard}
+J'ai également animé la session « Remote Sensing » de la même édition.
+
+\cvrubric{Conférences et séminaires invités}
+
+\cventry[2026]{Apprentissage profond sur matrices de covariance : optimisation
+  riemannienne}{Journée \textsc{popills} 2026 ---
+  \url{https://popils-day.github.io}}
+
+\cventry[2022]{Riemannian Geometry in Machine Learning}{Laboratoire \textsc{cristal},
+  université de Lille, février 2022}
+
+\cvrubric{Logiciels libres}
+
+Le développement logiciel est le prolongement naturel du travail
+méthodologique : il conditionne la reproductibilité des résultats publiés et
+leur reprise par la communauté.
+
+\begin{cvfields}
+  \item[qanat] \emph{Auteur.} Gestion, archivage et traçabilité d'expériences
+    scientifiques. \url{https://github.com/ammarmian/qanat}
+  \item[robuststats] \emph{Auteur.} Estimation robuste de statistiques
+    d'ordre~2. \url{https://github.com/ammarmian/robuststats}
+  \item[pyRiemann] \emph{Contributeur.} Bibliothèque de référence pour le
+    traitement de données sur la variété \textsc{SPD}.
+    \url{https://github.com/pyRiemann/pyRiemann}
+  \item[spdlearn] \emph{Contributeur.} Apprentissage profond sur données
+    \textsc{sdp}. \url{https://github.com/bruAristimunha/spd_learn}
+\end{cvfields}
+
+\cvrubric{Vulgarisation}
+
+Fête de la science 2025 : animation d'un atelier grand public sur
+l'intelligence artificielle appliquée à la détection d'avalanches, illustrant
+l'apport des algorithmes d'apprentissage à la sécurité en montagne.
+
+
+\subsection{Participation à des jurys}
+\label{subsec:cv-jurys}
+
+\begin{cvfields}
+  \item[Jurys de thèse] Je n'ai à ce jour siégé dans aucun jury de thèse,
+    l'habilitation en étant la condition.
+  \item[Comités de suivi] Comité de suivi individuel de Huy Nguyen,
+    laboratoire \textsc{sondra}.
+\end{cvfields}
+
+\cvrubric{Comités de sélection}
+
+J'ai siégé dans six comités de sélection de maîtres de conférences, dans trois
+établissements et sur les deux sections dont relèvent mes activités.
+
+\begin{cvfields}
+  \item[\textsc{listic}] Université Savoie Mont-Blanc : deux comités en 2023,
+    en sections \textsc{cnu}~61 et~27, et un comité en 2026 en section
+    \textsc{cnu}~27.
+  \item[\textsc{leme}] \textsc{iut} de Ville-d'Avray : deux comités, en 2023
+    et en 2024, tous deux en section \textsc{cnu}~61.
+  \item[\textsc{cedric}] \textsc{cnam} : un comité en 2026, en section
+    \textsc{cnu}~27.
+\end{cvfields}
+
+
+% ============================================================================
+\section{Activités d'enseignement}
+\label{sec:cv-enseignement}
+% ============================================================================
+
+\subsection{Synthèse}
+\label{subsec:cv-enseignement-synthese}
+
+J'enseigne à Polytech Annecy-Chambéry sur l'ensemble du cursus d'ingénieur ---
+du cycle préparatoire intégré au master~2 --- ainsi que dans la formation
+doctorale de l'école \textsc{sie}. Mes enseignements se répartissent entre
+l'informatique (programmation, algorithmique, structures de données, bases de
+données, développement web), les mathématiques appliquées (optimisation) et
+l'intelligence artificielle. Le détail annuel du service figure en
+\cref{sec:cv-annexe-enseignements}.
+
+
+\subsection{Modules et responsabilités}
+\label{subsec:cv-modules}
+
+Je suis responsable pédagogique des modules ci-dessous : montage du cours,
+réalisation des supports, coordination de l'équipe d'intervenants, sujets
+d'examen et bilan.
+
+\cventry[L1]{\textsc{info}101 --- Introduction à la programmation}{Tronc commun,
+  80 étudiants --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Bases de la programmation en Python. Responsable sur le site d'Annecy, en
+coordination avec le site du Bourget ; équipe de 4 intervenants.
+
+\cventry[L3]{\textsc{info}501 --- Numération et algorithmique}{Tronc commun,
+  200 étudiants --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Représentation des nombres et algorithmique en Python. Responsable d'une équipe
+de 9 à 10 intervenants.
+
+\cventry[L3]{\textsc{info}503 --- Algorithmes et structures de données}{Filières
+  \textsc{sni} et \textsc{idu} --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Algorithmique en langage C et analyse de structures de données.
+
+\cventry[L3]{\textsc{data}601 --- Enjeux de l'intelligence artificielle}{Tronc
+  commun --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Mécanismes des \textsc{ia} génératives, enjeux éthiques et environnementaux.
+Montage du cours pour la rentrée 2026.
+
+\cventry[L3]{\textsc{math}641 --- Mathématiques spécialisées : optimisation}{Filière
+  \textsc{sni} --- \textsc{cm}, \textsc{td}}
+Co-responsable avec Abdourahmane Atto.
+
+\cventry[M1]{\textsc{info}734 --- Développement full-stack}{Filière \textsc{idu}
+  --- \textsc{cm}, \textsc{td}, projet}
+Application JavaScript complète : front-end, back-end, base de données.
+
+\cventry[M1]{\textsc{data}832 --- Machine learning~I}{Filière \textsc{idu} ---
+  \textsc{cm}, \textsc{td}, \textsc{tp}}
+Introduction à l'apprentissage automatique, orientée pratique.
+
+\cventry[M2]{\textsc{data}931 --- Théorie de l'apprentissage}{Filière \textsc{idu}
+  --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Concepts fondateurs de l'apprentissage automatique et de l'optimisation.
+
+\cventry[M2]{\textsc{isoc}931 --- Introduction à la recherche}{Filière \textsc{idu}
+  et école doctorale \textsc{sie} --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Méthodologie de la recherche en informatique, état de l'art, rédaction
+scientifique.
+
+\cventry[Doctorat]{Numerical Optimisation: Theory \& Applications}{Formation doctorale de
+  l'école \textsc{sie} --- \textsc{cm}, \textsc{td}, \textsc{tp}}
+Outils mathématiques des algorithmes d'optimisation continue, application aux
+problèmes inverses et à l'apprentissage automatique.
+
+\medskip
+\noindent J'interviens par ailleurs dans les modules de modélisation
+stochastique et d'apprentissage non supervisé placés sous la responsabilité de
+collègues, et j'assure chaque année le suivi de stages pour les filières
+\textsc{idu} et \textsc{sni}. J'ai enfin été responsable des semestres~7 et~8
+de la filière \textsc{sni} de septembre 2023 à août 2026.
+
+
+% ============================================================================
+\section{Responsabilités collectives}
+\label{sec:cv-responsabilites}
+% ============================================================================
+
+\cventry[depuis 2023]{Chargé de mission « intelligence artificielle dans les
+  formations »}{Polytech Annecy-Chambéry --- 12~h équivalent \textsc{td}}
+Référent \textsc{ia} de l'établissement, je définis la stratégie pédagogique en
+matière d'intelligence artificielle et coordonne les enseignements associés dans
+les différentes filières.
+
+\begin{cvfields}
+  \item[Cadrage] Animation de groupes de réflexion sur l'usage de
+    l'\textsc{ia} par les élèves
+  \item[Formation] Accompagnement des collègues souhaitant intégrer
+    l'\textsc{ia} générative à leurs cours
+  \item[Plateforme] Développement d'une plateforme d'\textsc{ia} souveraine
+    hébergée par l'école, avec encadrement de l'ingénieur de recherche dédié
+  \item[Communication] Diffusion de ces enjeux auprès de l'école et des
+    laboratoires de l'université
+\end{cvfields}
+
+\cventry[depuis 2024]{Responsable du thème AFUTE}{\textsc{listic} ---
+  17 permanents, 8 doctorants}
+Voir \cref{subsec:cv-animation}.
+
+\cventry[2023--2026]{Responsable des semestres~7 et~8}{Filière \textsc{sni}, Polytech
+  Annecy-Chambéry}
+De septembre 2023 à août 2026.
+
+
+
+% ============================================================================
+\section{Production scientifique}
+\label{sec:cv-production}
+% ============================================================================
+
+Ma production compte à ce jour 11~articles de revue internationale à comité de
+lecture, 3~chapitres d'ouvrage, 2~communications dans des conférences
+d'apprentissage automatique de rang \textsc{a} ou \textsc{a}$^\ast$,
+14~communications dans des conférences internationales de traitement du signal
+et 7~communications nationales. L'ensemble est déposé sur \textsc{hal}
+(extraction disponible ici : \url{https://ammarmian.fr/Publications.html}).
+
+Les noms \underline{soulignés} sont ceux d'étudiants ou de post-doctorants que
+j'ai encadrés. La clé portée en regard de chaque référence est celle qui la
+désigne dans le reste du mémoire. Chaque catégorie est donnée par date de
+parution décroissante.
+
+\cvrubric{Revues internationales à comité de lecture (11)}
+
+\begin{cvpublist}
+  \cvpub{SP26}
+  \cvpub{JOE26}
+  \cvpub{JSTARS25}
+  \cvpub{SP24}
+  \cvpub{JOE24}
+  \cvpub{TGRS23}
+  \cvpub{JSTARS20}
+  \cvpub{SP20}
+  \cvpub{TSP19}
+  \cvpub{TGRS19}
+  \cvpub{GRSL19}
+\end{cvpublist}
+
+\cvrubric{Chapitres d'ouvrage (3)}
+
+\begin{cvpublist}
+  \cvpub{CHAP22}
+  \cvpub{CHAP21a}
+  \cvpub{CHAP21b}
+\end{cvpublist}
+
+\cvrubric{Conférences d'apprentissage automatique (2)}
+
+\begin{cvpublist}
+  \cvpub{ICML24}
+  \cvpub{ECML23}
+\end{cvpublist}
+
+\cvrubric{Conférences internationales de traitement du signal (14)}
+
+\begin{cvpublist}
+  \cvpub{EUSIPCO26a}
+  \cvpub{EUSIPCO26b}
+  \cvpub{IGARSS25}
+  \cvpub{EUSIPCO25}
+  \cvpub{MEAS25}
+  \cvpub{ICASSP24}
+  \cvpub{IGARSS24}
+  \cvpub{EUSIPCO22}
+  \cvpub{IGARSS22}
+  \cvpub{EUSIPCO21}
+  \cvpub{ICASSP19}
+  \cvpub{ICASSP18}
+  \cvpub{EUSIPCO18}
+  \cvpub{EUSIPCO17}
+\end{cvpublist}
+
+\cvrubric{Conférences nationales (7)}
+
+\begin{cvpublist}
+  \cvpub{RSV25}
+  \cvpub{GRETSI23a}
+  \cvpub{GRETSI23b}
+  \cvpub{GRETSI23c}
+  \cvpub{GRETSI22}
+  \cvpub{GRETSI19}
+  \cvpub{GRETSI17}
+\end{cvpublist}
+
+\cvrubric{Thèse de doctorat}
+
+\begin{cvpublist}
+  \cvpub{THESE19}
+\end{cvpublist}
+
+
+% ============================================================================
+\section{Annexe : service d'enseignement détaillé}
+\label{sec:cv-annexe-enseignements}
+% ============================================================================
+
+Sauf mention contraire, les enseignements ci-dessous sont dispensés à Polytech
+Annecy-Chambéry en formation initiale. Les volumes sont donnés en heures
+effectives.
+
+\cvrubric{Année 2022--2023}
+
+\begin{tabularx}{\textwidth}{Xccrrrr}
+  \toprule
+  \tableheadline{Intitulé} & \tableheadline{Niv.} &
+  \tableheadline{Form.} & \tableheadline{Eff.} &
+  \tableheadline{\textsc{cm}} & \tableheadline{\textsc{td}} &
+  \tableheadline{\textsc{tp}} \\
+  \midrule
+  \textsc{info}101 --- Introduction à la programmation & L1 & \textsc{fi} & 80  & 6   & 9  & 24 \\
+  \textsc{info}501 --- Numération et algorithmique     & L3 & \textsc{fi} & 200 & 21  & 25 & 24 \\
+  \textsc{info}502 --- Bases de données                & L3 & \textsc{fi} & 24  &     & 9  & 24 \\
+  \textsc{info}701 --- Programmation Python (\textsc{iae} Annecy) & L3 & \textsc{fi} & 24 & 15 & & \\
+  \textsc{data}731 --- Modélisation stochastique       & M1 & \textsc{fi} & 24  & 4,5 &    &    \\
+  \textsc{data}832 --- Théorie de l'apprentissage      & M1 & \textsc{fi} & 24  & 3   & 3  & 4  \\
+  \textsc{data}931 --- Machine learning                & M2 & \textsc{fi} & 12  & 3   & 3  & 4  \\
+  \textsc{info}942 --- Apprentissage non supervisé     & M2 & \textsc{fi} & 24  & 4,5 &    &    \\
+  \textsc{isoc}931 --- Introduction à la recherche     & M2 & \textsc{fi} & 12  & 3   & 3  & 4  \\
+  Suivi de stage                                       & M2 & \textsc{fi} & 4   &     & 12 &    \\
+  \midrule
+  \textbf{Total} & & & & \textbf{60} & \textbf{64} & \textbf{84} \\
+  \bottomrule
+\end{tabularx}
+
+\cvrubric{Année 2023--2024}
+
+\begin{tabularx}{\textwidth}{Xccrrrr}
+  \toprule
+  \tableheadline{Intitulé} & \tableheadline{Niv.} &
+  \tableheadline{Form.} & \tableheadline{Eff.} &
+  \tableheadline{\textsc{cm}} & \tableheadline{\textsc{td}} &
+  \tableheadline{\textsc{tp}} \\
+  \midrule
+  \textsc{info}101 --- Introduction à la programmation & L1 & \textsc{fi} & 80  & 4,5 &     &    \\
+  \textsc{info}501 --- Numération et algorithmique     & L3 & \textsc{fi} & 200 & 21  & 9   & 48 \\
+  \textsc{info}502 --- Bases de données                & L3 & \textsc{fi} & 24  &     & 9   & 12 \\
+  \textsc{math}642 --- Optimisation                    & L3 & \textsc{fi} & 12  & 4,5 & 3   &    \\
+  \textsc{data}731 --- Modélisation stochastique       & M1 & \textsc{fi} & 24  & 1,5 &     & 8  \\
+  \textsc{info}734 --- Développement full-stack        & M1 & \textsc{fi} & 24  & 12  & 24  &    \\
+  \textsc{data}832 --- Théorie de l'apprentissage      & M1 & \textsc{fi} & 24  & 3   & 3   & 4  \\
+  \textsc{data}931 --- Machine learning                & M2 & \textsc{fi} & 12  & 3   & 3   & 4  \\
+  \textsc{isoc}931 --- Introduction à la recherche     & M2 & \textsc{fi} & 12  & 1,5 & 4,5 & 10 \\
+  Suivi de stage                                       & M2 & \textsc{fi} & 3   &     & 9   &    \\
+  \midrule
+  \textbf{Total} & & & & \textbf{51} & \textbf{64,5} & \textbf{86} \\
+  \bottomrule
+\end{tabularx}
+
+\cvrubric{Année 2024--2025}
+
+\begin{tabularx}{\textwidth}{Xccrrrr}
+  \toprule
+  \tableheadline{Intitulé} & \tableheadline{Niv.} &
+  \tableheadline{Form.} & \tableheadline{Eff.} &
+  \tableheadline{\textsc{cm}} & \tableheadline{\textsc{td}} &
+  \tableheadline{\textsc{tp}} \\
+  \midrule
+  \textsc{info}101 --- Introduction à la programmation & L1   & \textsc{fi} & 80  & 6    & 10,5 & 12 \\
+  \textsc{info}201 --- Systèmes d'exploitation         & L1   & \textsc{fi} & 15  &      &      & 15 \\
+  \textsc{info}501 --- Numération et algorithmique     & L3   & \textsc{fi} & 200 & 36   & 21   & 36 \\
+  \textsc{info}502 --- Bases de données                & L3   & \textsc{fi} & 24  &      & 4,5  & 12 \\
+  \textsc{math}642 --- Optimisation                    & L3   & \textsc{fi} & 12  & 4,5  & 3    &    \\
+  \textsc{data}731 --- Modélisation stochastique       & M1   & \textsc{fi} & 24  & 1,5  &      & 8  \\
+  \textsc{info}734 --- Développement full-stack        & M1   & \textsc{fi} & 24  & 12   & 24   &    \\
+  \textsc{data}832 --- Théorie de l'apprentissage      & M1   & \textsc{fi} & 24  & 9    & 6    & 8  \\
+  \textsc{data}931 --- Machine learning                & M2   & \textsc{fi} & 12  & 3    & 3    & 4  \\
+  \textsc{isoc}931 --- Introduction à la recherche     & M2   & \textsc{fi} & 12  & 1,5  & 7,5  & 10 \\
+  \textsc{pr\&d sni}                                   & M2   & \textsc{fi} & 2   &      & 15   &    \\
+  Numerical Optimisation: Theory \& Applications       & Doc. & \textsc{fi} & 20  & 13,5 & 6    & 4  \\
+  Suivi de stage                                       & M2   & \textsc{fi} &     &      & 24   &    \\
+  \midrule
+  \textbf{Total} & & & & \textbf{87} & \textbf{124,5} & \textbf{109} \\
+  \bottomrule
+\end{tabularx}
+
+
+% ============================================================================
+\section{Annexe : fiches d'encadrement doctoral}
+\label{sec:cv-annexe-encadrements}
+% ============================================================================
+
+\cventry[2021--2024]{Olivier Lerda}{Détection robuste pour un sonar à croix de Mills}
+\begin{cvfields}
+  \item[Période] Début en avril 2021, soutenance le 17 décembre 2024
+  \item[Financement] Ingénieur chez iXBlue, thèse préparée à mi-temps en
+    parallèle de son poste --- il ne s'agit pas d'un contrat \textsc{cifre}
+  \item[Encadrement] 33~\%, avec Guillaume Ginolhac et Jean-Philippe Ovarlez
+  \item[Discipline] \textsc{stic} --- traitement de l'information
+  \item[École doctorale] Sciences, ingénierie, environnement (Chambéry)
+  \item[Laboratoire] \textsc{listic}, Annecy --- soutenance à Chambéry
+  \item[Jury] Nicolas Le Bihan (président) ; Philippe Forster et Éric
+    Chaumette (rapporteurs) ; Angélique Drémeau (examinatrice)
+  \item[\textsc{doi}] \href{https://doi.org/10.70675/342ac9b9z6383z42acza2aez69f69e3bbfcf}%
+    {10.70675/342ac9b9z6383z42acza2aez69f69e3bbfcf}
+  \item[Publications] \cvcite{JOE24,JOE26,GRETSI23a}
+  \item[Devenir] Ingénieur de recherche chez Exail
+\end{cvfields}
+
+\cventry[2022--2025]{Douba Jafuno}{Classification de signaux \textsc{gpr}}
+\begin{cvfields}
+  \item[Période] Début le 1\textsuperscript{er} juin 2022, soutenance le
+    4 novembre 2025
+  \item[Financement] Contrat \textsc{cifre} avec Géolithe
+  \item[Encadrement] 45~\%, avec Guillaume Ginolhac et Nickolas Stelzenmuller
+  \item[Discipline] \textsc{stic} --- traitement de l'information
+  \item[École doctorale] Sciences, ingénierie, environnement (Chambéry)
+  \item[Laboratoire] \textsc{listic}, Annecy --- soutenance à Chambéry
+  \item[Jury] Thomas Oberlin (président) ; Sylvain Chevallier et Audrey
+    Giremus (rapporteurs) ; Sophie Giffard-Roisin (examinatrice)
+  \item[\textsc{doi}] \href{https://doi.org/10.70675/2b4df77cz09d2z4ad1z8c43z5ab013c30172}%
+    {10.70675/2b4df77cz09d2z4ad1z8c43z5ab013c30172}
+  \item[Publications] \cvcite{JSTARS25,IGARSS24,GRETSI23b}
+\end{cvfields}
+
+\cventry[depuis 2024]{Matthieu Verlynde}{Apprentissage frugal pour la télédétection}
+\begin{cvfields}
+  \item[Période] Début le 1\textsuperscript{er} octobre 2024, soutenance
+    prévue en 2027
+  \item[Financement] Bourse ministérielle
+  \item[Encadrement] 60~\%, avec Yajing Yan
+  \item[École doctorale] \textsc{sie}
+  \item[Publications] \cvcite{IGARSS25,EUSIPCO25}
+\end{cvfields}
+
+\cventry[depuis 2025]{Wenli Shi}{Réseaux de diffusion parcimonieux sur données non
+  textuelles}
+\begin{cvfields}
+  \item[Période] Début en décembre 2025, soutenance prévue en 2028
+  \item[Financement] Contrat \textsc{cifre} avec Givaudan
+  \item[Encadrement] Co-direction à 33~\%, avec Frédéric Pascal (\textsc{l2s},
+    université Paris-Saclay) et Matthieu Jonckheere (\textsc{dr cnrs},
+    \textsc{laas})
+  \item[École doctorale] STIC, Paris-Saclay
+\end{cvfields}
+
+\cventry[à partir de 2026]{Roman Wild}{Phase géométrique en \textsc{polinsar}}
+\begin{cvfields}
+  \item[Période] Début Octobre 2026
+  \item[Financement] Chaire \textsc{miai}
+  \item[Encadrement] 33~\%, avec Nicolas Le Bihan et Pierre-Olivier Amblard
+  \item[Laboratoire] \textsc{gipsa}-lab, équipe \textsc{gaia}
+\end{cvfields}
