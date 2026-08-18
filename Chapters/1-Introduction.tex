@@ -1295,6 +1295,428 @@ Signalons enfin que les difficultés dimensionnelles rencontrées en \cref{subse
 \subsection{Le cas complexe}
 \label{subsec:context-definition-complex}
 
+Nous avons jusqu'ici supposé les observations réelles. Or, la quasi-totalité des données que nous manipulerons dans cette dissertation sont complexes: la démodulation en quadrature d'un signal à bande étroite produit un couple de voies $I$ et $Q$ que l'on regroupe en une seule enveloppe complexe, et c'est sous cette forme que se présentent aussi bien les images RSO que les signaux d'une antenne SONAR. La phase n'y est pas un artefact de représentation: elle porte l'interférométrie, l'effet Doppler et la direction d'arrivée, et la jeter en ne conservant que le module reviendrait à perdre l'essentiel de l'information.
+
+Il serait tentant de considérer que tout ce qui précède se transpose mécaniquement en remplaçant les transpositions par des transpositions conjuguées. Ce n'est pas faux, mais c'est insuffisant à deux titres. D'une part, un vecteur aléatoire complexe n'est pas caractérisé au second ordre par sa seule matrice de covariance: il en faut une seconde, et l'usage universel de la première seule repose sur une hypothèse — la circularité — qu'il convient d'expliciter plutôt que de subir. D'autre part, les constantes de normalisation, les lois des formes quadratiques et jusqu'à la définition des fonctions de poids changent, de sorte qu'une transposition naïve conduit à des facteurs $2$ erronés. Cette sous-section reprend donc les résultats des \cref{subsec:context-distributions-gaussian,subsec:context-distributions-elliptical,subsec:context-robust-m-estimation} dans le cas complexe, en indiquant à chaque étape ce qui change et pourquoi.
+
+\subsubsection{Vecteurs aléatoires complexes et forme réelle}
+
+Un vecteur aléatoire complexe $\Variable\in\C^\Nvar$ n'est rien d'autre qu'un couple de vecteurs aléatoires réels, $\Variable = \Variable_x + j\Variable_y$ avec $\Variable_x,\Variable_y\in\R^\Nvar$. Sa loi \emph{est}, par définition, la loi conjointe du vecteur réel $2\Nvar$-dimensionnel obtenu par empilement, et il en va de même pour sa d.d.p. Tout ce que nous écrirons dans $\C^\Nvar$ peut donc être ramené à $\R^{2\Nvar}$, ce qui sera notre outil de démonstration systématique. Encore faut-il préciser ce que devient une matrice complexe dans cette correspondance.
+
+\begin{definition}[{Forme réelle d'une matrice complexe}]
+\label{def:context-complex-form}
+  Soit $\mat{A}\in\C^{\Nvar\times\Nvar}$. On appelle \textbf{forme réelle} de $\mat{A}$ la matrice réelle $2\Nvar\times2\Nvar$
+\begin{equation}
+  \complexform{\mat{A}}
+  \eqdef
+  \begin{pmatrix}
+    \Realp\mat{A} & -\Imagp\mat{A} \\
+    \Imagp\mat{A} & \Realp\mat{A}
+  \end{pmatrix},
+  \label{eq:context-complex-form}
+\end{equation}
+  et l'on dit d'une matrice réelle qu'elle est \emph{de forme complexe} lorsqu'elle s'écrit ainsi. En notant $\vector{v}=[\vector{x}^\T,\vector{y}^\T]^\T\in\R^{2\Nvar}$ le vecteur réel associé à $\vector{z}=\vector{x}+j\vector{y}$, on a l'équivalence $\mat{A}\vector{z} \longleftrightarrow \complexform{\mat{A}}\vector{v}$.
+\end{definition}
+
+\begin{property}[{Transport des structures}]
+\label{prop:context-complex-transport}
+  L'application $\complexform{\cdot}$ est un morphisme injectif d'algèbres: $\complexform{\mat{A}\mat{B}} = \complexform{\mat{A}}\complexform{\mat{B}}$, $\complexform{\mat{A}+\mat{B}} = \complexform{\mat{A}}+\complexform{\mat{B}}$ et $\complexform{\inv{\mat{A}}} = \inv{\complexform{\mat{A}}}$. De plus:
+  \begin{itemize}
+    \item $\mat{A}$ est hermitienne si et seulement si $\complexform{\mat{A}}$ est symétrique;
+    \item $\mat{A}$ est hermitienne définie positive si et seulement si $\complexform{\mat{A}}$ est symétrique définie positive, i.e, $\mat{A}\in\HPD{\Nvar}\iff\complexform{\mat{A}}\in\SPD{2\Nvar}$;
+    \item $\mat{A}$ est unitaire si et seulement si $\complexform{\mat{A}}$ est orthogonale;
+    \item $\Det(\complexform{\mat{A}}) = \abs{\Det(\mat{A})}^2$.
+  \end{itemize}
+\end{property}
+
+\begin{remark}
+  Ce simple énoncé, dû dans cette formulation à \sidecite[1.6cm]{6263313}, est l'outil central de toute la suite: chaque fois qu'un résultat du cas réel repose sur la seule structure du cône $\SPD{\cdot}$ — c'est le cas des théorèmes d'existence et d'unicité de la \cref{subsec:context-robust-m-estimation} — il se transporte au cas complexe sans nouvelle démonstration, en observant qu'une équation dans $\HPD{\Nvar}$ équivaut à la même équation dans $\SPD{2\Nvar}$ restreinte aux matrices de forme complexe.
+
+  Il donne aussi immédiatement le décompte des degrés de liberté, qui nous servira de fil conducteur. Une matrice de $\HPD{\Nvar}$ possède $\Nvar$ coefficients diagonaux réels et $\Nvar(\Nvar-1)/2$ coefficients extra-diagonaux complexes, soit $\Nvar^2$ paramètres réels libres, contre $\Nvar(\Nvar+1)/2$ dans le cas réel: il y a environ deux fois plus à estimer. Mais chaque observation apporte elle aussi deux fois plus de nombres réels, et nous verrons que ces deux facteurs se compensent exactement.
+\end{remark}
+
+\subsubsection{Statistiques d'ordre deux: covariance et pseudo-covariance}
+
+Venons-en au point qui n'a pas d'équivalent réel. Dans $\R^\Nvar$, la matrice $\E\{\Variable\Variable^\T\}$ épuise l'information d'ordre deux. Dans $\C^\Nvar$, les moments d'ordre deux d'un vecteur centré sont au nombre de deux, selon que l'on conjugue ou non le second facteur.
+
+\begin{definition}[{Covariance et pseudo-covariance}]
+\label{def:context-complex-pseudocov}
+  Soit $\Variable\in\C^\Nvar$ un vecteur aléatoire complexe centré de moments d'ordre deux finis. On appelle \textbf{matrice de covariance} et \textbf{matrice de pseudo-covariance}\footnote{Également appelée \emph{matrice de relation} par \cite{Picinbono1996}, qui l'introduit sous ce nom, et \emph{complementary covariance matrix} par \cite{SchreierScharf2010}.} de $\Variable$ les matrices
+\begin{equation}
+  \MCov_\Variable \eqdef \E\{\Variable\Variable^\herm\},
+  \qquad
+  \MPCov_\Variable \eqdef \E\{\Variable\Variable^\T\}.
+  \label{eq:context-complex-covpcov}
+\end{equation}
+  La première est hermitienne semi-définie positive, la seconde est symétrique complexe.
+\end{definition}
+
+Ces deux matrices contiennent exactement la même information que les trois blocs réels $\MCov_x=\E\{\Variable_x\Variable_x^\T\}$, $\MCov_y=\E\{\Variable_y\Variable_y^\T\}$ et $\MCov_{xy}=\E\{\Variable_x\Variable_y^\T\}$, puisque
+\begin{equation}
+  \MCov_\Variable = \MCov_x + \MCov_y + j\left(\MCov_{xy}^\T - \MCov_{xy}\right),
+  \qquad
+  \MPCov_\Variable = \MCov_x - \MCov_y + j\left(\MCov_{xy} + \MCov_{xy}^\T\right),
+  \label{eq:context-complex-blocs}
+\end{equation}
+relations que l'on inverse en $\MCov_x = \frac12\Realp(\MCov_\Variable+\MPCov_\Variable)$, $\MCov_y = \frac12\Realp(\MCov_\Variable-\MPCov_\Variable)$ et $\MCov_{xy} = \frac12\Imagp(\MPCov_\Variable-\MCov_\Variable)$. La covariance seule ne détermine donc pas les trois blocs: elle en fixe la somme $\MCov_x+\MCov_y$ et la partie antisymétrique de $\MCov_{xy}$, et laisse libre tout le reste. \\
+
+Une question se pose alors naturellement: le couple $(\MCov_\Variable,\MPCov_\Variable)$ peut-il être arbitraire, sous les seules réserves d'hermitianité et de symétrie? La réponse est négative, et la contrainte qui les lie est explicite.
+
+\begin{proposition}[{Admissibilité du couple covariance--pseudo-covariance}]
+\label{prop:context-complex-picinbono}
+  Soient $\MCov\in\HPD{\Nvar}$ et $\MPCov\in\C^{\Nvar\times\Nvar}$ symétrique. Il existe un vecteur aléatoire complexe $\Variable$ de covariance $\MCov$ et de pseudo-covariance $\MPCov$ si et seulement si la matrice
+\begin{equation}
+  \MErr \eqdef \conj{\MCov} - \MPCov^\herm\inv{\MCov}\MPCov
+  \label{eq:context-complex-picinbono}
+\end{equation}
+  est hermitienne semi-définie positive.
+\end{proposition}
+
+\begin{remark}[{Lecture en prédiction}]
+  La démonstration, due à \sidecite[2.4cm]{Picinbono1996}, consiste à écrire la matrice de covariance du vecteur augmenté $[\Variable^\T,\Variable^\herm]^\T\in\C^{2\Nvar}$,
+  $$
+  \E\left\{
+  \begin{pmatrix}\Variable\\\conj{\Variable}\end{pmatrix}
+  \begin{pmatrix}\Variable^\herm & \Variable^\T\end{pmatrix}
+  \right\}
+  =
+  \begin{pmatrix}
+    \MCov & \MPCov \\
+    \conj{\MPCov} & \conj{\MCov}
+  \end{pmatrix},
+  $$
+  puis à en prendre le complément de Schur: cette matrice est semi-définie positive, ce qu'elle doit être en tant que matrice de covariance, si et seulement si $\MErr\succeq 0$. La réciproque s'obtient en repassant aux blocs réels par \cref{eq:context-complex-blocs}.
+
+  La quantité $\MErr$ a de surcroît un sens statistique direct. La meilleure prédiction linéaire de $\conj{\Variable}$ à partir de $\Variable$ au sens des moindres carrés est $\MWl\Variable$ avec $\MWl = \MPCov^\herm\inv{\MCov}$, et $\MErr$ est précisément la matrice de covariance de l'erreur de prédiction associée. La contrainte $\MErr\succeq 0$ n'est donc rien d'autre que la positivité d'une covariance d'erreur, et le cas $\MPCov\neq\mat{0}$ signifie qu'une partie de $\conj{\Variable}$ est linéairement prédictible depuis $\Variable$: c'est ce qui fonde la notion d'estimation \emph{linéaire élargie}\footnote{\emph{Widely linear} en anglais, cf. \cite{PicinbonoChevalier1995}, où l'on montre qu'un prédicteur de la forme $\mat{A}\Variable + \mat{B}\conj{\Variable}$ est strictement meilleur qu'un prédicteur linéaire dès que $\MPCov\neq\mat{0}$.}.
+\end{remark}
+
+Le cas où cette pseudo-covariance s'annule est celui que nous retiendrons, et il mérite une définition en propre.
+
+\begin{definition}[{Circularité}]
+\label{def:context-complex-circularity}
+  Un vecteur aléatoire complexe $\Variable$ est dit \textbf{circulaire} (au sens strict) si sa loi est invariante par déphasage, i.e, si $e^{j\alpha}\Variable\overset{d}{=}\Variable$ pour tout $\alpha\in\R$. Il est dit \textbf{circulaire au second ordre}, ou \textbf{propre}\footnote{\emph{Proper} en anglais, terminologie introduite par \sidecite[-1.5cm]{NeeserMassey1993}.}, si l'une des trois conditions équivalentes suivantes est vérifiée:
+  \begin{enumerate}
+    \item $\MPCov_\Variable = \mat{0}$;
+    \item $\MCov_x = \MCov_y$ et $\MCov_{xy} = -\MCov_{xy}^\T$;
+    \item la matrice de covariance du vecteur réel associé est de forme complexe au sens de la \cref{def:context-complex-form}, et vaut $\frac12\complexform{\MCov_\Variable}$.
+  \end{enumerate}
+\end{definition}
+
+\begin{remark}
+  L'équivalence des trois conditions se lit directement sur \cref{eq:context-complex-blocs}. La circularité stricte entraîne la circularité au second ordre dès lors que les moments existent, puisque $\E\{e^{j\alpha}\Variable(e^{j\alpha}\Variable)^\T\} = e^{2j\alpha}\MPCov_\Variable$ doit être indépendant de $\alpha$; la réciproque est fausse en général, mais nous verrons qu'elle est vraie dans le cas gaussien.
+
+  Sur le plan de la modélisation, la circularité traduit l'absence de référence de phase privilégiée. Elle est physiquement légitime pour un signal à bande étroite après démodulation, la phase absolue de l'écho résultant d'un trajet de propagation dont la longueur est très grande devant la longueur d'onde et pouvant être tenue pour uniforme: c'est le cas du fouillis radar, de l'écho RSO d'une cellule de résolution comportant de nombreux diffuseurs, et du bruit ambiant SONAR. Elle cesse en revanche de l'être en présence d'un déséquilibre entre les voies $I$ et $Q$, d'un signal réel modulé, ou de certaines modulations numériques. Nous supposerons la circularité acquise dans toute la suite de cette dissertation, mais il s'agit bien d'une hypothèse de modélisation et non d'une commodité d'écriture; le lecteur intéressé par le cas général se reportera à \sidecite[-1cm]{Picinbono1994,SchreierScharf2010}.
+\end{remark}
+
+\subsubsection{La distribution gaussienne complexe}
+
+Un vecteur complexe est dit gaussien lorsque ses parties réelle et imaginaire sont conjointement gaussiennes. Sa d.d.p est donc entièrement déterminée par la gaussienne réelle en dimension $2\Nvar$, et il ne reste qu'à la réécrire en fonction de $\MCov_\Variable$ et $\MPCov_\Variable$.
+
+\begin{proposition}[{d.d.p gaussienne complexe générale}]
+\label{prop:context-complex-gaussianpdf}
+  Soit $\Variable\in\C^\Nvar$ un vecteur gaussien complexe centré, de covariance $\MCov_\Variable\in\HPD{\Nvar}$ et de pseudo-covariance $\MPCov_\Variable$, et soient $\MWl$ et $\MErr$ définies comme précédemment. Sa d.d.p, vue comme densité sur $\R^{2\Nvar}$, s'écrit
+\begin{equation}
+  \ddp{\Variable}(\vector{z})
+  =
+  \pi^{-\Nvar}
+  \left[\Det(\MCov_\Variable)\Det(\MErr)\right]^{-1/2}
+  \exp\left\{
+    -\vector{z}^\herm\conj{\inv{\MErr}}\vector{z}
+    + \Realp\left(\vector{z}^\T\MWl^\T\conj{\inv{\MErr}}\vector{z}\right)
+  \right\}.
+  \label{eq:context-complex-gaussiangeneral}
+\end{equation}
+\end{proposition}
+
+\begin{remark}
+  On peut mettre \cref{eq:context-complex-gaussiangeneral} sous une forme plus parlante en appliquant le lemme d'inversion matricielle à $\conj{\inv{\MErr}} = \inv{\MCov_\Variable} + \inv{\MCov_\Variable}\MPCov_\Variable\inv{\MErr}\MPCov_\Variable^\herm\inv{\MCov_\Variable}$: la d.d.p se factorise alors en le produit de la d.d.p du cas circulaire, donnée ci-dessous, et d'un facteur correctif ne dépendant que du couple $(\MWl,\MErr)$, dont le déterminant se réduit à $\Det(\inv{\MCov_\Variable}\MErr) = \Det(\Id{\Nvar}-\MWl^\herm\MWl^\T)$. Toute la non-circularité est ainsi concentrée dans ce facteur, qui vaut $1$ lorsque $\MPCov_\Variable=\mat{0}$.
+\end{remark}
+
+\begin{definition}[{Vecteur aléatoire gaussien complexe circulaire}]
+\label{def:context-complex-cgaussian}
+  On dit que $\Variable\in\C^\Nvar$ suit une distribution gaussienne complexe circulaire de moyenne $\Vmoy_\Variable$ et de covariance $\MCov_\Variable\in\HPD{\Nvar}$, et on note $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, si sa d.d.p est
+\begin{equation}
+  \ddp{\Variable}(\vector{z};\param)
+  =
+  \pi^{-\Nvar}\Det(\MCov_\Variable)^{-1}
+  \exp\left\{-\quadraticH{(\vector{z}-\Vmoy_\Variable)}{\MCov_\Variable}\right\}.
+  \label{eq:context-complex-cgaussianpdf}
+\end{equation}
+\end{definition}
+
+\begin{remark}[{Origine des constantes}]
+  L'\cref{eq:context-complex-cgaussianpdf} s'obtient en posant $\MPCov_\Variable=\mat{0}$ dans \cref{eq:context-complex-gaussiangeneral}, ce qui donne $\MWl=\mat{0}$, $\MErr=\conj{\MCov_\Variable}$, et donc $\Det(\MCov_\Variable)\Det(\MErr) = \Det(\MCov_\Variable)^2$ puisque le déterminant d'une matrice hermitienne définie positive est réel positif.
+
+  La comparaison avec \cref{eq:context-definition-gaussian} fait apparaître trois différences: la constante est $\pi^{-\Nvar}$ et non $(2\pi)^{-\Nvar/2}$, le déterminant est à la puissance $-1$ et non $-1/2$, et le facteur $1/2$ a disparu de la forme quadratique. Ces trois écarts ont une seule et même origine, qui est la \cref{def:context-complex-circularity}: la d.d.p n'est autre que celle d'une gaussienne réelle en dimension $2\Nvar$ dont la covariance vaut $\frac12\complexform{\MCov_\Variable}$. Le facteur $1/2$ de cette covariance absorbe celui de l'exposant, et \cref{prop:context-complex-transport} donne
+  $$
+  \Det\left(\tfrac12\complexform{\MCov_\Variable}\right)^{-1/2}
+  = \left(2^{-2\Nvar}\abs{\Det(\MCov_\Variable)}^2\right)^{-1/2}
+  = 2^{\Nvar}\Det(\MCov_\Variable)^{-1},
+  $$
+  le facteur $2^\Nvar$ transformant $(2\pi)^{-\Nvar}$ en $\pi^{-\Nvar}$. Il n'y a donc aucune convention arbitraire dans \cref{eq:context-complex-cgaussianpdf}: c'est la gaussienne réelle, lue dans les bonnes coordonnées.
+\end{remark}
+
+\begin{property}[{Loi de la forme quadratique}]
+\label{prop:context-complex-quadform}
+  Si $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, alors
+  \begin{equation}
+    \quadraticH{(\Variable-\Vmoy_\Variable)}{\MCov_\Variable}
+    \sim
+    \tfrac12\chisquared_{2\Nvar}
+    =
+    \gammadist(\Nvar,1).
+    \label{eq:context-complex-quadform}
+  \end{equation}
+\end{property}
+
+\begin{remark}
+  C'est la clé de lecture de tous les changements d'exposants qui suivront. Là où le cas réel faisait apparaître un $\chisquared_\Nvar$, le cas complexe fait apparaître un $\chisquared$ à $2\Nvar$ degrés de liberté, réduit de moitié: une observation complexe vaut bien deux observations réelles. On notera au passage que la circularité au second ordre entraîne ici la circularité stricte, puisque la d.d.p \cref{eq:context-complex-cgaussianpdf} centrée ne dépend de $\vector{z}$ qu'au travers d'une forme quadratique hermitienne, invariante par déphasage.
+\end{remark}
+
+L'estimation se transpose alors sans surprise, à ceci près que les lois exactes changent de constantes.
+
+\begin{proposition}[{mle et loi de la scm sous modèle gaussien complexe}]
+\label{prop:context-complex-mle}
+  \'Etant donné un ensemble d'observations i.i.d $\X$ de $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, les estimateurs au sens du maximum de vraisemblance sont
+  \begin{equation}
+    \hat{\Vmoy}_\Variable^{\mathrm{ML}} = \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\vector{z}_\iobs,
+    \qquad
+    \hat{\MCov}_\Variable^{\mathrm{ML}}
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \left(\vector{z}_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)
+    \left(\vector{z}_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)^\herm.
+    \label{eq:context-complex-mle}
+  \end{equation}
+  De plus, pour $\Nobs>\Nvar$, la matrice $\Smat=\Nobs\hat{\MCov}_\Variable^{\mathrm{ML}}$ suit une \textbf{distribution de Wishart complexe} à $\Nobs-1$ degrés de liberté \sidecite[1.2cm]{Goodman1963}, notée $\Smat\sim\cwishart(\Nobs-1,\MCov_\Variable)$, de d.d.p sur le cône $\HPD{\Nvar}$
+  \begin{equation}
+    \ddp{\Smat}(\mat{S};\Nobs,\MCov)
+    =
+    \frac{
+      \Det(\mat{S})^{\Nobs-\Nvar}
+      \exp\left\{-\trace{\inv{\MCov}\mat{S}}\right\}
+    }{
+      \tilde{\Gamma}_\Nvar(\Nobs)\Det(\MCov)^{\Nobs}
+    },
+    \label{eq:context-complex-cwishart}
+  \end{equation}
+  où $\tilde{\Gamma}_\Nvar(a) = \pi^{\Nvar(\Nvar-1)/2}\prod_{\ivar=1}^{\Nvar}\Gamma(a-\ivar+1)$ est la fonction gamma multivariée complexe. Enfin, $\hat{\Vmoy}_\Variable^{\mathrm{ML}}\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable/\Nobs)$ lui est indépendante.
+\end{proposition}
+
+\begin{proposition}[{Erreur quadratique de la scm complexe}]
+\label{prop:context-complex-msescm}
+  Pour l'estimateur non-biaisé $\hat{\MCov}_\Variable = \Smat/(\Nobs-1)$, on a
+  \begin{equation}
+    \Cov\left(
+      (\hat{\MCov}_\Variable)_{\ivar\ivarbis},
+      (\hat{\MCov}_\Variable)_{k\ell}
+    \right)
+    =
+    \frac{(\MCov_\Variable)_{\ivar k}\conj{(\MCov_\Variable)_{\ivarbis \ell}}}{\Nobs-1},
+    \label{eq:context-complex-covscm}
+  \end{equation}
+  et, par sommation sur tous les coefficients,
+  \begin{equation}
+    \E\left\{\left\|\hat{\MCov}_\Variable-\MCov_\Variable\right\|_\frob^2\right\}
+    =
+    \frac{\left(\trace{\MCov_\Variable}\right)^2}{\Nobs-1}.
+    \label{eq:context-complex-msescm}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  La comparaison avec l'\cref{eq:context-distributions-msescm} est instructive. Le moment d'ordre quatre d'un vecteur gaussien complexe circulaire vaut $\E\{\variable_a\conj{\variable_b}\variable_c\conj{\variable_d}\} = \MCov_{ab}\MCov_{cd} + \MCov_{ad}\MCov_{cb}$, soit deux termes comme dans le cas réel; mais l'un des deux ne survit pas au centrage, alors que dans le cas réel les deux subsistent. C'est cette disparition du terme $\|\MCov_\Variable\|_\frob^2$ qui distingue \cref{eq:context-complex-msescm} de son homologue réelle.
+
+  Pour $\MCov_\Variable=\Id{\Nvar}$, l'erreur vaut $\Nvar^2/(\Nobs-1)$, contre $\Nvar(\Nvar+1)/(\Nobs-1)$ dans le cas réel. Le rapport n'est pas $2$ mais $2\Nvar/(\Nvar+1)$, et la lecture correcte n'est pas que le cas complexe serait plus coûteux: en notant $p$ le nombre de paramètres réels libres, l'erreur vaut $2p/(\Nobs-1)$ dans le cas réel et $p/(\Nobs-1)$ dans le cas complexe. Rapportée au nombre de scalaires \emph{réels} effectivement observés — $\Nobs\Nvar$ d'un côté, $2\Nobs\Nvar$ de l'autre — la précision est donc exactement la même. Le doublement du nombre de paramètres constaté plus haut est intégralement compensé par le doublement de l'information apportée par chaque observation, et la lecture en $\Nvar^2/\Nobs$ de la \cref{subsec:context-covariance-regularized-estimation} demeure inchangée.
+\end{remark}
+
+\subsubsection{Distributions elliptiques complexes}
+
+Le passage aux distributions elliptiques complexes (ces\footnote{Pour \emph{Complex Elliptically Symmetric} en anglais.}) suit la même logique: on conserve la dépendance en la seule forme quadratique hermitienne, et l'on relâche le générateur.
+
+\begin{definition}[{Distribution elliptique complexe}]
+\label{def:context-complex-ces}
+  Soit $\densgen:\R^+\to\R^+$ vérifiant la condition de moment fini
+  \begin{equation}
+    \densgenmomentC{\Nvar}
+    \eqdef
+    \int_{\R^+} t^{\Nvar-1}\densgen(t)\diff t < \infty,
+    \label{eq:context-complex-momentfini}
+  \end{equation}
+  et $\MScatter\in\HPD{\Nvar}$. On dit que $\Variable$ suit une distribution elliptique complexe de paramètres $\param=(\Vmoy_\Variable,\MScatter,\densgen)$, et on note $\Variable\sim\celliptical(\Vmoy_\Variable,\MScatter,\densgen)$, si sa d.d.p est
+  \begin{equation}
+    \ddp{\Variable}(\vector{z};\param)
+    =
+    \densgenconstC{\Nvar}\Det(\MScatter)^{-1}
+    \densgen\left(\quadraticH{(\vector{z}-\Vmoy_\Variable)}{\MScatter}\right),
+    \qquad
+    \densgenconstC{\Nvar}
+    \eqdef
+    \frac{\Gamma(\Nvar)}{\pi^\Nvar\densgenmomentC{\Nvar}}.
+    \label{eq:context-complex-cespdf}
+  \end{equation}
+\end{definition}
+
+\begin{remark}
+  La comparaison avec la \cref{def:context-distributions-elliptical} tient en trois substitutions: l'exposant $\Nvar/2-1$ du moment devient $\Nvar-1$, le déterminant passe de la puissance $-1/2$ à $-1$, et l'aire de la sphère unité $\spherearea{\Nvar}$ est remplacée par celle de la sphère unité de $\C^\Nvar\simeq\R^{2\Nvar}$, soit $\spherearea{2\Nvar}=2\pi^\Nvar/\Gamma(\Nvar)$. La constante s'obtient d'ailleurs par le même calcul: le changement de variable $\vector{y}=\MScatter^{-1/2}(\vector{z}-\Vmoy_\Variable)$ suivi d'un passage en coordonnées polaires dans $\R^{2\Nvar}$ donne $\densgenconstC{\Nvar} = 2\inv{\left(\spherearea{2\Nvar}\densgenmomentC{\Nvar}\right)}$, ce qui est bien l'expression annoncée. On vérifie que le cas gaussien $\densgen(t)=\exp(-t)$ — et non plus $\exp(-t/2)$ — donne $\densgenmomentC{\Nvar}=\Gamma(\Nvar)$ et donc $\densgenconstC{\Nvar}=\pi^{-\Nvar}$, en accord avec \cref{eq:context-complex-cgaussianpdf}.
+\end{remark}
+
+\begin{property}[{Représentation stochastique et lien dispersion--covariance}]
+\label{prop:context-complex-stochastic}
+  Si $\Variable\sim\celliptical(\Vmoy_\Variable,\MScatter,\densgen)$, alors
+  \begin{equation}
+    \Variable \overset{d}{=} \Vmoy_\Variable + \modvar\,\MScatter^{1/2}\vector{u},
+    \qquad
+    \vector{u}\sim\uniform\left(\csphere{\Nvar-1}\right),
+    \qquad
+    \p{\quadvar}(q) = \inv{\densgenmomentC{\Nvar}}\,q^{\Nvar-1}\densgen(q),
+    \label{eq:context-complex-stochastic}
+  \end{equation}
+  où $\modvar=\sqrt{\quadvar}$ est indépendante de $\vector{u}$, uniforme sur la sphère unité complexe $\csphere{\Nvar-1}=\{\vector{s}\in\C^\Nvar;\,\norm{\vector{s}}_2=1\}$. Si de plus les moments d'ordre deux existent,
+  \begin{equation}
+    \MCov_\Variable = \frac{\E\{\quadvar\}}{\Nvar}\MScatter,
+    \qquad
+    \E\{\quadvar\} = \frac{\densgenmomentC{\Nvar+1}}{\densgenmomentC{\Nvar}},
+    \qquad
+    \MPCov_\Variable = \mat{0}.
+    \label{eq:context-complex-scattercov}
+  \end{equation}
+\end{property}
+
+\begin{remark}
+  Le lien entre dispersion et covariance est donc formellement \emph{identique} à celui de la \cref{prop:context-distributions-scattercov}, seule la définition du moment $\densgenmomentC{\cdot}$ ayant changé; la \cref{def:context-distributions-scaleshape} de la paramétrisation échelle-forme et tout ce qui en découle s'appliquent inchangées, sur $\HPD{\Nvar}$ plutôt que sur $\SPD{\Nvar}$. On notera en revanche le troisième point de \cref{eq:context-complex-scattercov}: une distribution elliptique complexe au sens de la \cref{def:context-complex-ces} est automatiquement circulaire, puisque sa d.d.p ne dépend de $\vector{z}$ qu'au travers d'une forme quadratique hermitienne. La famille ces telle qu'elle est usuellement définie \cite{6263313} est donc, par construction, une famille de lois circulaires\footnote{Il existe des extensions non circulaires, construites sur le vecteur augmenté $[\vector{z}^\T,\vector{z}^\herm]^\T$, que nous n'emploierons pas.}.
+
+  La sous-famille des gaussiennes composées se définit de même par $\Variable \overset{d}{=} \Vmoy_\Variable + \sqrt{\texture}\,\Variablebis$ avec $\Variablebis\sim\cgaussian(\vector{0},\MShape)$ et $\texture$ une texture réelle positive indépendante, ce que nous noterons $\Variable\sim\ccompoundgaussian(\Vmoy_\Variable,\MShape,\p{\texture})$. Les modèles de la \cref{subsec:context-distributions-elliptical} — $t$ de Student, K, gaussienne généralisée — en admettent tous une version complexe, obtenue en assignant à la texture la même loi et en substituant le speckle complexe au speckle réel. Le modèle de gaussienne composée déterministe \cref{eq:context-distributions-detcompoundgaussian} se transpose de la même manière, en $\vector{z}_\iobs\sim\cgaussian(\vector{0},\texture_\iobs\MShape)$; c'est sous cette forme que nous l'emploierons au \cref{ch:robust-detection}. Signalons enfin que \cite{6263313} valide expérimentalement ces modèles sur des données de fouillis radar réelles (jeux IPIX), et introduit à cette occasion un modèle de texture inverse-gaussienne dont l'ajustement aux queues de distribution s'avère supérieur à celui des modèles $\kdist$ et $t$ usuels.
+\end{remark}
+
+\subsubsection{M-estimation complexe}
+
+Reprenons enfin l'estimation robuste. En annulant, au sens du calcul différentiel complexe précisé plus bas, la dérivée de la log-vraisemblance associée à \cref{eq:context-complex-cespdf}, on obtient là encore une équation de point fixe.
+
+\begin{proposition}[{\'Equation du mle sous modèle ces}]
+\label{prop:context-complex-mlefixedpoint}
+  \'Etant donné des observations i.i.d $\X$ de $\Variable\sim\celliptical(\vector{0},\MScatter,\densgen)$, le mle de $\MScatter$ vérifie
+  \begin{equation}
+    \hat{\MScatter}
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \weight\left(\quadraticH{\vector{z}_\iobs}{\hat{\MScatter}}\right)
+    \vector{z}_\iobs\vector{z}_\iobs^\herm,
+    \qquad
+    \weight(t) \eqdef -\frac{\densgen'(t)}{\densgen(t)}.
+    \label{eq:context-complex-fixedpoint}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  Le facteur $2$ de la fonction de poids de l'\cref{eq:context-robust-fixedpoint} a disparu: c'est la contrepartie exacte de la disparition du $1/2$ dans l'exposant de la d.d.p gaussienne, et confondre les deux conventions est l'erreur la plus fréquente lors du passage au complexe. On vérifie la cohérence sur le cas gaussien: $\densgen(t)=\exp(-t)$ donne $\weight(t)=1$, donc la scm de \cref{eq:context-complex-mle}. Pour le $t$ de Student complexe à $\dof$ degrés de liberté, de générateur $\densgen(t)=(1+2t/\dof)^{-(2\Nvar+\dof)/2}$, on obtient
+  $$
+  \weight(t) = \frac{2\Nvar+\dof}{\dof+2t},
+  $$
+  décroissante comme dans le cas réel, et l'on retrouve bien $\Nvar\mapsto2\Nvar$, $t\mapsto2t$: le poids complexe en dimension $\Nvar$ est le poids réel en dimension $2\Nvar$.
+\end{remark}
+
+La définition d'un M-estimateur complexe est alors identique à la \cref{def:context-robust-mestimator}, la transposée étant remplacée par la transposée conjuguée et le cône $\SPD{\Nvar}$ par $\HPD{\Nvar}$. C'est ici que la \cref{prop:context-complex-transport} paye:
+
+\begin{proposition}[{Existence et unicité, cas complexe}]
+\label{prop:context-complex-existence}
+  Sous les conditions de la \cref{prop:context-robust-existence} appliquées en dimension $2\Nvar$, l'équation \cref{eq:context-complex-fixedpoint} admet une unique solution dans $\HPD{\Nvar}$, limite des itérations de point fixe correspondantes.
+\end{proposition}
+
+\begin{remark}
+  La démonstration \sidecite[1.7cm]{6263313} consiste précisément à observer que $\hat{\MScatter}$ résout \cref{eq:context-complex-fixedpoint} si et seulement si $\complexform{\hat{\MScatter}}$ résout l'équation de M-estimation réelle associée aux $2\Nobs$ vecteurs $\{\vector{v}_\iobs, \complexform{j\Id{\Nvar}}\vector{v}_\iobs\}$, où $\vector{v}_\iobs$ est la forme réelle de $\vector{z}_\iobs$. Les résultats de \cite{Maronna76,Kent1991} s'appliquent alors tels quels. On notera que la condition dimensionnelle porte sur $2\Nvar$ et que le doublement du nombre de vecteurs réels la compense: la condition effective demeure $\Nobs>\Nvar$ en nombre d'observations \emph{complexes}.
+\end{remark}
+
+\begin{definition}[{Estimateur de Tyler complexe}]
+\label{def:context-complex-tyler}
+  L'estimateur de Tyler complexe est le M-estimateur associé à $\weight(t)=\Nvar/t$, i.e, la solution de
+  \begin{equation}
+    \Tyler
+    =
+    \frac{\Nvar}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \frac{\vector{z}_\iobs\vector{z}_\iobs^\herm}{\quadraticH{\vector{z}_\iobs}{\Tyler}},
+    \label{eq:context-complex-tyler}
+  \end{equation}
+  assortie de la normalisation $\trace{\Tyler}=\Nvar$.
+\end{definition}
+
+\begin{property}[{Caractère distribution-free}]
+\label{prop:context-complex-tylerdf}
+  L'estimateur \cref{eq:context-complex-tyler} est le mle de la matrice de forme sous le modèle de gaussienne composée déterministe complexe, quelles que soient les textures. C'est également le mle de la matrice de forme de la distribution \textbf{angulaire centrale gaussienne complexe}, notée $\vector{u}\sim\cangular(\MShape)$, de d.d.p sur la sphère $\csphere{\Nvar-1}$
+  \begin{equation}
+    \ddp{\vector{u}}(\vector{u};\MShape)
+    =
+    \frac{\Gamma(\Nvar)}{2\pi^\Nvar}\Det(\MShape)^{-1}
+    \left(\quadraticH{\vector{u}}{\MShape}\right)^{-\Nvar},
+    \label{eq:context-complex-acg}
+  \end{equation}
+  qui est la loi de $\Variable/\norm{\Variable}_2$ pour tout $\Variable\sim\celliptical(\vector{0},\MShape,\densgen)$, indépendamment de $\densgen$.
+\end{property}
+
+\begin{remark}
+  La \cref{eq:context-complex-acg} donne un contenu très concret à la notion de robustesse retenue en \cref{prop:context-robust-distributionfree}: le vecteur normalisé perd toute mémoire du générateur de densité, et Tyler n'est rien d'autre que le mle de la loi qu'il suit alors. On notera que cette d.d.p, quoique de la forme \cref{eq:context-complex-cespdf}, n'est pas celle d'une distribution ces: elle est définie par rapport à la mesure uniforme sur $\csphere{\Nvar-1}$ et non par rapport à la mesure de Lebesgue sur $\C^\Nvar$.
+\end{remark}
+
+Quant au comportement asymptotique, la \cref{prop:context-robust-asymptotic} se transpose avec la même structure — une combinaison de $(\Id{\Nvar^2}+\Kmat)(\MScatter\otimes\conj{\MScatter})$ et de $\vecop(\MScatter)\vecop(\MScatter)^\herm$ — au prix d'une subtilité: le vecteur limite étant complexe, sa loi n'est pleinement caractérisée que par la donnée de sa covariance \emph{et} de sa pseudo-covariance, conformément à la \cref{def:context-complex-pseudocov}. Le point qui nous intéresse est le suivant: pour la matrice de forme issue de l'estimateur de Tyler complexe, le scalaire correspondant à celui de \cref{eq:context-robust-tylerasymptotic} vaut
+\begin{equation}
+  \sigma_1 = \frac{\Nvar+1}{\Nvar},
+  \label{eq:context-complex-tylerasymptotic}
+\end{equation}
+au lieu de $(\Nvar+2)/\Nvar$ dans le cas réel. L'efficacité relative asymptotique de Tyler par rapport à la scm, lorsque les données sont effectivement gaussiennes complexes, vaut donc $\Nvar/(\Nvar+1)$: elle est de $66,7\%$ à $\Nvar=2$, de $90\%$ à $\Nvar=9$, et tend vers $1$ avec la dimension. Le prix de la robustesse est ainsi \emph{plus faible} dans le cas complexe que dans le cas réel, ce qui n'est que la traduction asymptotique de ce que nous avons déjà constaté sur l'erreur quadratique: à dimension égale, une observation complexe est deux fois plus informative. C'est un argument dont nous ferons usage au \cref{ch:robust-detection}, où la dimension est celle du nombre de capteurs ou de canaux polarimétriques.
+
+\subsubsection{Dérivation: le calcul de Wirtinger}
+
+Il reste à justifier ce que signifie « annuler la dérivée » d'une log-vraisemblance dans \cref{prop:context-complex-mlefixedpoint}. La difficulté est réelle: une log-vraisemblance est une fonction \emph{à valeurs réelles} d'une variable complexe, et une telle fonction, si elle n'est pas constante, ne vérifie jamais les conditions de Cauchy-Riemann. Elle n'est donc pas holomorphe, et la dérivée complexe usuelle n'existe en aucun point.
+
+\begin{definition}[{Dérivées de Wirtinger}]
+\label{def:context-complex-wirtinger}
+  Soit $f:\C\to\R$ une fonction $\R$-différentiable, vue comme fonction de $(x,y)$ avec $z=x+jy$. On appelle \textbf{dérivées de Wirtinger} \sidecite[1.8cm]{Brandwood1983} les opérateurs
+  \begin{equation}
+    \frac{\partial}{\partial z}
+    \eqdef
+    \frac{1}{2}\left(\frac{\partial}{\partial x} - j\frac{\partial}{\partial y}\right),
+    \qquad
+    \frac{\partial}{\partial \conj{z}}
+    \eqdef
+    \frac{1}{2}\left(\frac{\partial}{\partial x} + j\frac{\partial}{\partial y}\right).
+    \label{eq:context-complex-wirtinger}
+  \end{equation}
+\end{definition}
+
+\begin{remark}
+  Ces opérateurs se manipulent comme des dérivées partielles ordinaires, en traitant formellement $z$ et $\conj{z}$ comme deux variables indépendantes, ce qui est légitime puisque le passage de $(x,y)$ à $(z,\conj{z})$ est un changement de variables linéaire inversible. La condition d'holomorphie s'y lit $\partial f/\partial\conj{z} = 0$, ce qui montre bien qu'aucune fonction à valeurs réelles non constante ne l'est.
+
+  Deux conséquences nous importent. D'abord, un point stationnaire de $f$ est caractérisé par $\partial f/\partial\conj{z} = 0$, et c'est cette équation, appliquée à la log-vraisemblance dérivée par rapport à $\conj{\MScatter}$, qui produit \cref{eq:context-complex-fixedpoint}. Ensuite, la direction de plus forte pente de $f$ est donnée par $2\,\partial f/\partial\conj{z}$ et non par $\partial f/\partial z$ \sidecite[0.5cm]{vandenBos1994,KreutzDelgado2009,Hjorungnes2011}: une descente de gradient sur une fonction de coût complexe s'écrit donc $\vector{z}\leftarrow\vector{z} - 2\gamma\,\partial f/\partial\conj{\vector{z}}$. Nous retrouverons ces opérateurs en \cref{subsec:context-riemann-optimization}, lorsqu'il s'agira de définir un gradient sur le cône $\HPD{\Nvar}$; les règles de calcul matriciel associées sont rassemblées dans \cite{Hjorungnes2011}.
+\end{remark}
+
+\subsubsection{Bilan}
+
+Le \cref{tab:context-complex-summary} rassemble les correspondances établies dans cette sous-section.
+
+\begin{table}[h]
+  \centering
+  \caption{Correspondances entre le cas réel et le cas complexe circulaire.}
+  \label{tab:context-complex-summary}
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+     & Réel & Complexe circulaire \\
+    \midrule
+    Transposition & $\mat{A}^\T$ & $\mat{A}^\herm$ \\
+    Cône & $\SPD{\Nvar}$ & $\HPD{\Nvar}$ \\
+    Paramètres libres & $\Nvar(\Nvar+1)/2$ & $\Nvar^2$ \\
+    Constante gaussienne & $(2\pi)^{-\Nvar/2}\Det(\MCov)^{-1/2}$ & $\pi^{-\Nvar}\Det(\MCov)^{-1}$ \\
+    Forme quadratique & $\chisquared_\Nvar$ & $\tfrac12\chisquared_{2\Nvar}$ \\
+    Moment de $\densgen$ & $\int t^{\Nvar/2-1}\densgen(t)\diff t$ & $\int t^{\Nvar-1}\densgen(t)\diff t$ \\
+    Fonction de poids & $-2\densgen'(t)/\densgen(t)$ & $-\densgen'(t)/\densgen(t)$ \\
+    eqm de la scm & $\frac{\|\MCov\|_\frob^2+(\trace{\MCov})^2}{\Nobs-1}$ & $\frac{(\trace{\MCov})^2}{\Nobs-1}$ \\[1.2ex]
+    Efficacité de Tyler & $\Nvar/(\Nvar+2)$ & $\Nvar/(\Nvar+1)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Dans toute la suite de cette dissertation, sauf mention explicite du contraire, les données seront supposées complexes et circulaires, et nous emploierons la transposée conjuguée sans plus le signaler. Nous conserverons par ailleurs l'abus de langage acté en \cref{prop:context-distributions-scattercov}, consistant à parler de matrice de covariance là où nous manipulerons une matrice de dispersion ou de forme.
+
 \section{Une vision riemannienne : géométrie du cône SPD et des matrices orthogonales}
 \label{sec:context-riemann}
 

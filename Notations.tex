@@ -26,6 +26,10 @@
 \DeclareMathOperator{\Tr}{\operatorname{Tr}} %  Trace
 
 \newcommand{\T}{\mathrm{T}} % Transpose
+\newcommand{\herm}{\mathrm{H}} % Conjugate (hermitian) transpose
+\newcommand{\conj}[1]{{#1}^{*}} % Complex conjugate
+\DeclareMathOperator{\Realp}{\operatorname{Re}} % Real part
+\DeclareMathOperator{\Imagp}{\operatorname{Im}} % Imaginary part
 \DeclareMathOperator{\Diag}{\operatorname{diag}} % Determinant
 \DeclareMathOperator{\Cond}{k} % Condition number
 
@@ -36,6 +40,7 @@
 % Linear algebra
 \newcommand{\inv}[1]{{#1}^{-1}}
 \newcommand{\quadratic}[2]{#1^\T \inv{#2} #1 }
+\newcommand{\quadraticH}[2]{#1^\herm \inv{#2} #1 } % Hermitian quadratic form
 \newcommand{\q}[2]{\mathcal{q}\left(#1, #2\right)}
 \newcommand{\eqdef}{\triangleq} % Definition equality
 \newcommand{\intrange}[2]{\{#1,\dots,#2\}} % Integer range
@@ -104,6 +109,9 @@
 \newcommand{\eigset}{\Lambda} % Eigenvalues set
 \newcommand{\frob}{\mathbb{F}} % Frobenius norm text
 \newcommand{\SPD}[1]{\mathcal{S}_{#1}^{++}} % Set of SPD matrices of given dimension
+\newcommand{\HPD}[1]{\mathcal{H}_{#1}^{++}} % Set of hermitian positive definite matrices
+\newcommand{\complexform}[1]{\mathcal{M}\left(#1\right)} % Real form of a complex matrix
+\newcommand{\Unit}{\mat{U}} % Unitary matrix
 
 %----------------------------------------------------------------------------------------
 % Statistics
@@ -122,6 +130,9 @@
 \newcommand{\std}{\sigma} % Standard deviation
 \newcommand{\texture}{\tau} % texture parameter
 \newcommand{\MCov}{\mat{\Sigma}} % Covariance matrix
+\newcommand{\MPCov}{\mat{C}} % Pseudo-covariance (relation) matrix
+\newcommand{\MErr}{\mat{P}} % Error matrix of the widely linear predictor
+\newcommand{\MWl}{\mat{R}} % Widely linear predictor matrix
 \newcommand{\Nobs}{N}
 \newcommand{\Ntime}{T} % Number of time values in a temporal scenario
 \newcommand{\Nvar}{\vdim} % number of varaibles
@@ -159,6 +170,12 @@
 \newcommand{\chisquared}{\chi^2} % Chi-squared distribution
 \newcommand{\uniform}{\mathcal{U}} % Uniform distribution
 \newcommand{\wishart}{\mathcal{W}} % Wishart distribution
+\newcommand{\cgaussian}{\mathcal{CN}} % Complex circular Gaussian distribution
+\newcommand{\celliptical}{\mathcal{CE}} % Complex elliptical distribution
+\newcommand{\ccompoundgaussian}{\mathcal{CCG}} % Complex compound-Gaussian distribution
+\newcommand{\cwishart}{\mathcal{CW}} % Complex Wishart distribution
+\newcommand{\cangular}{\mathcal{CAG}} % Complex angular central Gaussian distribution
+\newcommand{\gcgaussian}{\mathcal{GCN}} % Generalised (non-circular) complex Gaussian
 \newcommand{\likelihood}{\ell} % Log-likelihood function
 
 %----------------------------------------------------------------------------------------
@@ -167,7 +184,10 @@
 \newcommand{\densgen}{g} % Density generator of an elliptical distribution
 \newcommand{\densgenmoment}[1]{\mathfrak{m}_{#1,\densgen}} % Finite moment of the density generator
 \newcommand{\densgenconst}[1]{\mathfrak{c}_{#1,\densgen}} % Normalisation constant of the d.d.p
+\newcommand{\densgenmomentC}[1]{\tilde{\mathfrak{m}}_{#1,\densgen}} % Finite moment, complex case
+\newcommand{\densgenconstC}[1]{\tilde{\mathfrak{c}}_{#1,\densgen}} % Normalisation constant, complex case
 \newcommand{\sphere}[1]{\mathbb{S}^{#1}} % Unit sphere
+\newcommand{\csphere}[1]{\mathbb{CS}^{#1}} % Complex unit sphere
 \newcommand{\spherearea}[1]{\mathfrak{s}_{#1}} % Surface area of the unit sphere
 \newcommand{\modvar}{\mathcal{R}} % Modular variate
 \newcommand{\quadvar}{\mathcal{Q}} % Quadratic form random variable
