@@ -1,15 +1,18 @@
 \chapter{Une vision riemannienne : géométrie du cône SPD et des matrices orthogonales}
 \label{ch:context-riemann}
 
-Les deux sections précédentes ont procédé de la même manière: définir un objet, puis l'estimer en minimisant un critère. Ce faisant, nous avons systématiquement traité l'ensemble $\SPD{\Nvar}$ comme un sous-ensemble de l'espace vectoriel des matrices symétriques, dont on se contentait de vérifier \emph{a posteriori} qu'on n'en était pas sorti. Trois symptômes montrent que cette manière de faire est insuffisante.
+
+Nous avons jusqu'ici défini notre objet d'étude qui est la covariance au travers d'un approche statistique en explorant sa définition formelle et en regardant les problématique d'inférence statistique sans nous soucier de la structure particulière de son espace d'existence que nous avions fait remarquer être l'intérieur d'un cône. Sans se soucier de la géométrie de cet espace, nous avons systématiquement traité l'ensemble $\SPD{\Nvar}$ comme un sous-ensemble de l'espace vectoriel des matrices symétriques, dont on se contentait de vérifier \emph{a posteriori} qu'on n'en était pas sorti. Trois symptômes montrent que cette manière de faire est insuffisante.
 
 Le premier est algorithmique. L'ensemble $\SPD{\Nvar}$ n'est pas un espace vectoriel: une itération de descente de gradient euclidienne appliquée à une fonction de coût définie sur les matrices de covariance peut parfaitement produire un itéré à valeurs propres négatives, sur lequel la fonction de coût n'est même plus définie. La contrainte est alors subie --- on projette, on pénalise, on réduit le pas --- plutôt qu'intégrée au problème.
 
-Le deuxième est métrologique et nous l'avons annoncé dès la \cref{sec:context-covariance-estimation}: mesurer l'erreur d'un estimateur par $\norm{\hat{\MCov}-\MCov}_\frob$ revient à traiter les matrices de covariance comme des tableaux de nombres. Or le problème d'estimation, lui, possède des symétries que cette norme ignore. Si l'on applique aux observations un filtrage linéaire inversible $\x\mapsto\mat{A}\x$ --- blanchiment, changement de base d'antennes, simple changement d'unité --- alors toutes les covariances subissent $\MCov\mapsto\mat{A}\MCov\mat{A}^\T$, et il n'y a aucune raison pour que l'écart entre la vraie matrice et son estimée s'en trouve modifié. La norme de Frobenius, elle, est modifiée.
+Le deuxième est métrologique et nous l'avons annoncé dès la \cref{sec:context-covariance-estimation}: mesurer l'erreur d'un estimateur par $\norm{\hat{\MCov}-\MCov}_\frob$ revient à traiter les matrices de covariance comme des tableaux de nombres. Or le problème d'estimation, lui, possède des symétries que cette norme ignore. Si l'on applique aux observations un filtrage linéaire inversible $\x\mapsto\mat{A}\x$ --- blanchiment, changement de base d'antennes, simple changement d'unité --- alors toutes les covariances subissent $\MCov\mapsto\mat{A}\MCov\mat{A}^\T$, et il n'y a aucune raison pour que l'écart entre la vraie matrice et son estimée s'en trouve modifié par cette opération de filtrage. La norme de Frobenius, elle, est modifiée.
 
 Le troisième est plus visuel. La moyenne arithmétique de deux matrices de covariance a un déterminant supérieur à celui que l'on attendrait: moyenner deux ellipsoïdes de concentration selon la règle euclidienne \emph{crée} de la puissance. Ce phénomène, connu sous le nom d'effet de gonflement (\textit{swelling effect}) \sidecite[0cm]{arsigny2006logeuclidean}, est une conséquence directe du fait que le déterminant n'est pas une fonction affine. \\
 
-Ces trois symptômes ont une cause commune: nous avons plaqué une structure d'espace vectoriel sur un ensemble qui n'en est pas un. La géométrie riemannienne fournit le cadre pour faire autrement. Nous en présentons ici le strict nécessaire, en suivant l'approche dite des \emph{sous-variétés plongées}, qui évite tout l'appareillage des cartes et des atlas et permet de tout lire dans un espace ambiant euclidien\footnote{C'est le point de vue adopté dans les ouvrages orientés optimisation \sidecite[0.5cm]{absil2008optimization,boumal2023introduction}; pour une présentation en géométrie différentielle classique, on renverra à \sidecite[2cm]{gallot2004riemannian,lee2018riemannian}, et pour tout ce qui concerne spécifiquement le cône des matrices définies positives aux ouvrages de référence \sidecite[4cm]{bhatia2007positive,pennec2020riemannian}.}. Nous nous plaçons dans tout ce chapitre dans le \textbf{cas réel}, où les dimensions et les figures sont plus lisibles; la \cref{sec:context-riemann-complexe} établira le dictionnaire vers le cas complexe, et nous verrons que celui-ci est nettement plus mécanique que ne l'étaient ceux des \cref{sec:context-definition-complex,sec:context-distributions-complex}.
+Ces trois symptômes ont une cause commune: nous avons plaqué une structure d'espace vectoriel sur un ensemble qui n'en est pas un. Regardons alors dans ce chapitre la structure géométrique pertinente : une variété riemannienne. Plutôt que d'être une référence dans le domaine de la géométrie riemannienne, on veut ici présenter uniquement les outils essentiels en tant qu'utilisateur sans avoir à subir le formalisme mathématique qui amène à l'existence de ces outils. En suivant l'approche dite des \emph{sous-variétés plongées}, qui évite tout l'appareillage des cartes et des atlas et permet de tout lire dans un espace ambiant euclidien\footnote{C'est le point de vue adopté dans les ouvrages orientés optimisation \sidecite[0.5cm]{absil2008optimization,boumal2023introduction}; pour une présentation en géométrie différentielle classique, on renverra à \sidecite[2cm]{gallot2004riemannian,lee2018riemannian}, et pour tout ce qui concerne spécifiquement le cône des matrices définies positives aux ouvrages de référence \sidecite[4cm]{bhatia2007positive,pennec2020riemannian}.}. Nous nous plaçons dans tout ce chapitre dans le \textbf{cas réel}, où les dimensions et les figures sont plus lisibles; la \cref{sec:context-riemann-complexe} établira le dictionnaire vers le cas complexe, et nous verrons que celui-ci est nettement plus mécanique que ne l'étaient ceux des \cref{sec:context-definition-complex,sec:context-distributions-complex}.
+
+
 
 
 \section{Notion de géométrie riemannienne}
@@ -26,13 +29,25 @@ L'idée directrice est de remplacer «~ensemble de matrices vérifiant des contr
 
 Deux régimes très différents se cachent derrière cette définition, et la distinction gouverne tout le coût algorithmique de ce qui suivra:
 \begin{itemize}
-  \item $\Manifold$ est un \textbf{ouvert} de $\ambient$. C'est le cas du cône $\SPD{\Nvar}$, qui est un ouvert de l'espace $\Sym{\Nvar}$ des matrices symétriques réelles: toute matrice symétrique suffisamment proche d'une matrice définie positive est encore définie positive. Sa dimension est donc celle de l'espace ambiant, $\Nvar(\Nvar+1)/2$;
-  \item $\Manifold$ est défini par des \textbf{équations} dans $\ambient$. C'est le cas de la sphère unité, ou de l'ensemble des matrices orthogonales $\Orthgroup{\Nvar}=\{\Orth\in\R^{\Nvar\times\Nvar};\,\Orth^\T\Orth=\Id{\Nvar}\}$. La dimension est alors strictement inférieure à celle de l'ambiant.
+  \item $\Manifold$ est un \textbf{ouvert} de $\ambient$. C'est le cas du cône $\SPD{\Nvar}$, qui est un ouvert de l'espace $\Sym{\Nvar}$ des matrices symétriques réelles: toute matrice symétrique suffisamment proche d'une matrice définie positive est encore définie positive, que l'on caractérise cette dernière par le signe des valeurs propres ou, de façon équivalente, par la positivité stricte des mineurs principaux dominants (critère de Sylvester). Dans les deux cas, la contrainte reste une inégalité \emph{stricte}: elle ne fait que découper un ouvert, sans réduire la dimension. Celle-ci est donc celle de l'espace ambiant, $\Nvar(\Nvar+1)/2$;
+  \item $\Manifold$ est \textbf{définie par une submersion}. C'est le cas de la sphère unité, ou de l'ensemble des matrices orthogonales $\Orthgroup{\Nvar}=\{\Orth\in\R^{\Nvar\times\Nvar};\,\Orth^\T\Orth=\Id{\Nvar}\}$: on écrit $\Manifold=h^{-1}(0)$ pour une application lisse $h:\ambient\to\R^k$ dont la différentielle est surjective en tout point de $\Manifold$ --- une \textbf{submersion} --- ici $h(\Orth)=\Orth^\T\Orth-\Id{\Nvar}$, à valeurs dans $\Sym{\Nvar}$. Cette condition garantit alors que $\Manifold$ est une variété lisse, de dimension $\dim\ambient-k$, strictement inférieure à celle de l'ambiant.
 \end{itemize}
 
 Cette distinction n'est pas cosmétique: dans le premier cas les opérations de projection que nous allons introduire seront triviales, dans le second elles ne le seront pas. \\
 
-Une fois la variété définie, la question suivante est celle des déplacements admissibles depuis un point donné. La réponse la plus économique consiste à regarder les vitesses des courbes tracées sur la variété.
+\begin{figure}[htb]
+  \centering
+  \input{gfx/tikZ/riemann/variete_tangent.tex}
+  \caption{Une variété $\Manifold$, une courbe $\geod$ tracée dessus et
+    l'espace tangent en $\param$. Ce dernier rassemble les vitesses en $\param$
+    de toutes les courbes passant par ce point: c'est l'ensemble construit à partir des directions des
+    déplacements infinitésimaux qui ne quittent pas $\Manifold$.}
+  \label{fig:context-riemann-tangent}
+\end{figure}
+
+
+Une fois la variété définie, l'outil central de toute la géométrie riemannienne est, en chacun de ses points, un \textbf{plan tangent} (notion illustrée en \cref{fig:context-riemann-tangent}) : une approximation lisse de $\Manifold$ au premier ordre. Intuitivement, si $\geod$ est une courbe lisse tracée sur $\Manifold$ et passant par $\param$ à la vitesse $\tvec$, elle s'écrit au premier ordre $\geod(t)=\param+t\tvec+o(t)$: le vecteur $\tvec$ est donc la meilleure approximation linéaire d'un chemin qui reste sur $\Manifold$, autrement dit la direction d'un \emph{déplacement admissible} depuis $\param$. Il ne s'agit toutefois que d'une admissibilité \emph{au premier ordre}: rien ne garantit que le point $\param+t\tvec$ lui-même reste sur $\Manifold$ pour $t$ fini --- c'est le cas pour $\SPD{\Nvar}$, ouvert dans $\Sym{\Nvar}$, mais pas pour $\Orthgroup{\Nvar}$, où $\Orth+t\mat{A}$ n'est orthogonale, en général, pour aucun $t\neq0$. L'ensemble de ces directions admissibles est l'espace tangent :
+
 
 \begin{definition}[{Espace tangent}]
 \label{def:context-riemann-tangent}
@@ -50,19 +65,8 @@ Une fois la variété définie, la question suivante est celle des déplacements
   C'est un espace vectoriel de dimension $d$. Ses éléments sont appelés \textbf{vecteurs tangents}.
 \end{definition}
 
-\begin{remark}
-  L'espace tangent est l'objet qui joue, localement, le rôle que jouait l'espace vectoriel tout entier dans le cas euclidien: c'est là que vivront les gradients, les directions de descente et les erreurs d'estimation. Pour le cône, $\SPD{\Nvar}$ étant ouvert dans $\Sym{\Nvar}$, on a simplement $\Tangent{\MCov}{\SPD{\Nvar}}=\Sym{\Nvar}$ en tout point $\MCov$: une perturbation admissible d'une matrice de covariance est une matrice symétrique quelconque, sans autre contrainte. Pour une variété définie par des équations, en revanche, l'espace tangent s'obtient en différentiant ces équations. Ainsi, en dérivant $\Orth^\T\Orth=\Id{\Nvar}$ le long d'une courbe, on trouve que $\Tangent{\Orth}{\Orthgroup{\Nvar}}=\{\Orth\mat{A};\,\mat{A}^\T=-\mat{A}\}$: les perturbations admissibles d'une matrice orthogonale sont les matrices antisymétriques, transportées en $\Orth$.
-\end{remark}
+  L'espace tangent est l'objet qui joue, localement, le rôle que jouait l'espace vectoriel tout entier dans le cas euclidien: c'est là que vivront les gradients, les directions de descente et les erreurs d'estimation. Pour le cône, $\SPD{\Nvar}$ étant ouvert dans $\Sym{\Nvar}$, on a simplement $\Tangent{\MCov}{\SPD{\Nvar}}=\Sym{\Nvar}$ en tout point $\MCov$: une perturbation admissible d'une matrice de covariance est une matrice symétrique quelconque, sans autre contrainte. Pour une variété définie par une submersion, en revanche, l'espace tangent s'obtient en différentiant l'équation $h=0$ qui la définit. Ainsi, en dérivant $\Orth^\T\Orth=\Id{\Nvar}$ le long d'une courbe, on trouve que $\Tangent{\Orth}{\Orthgroup{\Nvar}}=\{\Orth\mat{A};\,\mat{A}^\T=-\mat{A}\}$: les perturbations admissibles d'une matrice orthogonale sont les matrices antisymétriques, transportées en $\Orth$.
 
-\begin{figure}[htb]
-  \centering
-  \input{gfx/tikZ/riemann/variete_tangent.tex}
-  \caption{Une variété $\Manifold$, une courbe $\geod$ tracée dessus et
-    l'espace tangent en $\param$. Ce dernier rassemble les vitesses en $\param$
-    de toutes les courbes passant par ce point: c'est l'ensemble des
-    déplacements infinitésimaux qui ne quittent pas $\Manifold$.}
-  \label{fig:context-riemann-tangent}
-\end{figure}
 
 \subsection{Métrique riemannienne}
 
@@ -70,7 +74,7 @@ Une fois la variété définie, la question suivante est celle des déplacements
 
 \begin{definition}[{Métrique riemannienne}]
 \label{def:context-riemann-metric}
-  Une \textbf{métrique riemannienne} sur $\Manifold$ est la donnée, en chaque point $\param\in\Manifold$, d'un produit scalaire $\metric{\cdot}{\cdot}{\param}$ sur $\Tangent{\param}{\Manifold}$, dépendant de manière lisse du point $\param$. Le couple $(\Manifold, \metric{\cdot}{\cdot}{\cdot})$ est appelé \textbf{variété riemannienne}.
+  Une \textbf{métrique riemannienne} sur $\Manifold$ est la donnée, en chaque point $\param\in\Manifold$, d'un produit scalaire $\metric{\cdot}{\cdot}{\param}$ sur $\Tangent{\param}{\Manifold}$, dépendant de manière lisse du point $\param$ (\cref{fig:context-riemann-metrique}). Le couple $(\Manifold, \metric{\cdot}{\cdot}{\cdot})$ est appelé \textbf{variété riemannienne}.
 \end{definition}
 
 La métrique induit immédiatement une norme $\normriem{\tvec}{\param}^2=\metric{\tvec}{\tvec}{\param}$ sur chaque espace tangent, donc une longueur pour toute courbe $\geod:[0,1]\to\Manifold$:
@@ -113,14 +117,16 @@ De la métrique découle une série d'objets dont nous n'aurons besoin que d'une
   \label{fig:context-riemann-projection}
 \end{figure}
 
-\paragraph{Connexion de Levi-Civita.} Pour comparer deux vecteurs tangents pris en deux points distincts, on ne peut pas les soustraire: ils vivent dans des espaces différents. Dériver un champ de vecteurs le long d'une direction demande donc un objet supplémentaire, la \textbf{connexion} $\connection_{\tvec}\tvecbis$, qui généralise la dérivée directionnelle en tenant compte du fait que l'espace tangent «~tourne~» lorsque l'on se déplace. Parmi toutes les connexions possibles, il en existe une et une seule qui soit à la fois compatible avec la métrique et sans torsion: c'est la \textbf{connexion de Levi-Civita}, et c'est celle que l'on retient toujours. Nous ne l'utiliserons que comme intermédiaire de calcul, pour définir les deux objets suivants.
+\paragraph{Connexion de Levi-Civita.} Comparer un vecteur du plan tangent $\tvecbis$ en deux points voisins $\param$ et $\param+t\tvec$, c'est par définition en dériver le champ le long de $\tvec$. La difficulté propre à la variété est que $\tvecbis(\param)$ et $\tvecbis(\param+t\tvec)$ n'habitent pas le même espace tangent: la dérivée directionnelle ambiante $\dirderiv\tvecbis(\param)[\tvec]$ n'a donc aucune raison de rester tangente à $\Manifold$, ni d'être compatible avec la métrique choisie. La \textbf{connexion} $\connection_{\tvec}\tvecbis$ est cette dérivée directionnelle, corrigée pour rester tangente et compatible avec la métrique; parmi toutes les corrections possibles, une seule --- la \textbf{connexion de Levi-Civita} --- est de plus sans torsion, et c'est celle que l'on retient toujours. \\
 
-\paragraph{Géodésiques.} Une \textbf{géodésique} est une courbe d'accélération covariante nulle,
+En partant de cette connexion, on peut alors définir la notion de géodésique :
+
+\paragraph{Géodésiques.} Une \textbf{géodésique} est une courbe qui ne tourne pas: sa vitesse ne change jamais de direction, seulement de position, si bien qu'elle reste parallèle à elle-même tout au long du trajet --- c'est l'\textbf{accélération covariante} $\connection_{\dot\geod(t)}\dot\geod(t)$, généralisation de $\ddot\geod$ sur la variété, qui doit rester nulle:
 \begin{equation}
-  \connection_{\dot{\geod}(t)}\dot{\geod}(t) = \vector{0},
+  \connection_{\dot{\geod}(t)}\dot{\geod}(t) = \vector{0}.
   \label{eq:context-riemann-geodesique}
 \end{equation}
-c'est-à-dire la généralisation de la ligne droite: une courbe qui ne tourne pas, au sens où sa vitesse est parallèle à elle-même. Elle est déterminée soit par un point de départ et une vitesse initiale, soit par ses deux extrémités. Localement, c'est aussi le chemin le plus court (\cref{fig:context-riemann-geodesique}), ce qui donne la \textbf{distance géodésique}
+C'est la généralisation naturelle de la ligne droite. Une géodésique est déterminée soit par un point de départ et une vitesse initiale, soit par ses deux extrémités. Localement, c'est aussi le chemin le plus court (\cref{fig:context-riemann-geodesique}), ce qui donne la \textbf{distance géodésique}
 \begin{equation}
   \geodist(\param_0,\param_1)
   \eqdef
@@ -138,7 +144,7 @@ c'est-à-dire la généralisation de la ligne droite: une courbe qui ne tourne p
   \label{fig:context-riemann-geodesique}
 \end{figure}
 
-\paragraph{Applications exponentielle et logarithme.} L'\textbf{exponentielle riemannienne} $\exp_\param:\Tangent{\param}{\Manifold}\to\Manifold$ associe à un vecteur tangent $\tvec$ le point $\geod(1)$ atteint en suivant la géodésique partant de $\param$ à la vitesse $\tvec$. Elle réalise donc «~un déplacement de $\tvec$ en restant sur la variété~». Son inverse local, le \textbf{logarithme riemannien} $\log_{\param_0}(\param_1)\in\Tangent{\param_0}{\Manifold}$, est le vecteur tangent qui pointe de $\param_0$ vers $\param_1$ et dont la norme vaut $\geodist(\param_0,\param_1)$. Ces deux applications, illustrées en \cref{fig:context-riemann-explog}, sont les traductions riemanniennes de l'addition et de la soustraction.
+\paragraph{Applications exponentielle et logarithme.} L'\textbf{exponentielle riemannienne} $\exp_\param:\Tangent{\param}{\Manifold}\to\Manifold$ associe à un vecteur tangent $\tvec$ le point $\geod(1)$ atteint en suivant la géodésique partant de $\param$ à la vitesse $\tvec$. Elle réalise donc «~un déplacement de $\tvec$ en restant sur la variété~». Son inverse local, le \textbf{logarithme riemannien} $\log_{\param_0}(\param_1)\in\Tangent{\param_0}{\Manifold}$, est le vecteur tangent qui pointe de $\param_0$ vers $\param_1$ et dont la norme vaut $\geodist(\param_0,\param_1)$. Ces deux applications, illustrées en \cref{fig:context-riemann-explog} permettent de faire des opérations qui nous sortent de la variété et d'en revenir.
 
 \begin{figure}[htb]
   \centering
@@ -252,7 +258,7 @@ La géométrie associée à \cref{eq:context-riemann-metriqueaffine} est entièr
 
 \begin{property}[{Connexion et géodésiques}]
 \label{prop:context-riemann-geodspd}
-  La connexion de Levi-Civita associée à \cref{eq:context-riemann-metriqueaffine} est \sidecite[0cm]{bouchard2024fisherrao}
+  La connexion de Levi-Civita associée à \cref{eq:context-riemann-metriqueaffine} est :
   \begin{equation}
     \connection_{\tvec}\tvecbis = \dirderiv\tvecbis[\tvec] - \symop\!\left(\tvecbis\inv{\MCov}\tvec\right),
     \label{eq:context-riemann-connexionspd}
@@ -278,8 +284,9 @@ La géométrie associée à \cref{eq:context-riemann-metriqueaffine} est entièr
   \begin{equation}
     \exp_{\MCov}(\tvec)
     =
-    \MCov^{1/2}\expm\!\left(\MCov^{-1/2}\tvec\MCov^{-1/2}\right)\MCov^{1/2},
-    \quad
+    \MCov^{1/2}\expm\!\left(\MCov^{-1/2}\tvec\MCov^{-1/2}\right)\MCov^{1/2}, 
+  \end{equation}
+  \begin{equation}
     \log_{\MCov_0}(\MCov_1)
     =
     \MCov_0^{1/2}\logm\!\left(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2}\right)\MCov_0^{1/2},
@@ -408,8 +415,7 @@ L'idée est la suivante: l'application $\logm$ réalise une bijection lisse entr
 
 Par construction, $(\SPD{\Nvar},\metric{\cdot}{\cdot}{\cdot}^{\mathrm{LE}})$ est isométrique à l'espace euclidien $\Sym{\Nvar}$. Tout s'en déduit immédiatement: les géodésiques sont les images des segments,
 \begin{equation}
-  \geod^{\mathrm{LE}}(t) = \expm\!\left( (1-t)\logm\MCov_0 + t\logm\MCov_1 \right),
-  \qquad
+  \geod^{\mathrm{LE}}(t) = \expm\!\left( (1-t)\logm\MCov_0 + t\logm\MCov_1 \right),\\
   \geodist_{\mathrm{LE}}(\MCov_0,\MCov_1) = \norm{\logm\MCov_0 - \logm\MCov_1}_\frob,
   \label{eq:context-riemann-geodLE}
 \end{equation}
@@ -426,7 +432,7 @@ la courbure est nulle, et le transport parallèle est trivial dans les coordonn�
 
 D'autres géométries ont été proposées sur $\SPD{\Nvar}$, que nous mentionnons sans les développer. La métrique de \textbf{Bures-Wasserstein} \sidecite[0cm]{bhatia2019bures} est celle induite par le transport optimal entre lois gaussiennes centrées; sa distance est $\geodist^2_{\mathrm{BW}}(\MCov_0,\MCov_1)=\trace{\MCov_0}+\trace{\MCov_1}-2\trace{(\MCov_0^{1/2}\MCov_1\MCov_0^{1/2})^{1/2}}$, elle est de courbure positive et n'est pas complète, le bord du cône restant à distance finie. La métrique \textbf{log-Cholesky} exploite de la même manière que la log-euclidienne un difféomorphisme vers un espace vectoriel, en passant cette fois par la factorisation de Cholesky, avec un coût numérique moindre. Enfin, un certain nombre de \textbf{divergences} --- Stein, Jensen-Bregman, Kullback-Leibler --- sont utilisées comme substituts bon marché de la distance affine invariante, sans être issues d'une métrique riemannienne; nous y reviendrons en \cref{sec:context-geometry-divergences}. Une classification complète des métriques invariantes sur le cône est donnée dans \sidecite[1cm]{thanwerdas2023invariant}.
 
-Le \cref{tab:context-riemann-metriques} rassemble les propriétés qui gouvernent le choix pratique.
+Le \cref{tab:context-riemann-metriques} rassemble les propriétés qui gouvernent le choix pratique, et la \cref{fig:context-riemann-interpolation} met en image l'écart entre elles sur un exemple concret.
 
 \begin{table}
   \centering
@@ -496,7 +502,7 @@ Cette définition ne demande rien d'autre qu'une distance, et elle redonne bien 
   soit «~la moyenne est le point depuis lequel les autres se compensent~», et il faut recourir à un algorithme itératif \sidecite[0.5cm]{jeuris2012survey}. Ce sera notre premier exemple concret d'optimisation riemannienne, en \cref{sec:context-riemann-optimization}.
 \end{itemize}
 
-Le cas de deux points est instructif car il est le seul à admettre une forme close pour la métrique affine invariante: on obtient le milieu de la géodésique, $\Fmean=\MCov_0\geodmean_{1/2}\MCov_1=\MCov_0^{1/2}(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})^{1/2}\MCov_0^{1/2}$. Pour $\Nvar=1$ cette expression se réduit à $\sqrt{\sigma_0\sigma_1}$: c'est la moyenne géométrique. La moyenne riemannienne du cône est donc la généralisation matricielle exacte de la moyenne géométrique scalaire, et l'absence d'effet de gonflement en découle directement puisque $\Det(\Fmean)=\sqrt{\Det(\MCov_0)\Det(\MCov_1)}$.
+Le cas de deux points est instructif car il est le seul à admettre une forme close pour la métrique affine invariante: on obtient le milieu de la géodésique, $\Fmean=\MCov_0\geodmean_{1/2}\MCov_1=\MCov_0^{1/2}(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})^{1/2}\MCov_0^{1/2}$. Pour $\Nvar=1$ cette expression se réduit à $\sqrt{\sigma_0\sigma_1}$: c'est la moyenne géométrique. La moyenne riemannienne du cône est donc la généralisation matricielle exacte de la moyenne géométrique scalaire, et l'absence d'effet de gonflement en découle directement puisque $\Det(\Fmean)=\sqrt{\Det(\MCov_0)\Det(\MCov_1)}$. La \cref{fig:context-riemann-moyennes} compare les trois moyennes --- arithmétique, log-euclidienne, de Fréchet --- sur un échantillon, et rend cet effet visible.
 
 \begin{remark}[{Existence et unicité}]
   Rien ne garantit \emph{a priori} qu'un minimiseur de \cref{eq:context-riemann-frechet} existe ni qu'il soit unique --- sur une sphère, la moyenne de deux points antipodaux ne l'est pas. Pour le cône muni de la métrique affine invariante, tout se passe bien: la variété est complète, simplement connexe et de courbure sectionnelle négative ou nulle, ce qui en fait une variété de Hadamard, et la fonction objectif de \cref{eq:context-riemann-frechet} y est strictement convexe le long des géodésiques. Le minimiseur existe donc et est unique. Nous admettons ce résultat, dont la démonstration demande l'appareil de courbure que nous avons choisi de ne pas introduire, et renvoyons à \sidecite[0cm]{moakher2005differential,bhatia2007positive}.
@@ -688,7 +694,7 @@ Il reste une question de fond. Les algorithmes ci-dessus convergent vers un poin
   Si l'inégalité est stricte, $f$ est dite strictement $g$-convexe.
 \end{definition}
 
-Il s'agit de la convexité usuelle, où les segments ont été remplacés par les géodésiques, et elle en conserve la conséquence essentielle: \textbf{tout minimum local d'une fonction $g$-convexe est global, et il est unique si la fonction est strictement $g$-convexe}.
+Il s'agit de la convexité usuelle, où les segments ont été remplacés par les géodésiques, et elle en conserve la conséquence essentielle: \textbf{tout minimum local d'une fonction $g$-convexe est global, et il est unique si la fonction est strictement $g$-convexe}. La \cref{fig:context-riemann-gconvexite} en donne une illustration frappante sur le critère de Tyler, non convexe au sens euclidien mais $g$-convexe.
 
 Sur le cône muni de la métrique affine invariante, deux briques élémentaires suffisent à traiter la plupart de nos critères:
 \begin{itemize}
@@ -721,7 +727,7 @@ Sur le cône muni de la métrique affine invariante, deux briques élémentaires
 
 Ces algorithmes sont disponibles dans des bibliothèques spécialisées qui prennent en charge les variétés usuelles et leurs opérations: \texttt{Manopt} \sidecite[0cm]{boumal2014manopt}, \texttt{Pymanopt} \sidecite[1cm]{townsend2016pymanopt} et \texttt{Geomstats} \sidecite[2cm]{miolane2020geomstats}. En pratique, l'utilisateur ne fournit que la fonction de coût et, éventuellement, son gradient euclidien; la conversion \cref{eq:context-riemann-gradientspd} et la rétraction sont prises en charge par la bibliothèque.
 
-Le coût par itération est dominé par les décompositions spectrales, en $\bigO(\Nvar^3)$, ce qui est le prix de l'exponentielle et du logarithme de matrice. C'est ici que se joue l'arbitrage évoqué en \cref{rem:context-riemann-LEbilan}: la métrique affine invariante paye ce coût à chaque évaluation de distance, là où la métrique log-euclidienne ne le paye qu'une fois par matrice, ce qui la rend préférable dès que le nombre de matrices manipulées devient grand devant leur dimension.
+Le coût par itération est dominé par les décompositions spectrales, en $\bigO(\Nvar^3)$, ce qui est le prix de l'exponentielle et du logarithme de matrice. C'est ici que se joue l'arbitrage évoqué en \cref{rem:context-riemann-LEbilan}: la métrique affine invariante paye ce coût à chaque évaluation de distance, là où la métrique log-euclidienne ne le paye qu'une fois par matrice, ce qui la rend préférable dès que le nombre de matrices manipulées devient grand devant leur dimension. La \cref{fig:context-riemann-convergence} compare enfin les vitesses de convergence des différents algorithmes introduits dans cette section.
 
 \begin{figure}[h]
   \begin{center}

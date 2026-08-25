@@ -113,15 +113,15 @@ run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
 
-[figures.puissance-k]
-exp       = "sar_mc_power"
+[figures.puissance-gaussien]
+exp       = "sar_mc_power_gauss"
 sha       = "2052344"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
 
-[figures.puissance-gaussien]
-exp       = "sar_mc_power_gauss"
+[figures.puissance-k]
+exp       = "sar_mc_power"
 sha       = "2052344"
 run_date  = "2026-08-25"
 seed      = "42"

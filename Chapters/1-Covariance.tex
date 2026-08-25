@@ -362,7 +362,6 @@ Caractérisons alors les propriétés de cette matrice, ce qui nous sera utile p
   \end{itemize}
 \end{property}
 
-%TODO: verifier quand spd ou bien semi-definie positive
 
 \begin{remark}
 De par cette caractérisation, on comprends alors que l'espace de toutes les matrices de covariances correspond à un cône et son intérieur. Pour s'en rendre compte, on peut s'intéresser au cas $\Nvar=2$, où une matrice de covariance aura la forme\footnote{En vertu de la symétrie. Celle-ci est dûe au fait que l'opérator $\Cov$ est un opérateur commutatif.}:
@@ -751,7 +750,7 @@ Un vecteur aléatoire complexe $\Variable\in\C^\Nvar$ est un couple de vecteurs 
    En notant $\vector{v}=[\vector{x}^\T,\vector{y}^\T]^\T\in\R^{2\Nvar}$ le vecteur réel associé à $\vector{z}=\vector{x}+j\vector{y}$, on a l'équivalence $\mat{A}\vector{z} \longleftrightarrow \complexform{\mat{A}}\vector{v}$.
 \end{definition}
 
-De cette transofrmation complexe-réelle, on a naturellement les équivalences suivantes :
+De cette transformation complexe-réelle, on a naturellement les équivalences suivantes :
 
 \begin{property}[{Transport des structures}]
 \label{prop:context-complex-transport}
@@ -842,7 +841,7 @@ Le cas où cette pseudo-covariance s'annule est celui que nous retiendrons, et i
   L'équivalence des trois conditions se lit directement sur \cref{eq:context-complex-blocs}. La circularité stricte entraîne la circularité au second ordre dès lors que les moments existent, puisque $\E\{e^{j\alpha}\Variable(e^{j\alpha}\Variable)^\T\} = e^{2j\alpha}\MPCov_\Variable$ doit être indépendant de $\alpha$; la réciproque est fausse en général.
 \end{remark}
 
-  Sur le plan de la modélisation, la circularité traduit l'absence de référence de phase privilégiée. Elle est physiquement légitime pour un signal à bande étroite après démodulation, la phase absolue de l'écho résultant d'un trajet de propagation dont la longueur est très grande devant la longueur d'onde et pouvant être tenue pour uniforme: c'est le cas du fouillis radar, de l'écho RSO d'une cellule de résolution comportant de nombreux diffuseurs, et du bruit ambiant SONAR. La \cref{fig:context-complex-circularity} montre ce que l'hypothèse recouvre exactement: à covariance fixée, la pseudo-covariance déforme librement le nuage, et c'est bien elle, et non la covariance, qui porte l'information de forme dans le plan complexe. La circularité cesse en revanche d'être légitime en présence d'un déséquilibre entre les voies $I$ et $Q$, d'un signal réel modulé, ou de certaines modulations numériques. Nous supposerons la circularité acquise dans toute la suite de cette dissertation, mais il s'agit bien d'une hypothèse de modélisation et non d'une commodité d'écriture; le lecteur intéressé par le cas général se reportera à \sidecite[-1cm]{Picinbono1994,SchreierScharf2010}.
+  Sur le plan de la modélisation, la circularité traduit l'absence de référence de phase privilégiée. Elle est physiquement légitime pour un signal à bande étroite après démodulation, la phase absolue de l'écho résultant d'un trajet de propagation dont la longueur est très grande devant la longueur d'onde et pouvant être tenue pour uniforme: c'est le cas du fouillis radar, de l'écho RSO d'une cellule de résolution comportant de nombreux diffuseurs~\sidecite[-1cm]{GoodmanSpeckle1975}, et du bruit ambiant SONAR~\sidecite[-1cm]{AbrahamLyons2004}. La \cref{fig:context-complex-circularity} montre ce que l'hypothèse recouvre exactement: à covariance fixée, la pseudo-covariance déforme librement le nuage, et c'est bien elle, et non la covariance, qui porte l'information de forme dans le plan complexe. La circularité cesse en revanche d'être légitime en présence d'un déséquilibre entre les voies $I$ et $Q$, d'un signal réel modulé, ou de certaines modulations numériques. Nous supposerons la circularité acquise dans toute la suite de cette dissertation, mais il s'agit bien d'une hypothèse de modélisation et non d'une commodité d'écriture; le lecteur intéressé par le cas général se reportera à \sidecite[-1cm]{Picinbono1994,SchreierScharf2010}.
 
 
 \begin{figure}[h]

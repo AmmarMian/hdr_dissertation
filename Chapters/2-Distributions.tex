@@ -30,7 +30,7 @@ où $\param = (\Vmoy_\Variable, \MCov_\Variable)$ sont les paramètres de la dis
   \label{fig:context-distributions-gaussisocontours}
 \end{figure}
 
-On remarque que la forme quadratique $\quadratic{(\x-\Vmoy_\Variable)}{\MCov_\Variable}$ est la seule dépendance de la d.d.p en $\x$: les surfaces d'égale densité sont donc les ellipsoïdes définis par cette forme quadratique, dont la géométrie est entièrement portée par $\MCov_\Variable$ en vertu de la \cref{prop:context-definition-diagonalisation}. Cette observation, anodine à ce stade, est en fait le point de départ de la généralisation qui sera faite en \cref{subsec:context-distributions-elliptical}. \\
+On remarque que la forme quadratique $\quadratic{(\x-\Vmoy_\Variable)}{\MCov_\Variable}$ est la seule dépendance de la d.d.p en $\x$: les surfaces d'égale densité sont donc les ellipsoïdes (visualisés en \cref{fig:context-distributions-gaussisocontours}) définis par cette forme quadratique, dont la géométrie est entièrement portée par $\MCov_\Variable$ en vertu de la \cref{prop:context-definition-diagonalisation}. Cette observation, anodine à ce stade, est en fait le point de départ de la généralisation qui sera faite en \cref{subsec:context-distributions-elliptical}. \\
 
 
 Une fois ce modèle posé, l'estimation des paramètres peut être menée au sens du maximum de vraisemblance (mle\footnote{Pour \emph{Maximum likelihood Estimation} en anglais}) :
@@ -297,9 +297,7 @@ Il est alors usuel de séparer explicitement dans la matrice de dispersion ce qu
   \end{itemize}
 \end{definition}
 
-\begin{remark}[{Choix de la normalisation}]
   Telle quelle, la décomposition donnée en \cref{eq:context-distributions-scaleshape} n'est pas identifiable: il faut fixer une normalisation de $\MShape$. Trois choix cohabitent dans la littérature: le premier élément diagonal \sidecite[-6.25cm]{10.2307/2669766} avec $\MShape = \MScatter/(\MScatter)_{11}$, la trace \sidecite[-4.5cm]{Pascal08a} avec $\MShape = \Nvar\MScatter/\trace{\MScatter}$, ou le déterminant \sidecite[0.5cm]{tatsuoka2000} avec $\MShape = \MScatter/\Det(\MScatter)^{1/\Nvar}$. Sous des conditions de régularité faibles, ces choix sont essentiellement équivalents vis-à-vis des problèmes d'inférence sur la forme \sidecite[2cm]{Hallin2007}. Nous retiendrons la normalisation par la trace au \cref{ch:robust-detection} afin de rester cohérent avec \cite{6263313}, mais nous utiliserons la normalisation par le déterminant à partir de la \cref{ch:context-riemann}: nous verrons en effet que cette dernière est celle qui se marie naturellement avec la géométrie riemannienne du cône, la contrainte $\Det(\MShape)=1$ y définissant une sous-variété totalement géodésique.
-\end{remark}
 
 Une autre façon, plus constructive, d'aborder ces distributions consiste à les décrire par la manière dont on les simule:
 
@@ -374,15 +372,6 @@ Donnons à présent quelques exemples, qui seront ceux que nous utiliserons dans
   \label{fig:context-distributions-ellipticaltails}
 \end{figure}
 
-% TODO: à décommenter une fois l'expérience qanat context_elliptical_examples lancée
-% \begin{figure}[h]
-%   \begin{center}
-%     \input{gfx/generated/context_elliptical_examples/ellipticalmarginal/plot.tex}
-%   \end{center}
-%   \provEllipticalmarginalQR[.5cm]
-%   \caption{Histogramme d'une marginale simulée sous distribution $t$ de Student ($\dof=3$) et ajustements au sens du mle par un modèle gaussien et par un modèle de gaussienne généralisée. Le modèle gaussien échoue à rendre compte du comportement impulsif observé. \provEllipticalmarginal}
-%   \label{fig:context-distributions-ellipticalmarginal}
-% \end{figure}
 
 Enfin, la représentation donnée en \cref{eq:context-distributions-compoundgaussian} suggère une variante que nous exploiterons abondamment: plutôt que d'assigner une loi à la texture, on peut la considérer comme un paramètre déterministe qui varie d'une observation à l'autre.
 
@@ -402,6 +391,47 @@ Enfin, la représentation donnée en \cref{eq:context-distributions-compoundgaus
   Ce modèle ne suit pas strictement la paramétrisation donnée en \cref{eq:context-distributions-scaleshape}, puisqu'ici chaque observation possède son propre paramètre d'échelle alors que la paramétrisation n'en définit qu'un seul pour l'ensemble. Il postule donc une homogénéité de la structure et une hétérogénéité de la puissance au sein des observations. Son intérêt est de généraliser le modèle gaussien sans ajouter le moindre apriori sur la loi de la texture, au prix d'un nombre de paramètres qui croît avec $\Nobs$. Nous le retrouverons au \cref{ch:robust-detection} ainsi qu'en \cref{sec:context-geometry-compound-gaussian}.
 \end{remark}
 
+
+Le \cref{tab:context-distributions-ces-examples} rassemble les quatre exemples ci-dessus ainsi qu'une cinquième famille, la gaussienne généralisée de type Weibull, pour mémoire. On y trouvera, pour chacune, la constante de normalisation $\densgenconst{\Nvar}$, le générateur $\densgen$, la loi de la forme quadratique $\quadvar$ et, lorsqu'elle admet une représentation gaussienne composée, celle de sa texture $\texture$. 
+\begin{table*}[h]
+  \centering
+  \caption{Exemples de distributions elliptiques réelles, adaptés du cas complexe circulaire. Le symbole $\times$ signifie que la distribution n'admet pas de représentation gaussienne composée.}
+  \label{tab:context-distributions-ces-examples}
+  \small
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    $\elliptical\mathcal{S}$ & $\densgenconst{\Nvar}$ & $\densgen(t)$ & $\p{\quadvar}$ & $\p{\texture}$ \\
+    \midrule
+    $\gaussian$
+      & $(2\pi)^{-\Nvar/2}$
+      & $\exp(-t/2)$
+      & $\chisquared_\Nvar$
+      & $\delta_a(\texture),\ a\geq0$ \\[1ex]
+    $t_\dof$
+      & $\dfrac{\Gamma\left(\frac{\Nvar+\dof}{2}\right)}{(\pi\dof)^{\Nvar/2}\,\Gamma\left(\frac{\dof}{2}\right)}$
+      & $\left(1+\dfrac{t}{\dof}\right)^{-(\Nvar+\dof)/2}$
+      & $\Nvar F_{\Nvar,\dof}$
+      & $\mathrm{IG}\left(\dfrac{\dof}{2},\dfrac{\dof}{2}\right)$ \\[2.5ex]
+    $\mathcal{K}_\dof$
+      & $\dfrac{2\,\dof^{(\dof+\Nvar/2)/2}}{(\sqrt{2}\pi)^{\Nvar/2}\,2^{\dof/2}\,\Gamma(\dof)}$
+      & $t^{(\dof-\Nvar/2)/2}K_{\dof-\Nvar/2}(\sqrt{2\dof t})$
+      & sans forme close
+      & $\gammadist\left(\dof,\inv{\dof}\right)$ \\[2.5ex]
+    $\mathcal{W}_{s,b}$
+      & $\dfrac{s\,\Gamma\left(\frac{\Nvar}{2}\right)}{\pi^{\Nvar/2}(2b)^{(\Nvar/2+s-1)/s}\,\Gamma\left(\frac{\Nvar/2+s-1}{s}\right)}$
+      & $t^{s-1}\exp\left(-\dfrac{t^s}{2b}\right)$
+      & $\gammadist^{1/s}\!\left(\dfrac{\Nvar/2+s-1}{s},2b\right)$
+      & $\times$ \\[2.5ex]
+    $\mathcal{GG}_{s,b}$
+      & $\dfrac{s\,\Gamma\left(\frac{\Nvar}{2}\right)}{\pi^{\Nvar/2}(2b)^{\Nvar/(2s)}\,\Gamma\left(\frac{\Nvar}{2s}\right)}$
+      & $\exp\left(-\dfrac{t^s}{2b}\right)$
+      & $\gammadist^{1/s}\!\left(\dfrac{\Nvar}{2s},2b\right)$
+      & $\times$ \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table*}
 
 \subsection{Estimation robuste: M-estimation}
 \label{subsec:context-robust-m-estimation}
@@ -448,7 +478,7 @@ Cette lecture suggère naturellement de s'affranchir du générateur de densité
 \end{equation}
 \end{definition}
 
-Rien ne garantit à priori qu'une telle équation admette une solution, ni qu'elle soit unique. Les conditions classiques, dues à (\cite{Maronna76}), portent sur la fonction de poids:
+Rien ne garantit à priori qu'une telle équation admette une solution, ni qu'elle soit unique. Les conditions classiques, dues à \cite{Maronna76}, portent sur la fonction de poids:
 
 \begin{proposition}[{Existence et unicité}]
 \label{prop:context-robust-existence}
@@ -483,7 +513,7 @@ Un cas particulier mérite une attention spécifique, à la fois parce qu'il éc
 \end{definition}
 
 \begin{remark}
-  Le choix $\weight(t)=\Nvar/t$ donne $t\weight(t)=\Nvar$, qui est constante: les conditions de la \cref{prop:context-robust-existence} ne sont donc pas vérifiées, et l'unicité doit être établie séparément (\cite{Pascal08a}). La conséquence directe de cette constance est que \cref{eq:context-robust-tyler} est invariante par changement d'échelle de $\Tyler$: la solution n'est définie qu'à un facteur positif près, ce qui explique la normalisation imposée. Autrement dit, l'estimateur de Tyler n'estime pas une matrice de dispersion mais une matrice de \emph{forme} au sens de la \cref{def:context-distributions-scaleshape}.
+  Le choix $\weight(t)=\Nvar/t$ donne $t\weight(t)=\Nvar$, qui est constante: les conditions de la \cref{prop:context-robust-existence} ne sont donc pas vérifiées, et l'unicité doit être établie séparément \cite{Pascal08a}. La conséquence directe de cette constance est que \cref{eq:context-robust-tyler} est invariante par changement d'échelle de $\Tyler$: la solution n'est définie qu'à un facteur positif près, ce qui explique la normalisation imposée. Autrement dit, l'estimateur de Tyler n'estime pas une matrice de dispersion mais une matrice de \emph{forme} au sens de la \cref{def:context-distributions-scaleshape}.
 \end{remark}
 
 \begin{property}[{Caractère distribution-free}]
@@ -537,7 +567,7 @@ Il reste à répondre à la question que nous avions laissée en suspens en \cre
 \end{proposition}
 
 \begin{remark}
-  Le point remarquable n'est pas tant la gaussianité que la \emph{structure} de la covariance limite: elle est exactement celle que nous avions obtenue sous modèle gaussien en \cref{eq:context-distributions-covscm}, aux deux scalaires $\sigma_1$ et $\sigma_2$ près. Toute la dépendance au générateur de densité $\densgen$ et au choix de la fonction de poids $\weight$ se concentre dans ces deux nombres. On vérifie d'ailleurs que le choix gaussien $\weight(t)=1$ donne $\scorefun(t)=t$, $\beta=1$ et $\E\{\scorefun^2(\quadvar)\}=\E\{\quadvar^2\}=\Nvar(\Nvar+2)$, d'où $\sigma_1=1$ et $\sigma_2=0$: on retombe sur la scm. En particulier, la lecture en $\Nvar^2/\Nobs$ de l'\cref{eq:context-distributions-msescm} reste valable pour tout M-estimateur, seule la constante multiplicative changeant.
+  Le point remarquable n'est pas tant la gaussianité que la \emph{structure} de la covariance limite: elle est celle que nous avions obtenue sous modèle gaussien en \cref{eq:context-distributions-covscm}, aux deux scalaires $\sigma_1$ et $\sigma_2$ près. Toute la dépendance au générateur de densité $\densgen$ et au choix de la fonction de poids $\weight$ se concentre dans ces deux nombres. On vérifie d'ailleurs que le choix gaussien $\weight(t)=1$ donne $\scorefun(t)=t$, $\beta=1$ et $\E\{\scorefun^2(\quadvar)\}=\E\{\quadvar^2\}=\Nvar(\Nvar+2)$, d'où $\sigma_1=1$ et $\sigma_2=0$: on retombe sur la scm. En particulier, la lecture en $\Nvar^2/\Nobs$ de l'\cref{eq:context-distributions-msescm} reste valable pour tout M-estimateur, seule la constante multiplicative changeant.
 \end{remark}
 
 La normalisation $\E\{\scorefun(\quadvar)\}=\Nvar$ n'est pas anodine: sans elle, $\Mestim$ converge non pas vers $\MScatter$ mais vers $\sigma\MScatter$, où $\sigma$ est solution de $\E\{\scorefun(\quadvar/\sigma)\}=\Nvar$. Autrement dit, un M-estimateur estime toujours consistamment la matrice de \emph{forme} au sens de la \cref{def:context-distributions-scaleshape}, mais l'échelle n'est restituée qu'au prix d'un facteur correctif qui, lui, dépend de $\densgen$. C'est la version asymptotique de ce que nous avons déjà constaté sur l'estimateur de Tyler, pour lequel cette indétermination est totale. \\
@@ -584,7 +614,7 @@ Un vecteur complexe est dit gaussien lorsque ses parties réelle et imaginaire s
   On peut mettre \cref{eq:context-complex-gaussiangeneral} sous une forme plus parlante en appliquant le lemme d'inversion matricielle à $\conj{\inv{\MErr}} = \inv{\MCov_\Variable} + \inv{\MCov_\Variable}\MPCov_\Variable\inv{\MErr}\MPCov_\Variable^\herm\inv{\MCov_\Variable}$: la d.d.p se factorise alors en le produit de la d.d.p du cas circulaire, donnée ci-dessous, et d'un facteur correctif ne dépendant que du couple $(\MWl,\MErr)$, dont le déterminant se réduit à $\Det(\inv{\MCov_\Variable}\MErr) = \Det(\Id{\Nvar}-\MWl^\herm\MWl^\T)$. Toute la non-circularité est ainsi concentrée dans ce facteur, qui vaut $1$ lorsque $\MPCov_\Variable=\mat{0}$.
 \end{remark}
 
-Dans le cas circulaire qui nosu intéresse, nous aovsn alors :
+Dans le cas circulaire qui nous intéresse, nous aovsn alors :
 
 \begin{definition}[{Vecteur aléatoire gaussien complexe circulaire}]
 \label{def:context-complex-cgaussian}
@@ -627,7 +657,7 @@ On retrouve à partir de celle-ci, la loi de la forme quadratique :
 \end{property}
 
 \begin{remark}
-  Là où le cas réel faisait apparaître un $\chisquared_\Nvar$, le cas complexe fait apparaître un $\chisquared$ à $2\Nvar$ degrés de liberté, réduit de moitié: une observation complexe vaut bien deux observations réelles. On notera au passage que la circularité au second ordre entraîne ici la circularité stricte, puisque la d.d.p \cref{eq:context-complex-cgaussianpdf} centrée ne dépend de $\vector{z}$ qu'au travers d'une forme quadratique hermitienne, invariante par déphasage.
+  Là où le cas réel faisait apparaître un $\chisquared_\Nvar$, le cas complexe fait apparaître un $\chisquared$ à $2\Nvar$ degrés de liberté, réduit de moitié: une observation complexe vaut bien deux observations réelles.
 \end{remark}
 
 L'estimation se transpose alors sans surprise, à ceci près que les lois exactes changent de constantes :
@@ -893,4 +923,4 @@ Le \cref{tab:context-complex-summary} rassemble les correspondances établies ic
   \end{tabular}
 \end{table}
 
-Dans la suite de cette dissertation, les deux cas coexisteront: les applications radar et sonar du \cref{ch:robust-detection} relèvent du complexe circulaire, tandis que d'autres jeux de données sont naturellement réels. Nous préciserons donc à chaque fois le cadre retenu, et nous emploierons alors la transposée conjuguée sans plus le signaler. En particulier, la \cref{ch:context-riemann} sera menée dans le cas réel, où les figures et les dimensions sont plus lisibles, et une section dédiée établira le dictionnaire vers le cas complexe; la \cref{ch:context-geometry} repassera ensuite au complexe, qui est celui des modèles exploités au \cref{ch:robust-detection}. Nous conserverons par ailleurs l'abus de langage acté en \cref{prop:context-distributions-scattercov}, consistant à parler de matrice de covariance là où nous manipulerons une matrice de dispersion ou de forme.
+Dans la suite de cette dissertation, les deux cas coexisteront: les applications radar et sonar du \cref{ch:robust-detection} de la \cref{pt:contributions} relèvent du complexe circulaire, tandis que d'autres jeux de données sont naturellement réels. Nous préciserons donc à chaque fois le cadre retenu, et nous emploierons alors la transposée conjuguée sans plus le signaler. En particulier, la \cref{ch:context-riemann} de la partie courante sera menée dans le cas réel, où les figures et les dimensions sont plus lisibles, et une section dédiée établira le dictionnaire vers le cas complexe; la \cref{ch:context-geometry} repassera ensuite au complexe, qui est celui des modèles exploités au \cref{ch:robust-detection}. Nous conserverons par ailleurs l'abus de langage acté en \cref{prop:context-distributions-scattercov}, consistant à parler de matrice de covariance là où nous manipulerons une matrice de dispersion ou de forme.

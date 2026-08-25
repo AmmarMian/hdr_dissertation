@@ -23,15 +23,16 @@
   \draw[rtangent!85] ($(P)+(0.52,-0.11)$) arc[start angle=-12, end angle=51, radius=0.53];
   \node[rtangent!90, font=\scriptsize, anchor=west, inner sep=1pt] at ($(P)+(0.60,0.24)$) {$\phi$};
 
-  % le couple transporte en theta_1 : meme ecart angulaire
-  \draw[rvector, very thick, ->] (Q) -- ++(0.90,0.33);
-  \node[rvector, anchor=west, inner sep=1pt] at ($(Q)+(0.90,0.33)$)
+  % le couple transporte en theta_1 : meme ecart angulaire, tourne dans le
+  % meme sens que la geodesique (qui vire vers le bas a droite)
+  \draw[rvector, very thick, ->] (Q) -- ++(0.82,-0.51);
+  \node[rvector, anchor=north, inner sep=1pt] at ($(Q)+(0.82,-0.51)$)
     {$\transport(\tvec)$};
-  \draw[rvector, very thick, ->] (Q) -- ++(0.05,0.66);
-  \node[rvector, anchor=south, inner sep=1pt] at ($(Q)+(0.05,0.66)$)
+  \draw[rvector, very thick, ->] (Q) -- ++(0.57,0.34);
+  \node[rvector, anchor=south west, inner sep=1pt] at ($(Q)+(0.57,0.34)$)
     {$\transport(\tvecbis)$};
-  \draw[rtangent!85] ($(Q)+(0.51,0.19)$) arc[start angle=20, end angle=83, radius=0.54];
-  \node[rtangent!90, font=\scriptsize, anchor=west, inner sep=1pt] at ($(Q)+(0.46,0.52)$) {$\phi$};
+  \draw[rtangent!85] ($(Q)+(0.46,-0.29)$) arc[start angle=-32, end angle=31, radius=0.54];
+  \node[rtangent!90, font=\scriptsize, anchor=west, inner sep=1pt] at ($(Q)+(0.75,-0.01)$) {$\phi$};
 
   \fill (P) circle (1.7pt);
   \node[anchor=north east, inner sep=2pt] at (P) {$\param_0$};
