@@ -53,7 +53,7 @@
 \newcommand{\myUni}{Université Savoie Mont-Blanc\xspace}
 \newcommand{\myLocation}{Annecy, France\xspace}
 \newcommand{\myTime}{2026\xspace}
-\newcommand{\myVersion}{v0.1.0}
+\newcommand{\myVersion}{v0.1.1}
 
 % ********************************************************************
 % Setup, finetuning, and useful commands
@@ -88,7 +88,10 @@
   sorting=nyt, % name, year, title
   maxbibnames=10, % default: 3, et al.
   %backref=true,%
-  natbib=true % natbib compatibility mode (\citep and \citet still work)
+  natbib=true, % natbib compatibility mode (\citep and \citet still work)
+  pagetracker=false % \sidecite/\parencite never use ibid.; the per-citation
+    % page tracking this disables is what oscillates by one page forever once
+    % the bibliography's page break falls on a knife-edge, hanging the build
 }{biblatex}
     \usepackage{biblatex}
 
@@ -199,6 +202,13 @@
 % rester coherentes avec le rendu de \sidecite ci-dessus, qui s'appuie sur
 % \parencite. \citet et \citep (mode natbib) ne sont pas affectes.
 \let\cite\parencite
+
+
+% Widepar
+\usepackage{changepage}
+\newenvironment{wide}
+  {\begin{adjustwidth}{0pt}{-\dimexpr\marginparwidth+\marginparsep\relax}}
+  {\end{adjustwidth}}
 % ****************************************************************************************************
 
 
@@ -275,6 +285,30 @@
   pdfproducer={LaTeX with hyperref and classicthesis}%
 }
 
+
+% ********************************************************************
+% Articles reproduits en fin de chapitre
+% ********************************************************************
+% Charge apres hyperref (classicthesis.sty), comme pdfpages le demande.
+\usepackage{pdfpages}
+
+% \joinedpapers{<contenu>} ouvre la section de fin de chapitre; chaque
+% \joinedpaper{<titre court>}{<chemin pdf>} y insere un article. Les pages
+% reproduites gardent la pagination de l'editeur, donc pas de bandeau ni de
+% folio du memoire par-dessus: \thispagestyle{empty}.
+\newcommand{\joinedpapers}[1]{%
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{section}{Articles reproduits}%
+  \section*{Articles reproduits}%
+  #1%
+}
+\newcommand{\joinedpaper}[2]{%
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{subsection}{#1}%
+  \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#2}%
+}
 
 % ********************************************************************
 % Math environments
@@ -701,16 +735,27 @@
   Jafuno,Lerda,Verlynde,Gallet,Shi,Petellat,Pautrel,Ndiaye,Brehier,%
   Wild,Duss,Molière}
 
-% biblatex hands \mkbibnamefamily the macro \namepartfamily, not the name it
-% holds, so the name has to be expanded to a string before it can be compared
-% against the lists above -- comparing the unexpanded macro always fails.
-\newcommand{\cv@markfamily}[1]{%
+% Marks whichever name part is being printed (given or family) according to
+% the family name of the *current* name -- \namepartfamily stays bound to it
+% throughout biblatex's formatting of that name, even while \mkbibnamegiven is
+% the one being expanded, so the same lookup drives both. The family name
+% still has to be expanded to a string before it can be compared against the
+% lists above -- comparing the unexpanded \namepartfamily macro always fails.
+\newcommand{\cv@markname}[1]{%
   \begingroup\protected@edef\cv@tmp{\endgroup
-    \noexpand\cv@markfamily@i{#1}}\cv@tmp}
-\newcommand{\cv@markfamily@i}[1]{%
+    \noexpand\cv@markname@i{\namepartfamily}{#1}}\cv@tmp}
+\newcommand{\cv@markname@i}[2]{%
   \ifinlist{#1}{\cv@supervised}%
-    {\underline{#1}}%
-    {\ifdefstring{\cvselfname}{#1}{\textbf{#1}}{#1}}}
+    {\underline{#2}}%
+    {\ifdefstring{\cvselfname}{#1}{\textbf{#2}}{#2}}}
+
+% \mkbibnamegiven and \mkbibnamefamily each get wrapped in their own
+% \underline/\textbf, so the space biblatex inserts between an abbreviated
+% given name and the family name (\bibnamedelimd) sits outside either wrap --
+% the underline rule breaks under it. Marking that delimiter the same way
+% closes the gap; \cv@bibnamedelimd@orig is biblatex's definition, captured
+% before we overwrite it below.
+\let\cv@bibnamedelimd@orig\bibnamedelimd
 
 % \cvcite{JOE24,ICML24} -- cites my own work by its mnemonic key rather than by
 % author and year. Author-year would be noise here: in a CV every entry is mine,
@@ -730,11 +775,15 @@
 % The label is the mnemonic key, so a reader who meets \cvcite{JOE24} in a later
 % chapter finds the entry here without an intermediate lookup.
 \newcommand{\cv@pubsetup}{%
-  % \mkbibnamefamily is declared robust by biblatex, so it must be redefined
-  % robustly too; \renewcommand would silently lose the markup. The URL is
-  % dropped because HAL is announced once above the list, and repeating it on
-  % every entry buries the reference under its own metadata.
-  \renewrobustcmd*{\mkbibnamefamily}[1]{\cv@markfamily{##1}}%
+  % \mkbibnamefamily and \mkbibnamegiven are declared robust by biblatex, so
+  % they must be redefined robustly too; \renewcommand would silently lose the
+  % markup. Both are marked so bold/underline covers the given-name initial as
+  % well as the surname. The URL is dropped because HAL is announced once
+  % above the list, and repeating it on every entry buries the reference under
+  % its own metadata.
+  \renewrobustcmd*{\mkbibnamefamily}[1]{\cv@markname{##1}}%
+  \renewrobustcmd*{\mkbibnamegiven}[1]{\cv@markname{##1}}%
+  \renewrobustcmd*{\bibnamedelimd}{\cv@markname{\cv@bibnamedelimd@orig}}%
   \renewbibmacro*{url+urldate}{}}
 
 % \cvfullcite -- \fullcite is a cite command, so it truncates the author list at

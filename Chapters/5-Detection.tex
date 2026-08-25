@@ -1595,15 +1595,16 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   hors ligne avec et sans structure de Kronecker, et leurs contreparties
   recursives. Les seuils sont fixes par detecteur et par $\Ntime$ au quantile
   empirique des statistiques sous $\hypothesis_0$, de sorte que toutes les
-  courbes se lisent à la meme fausse alarme. $5\times10^3$ tirages.
+  courbes se lisent à la meme fausse alarme. $10^3$ tirages.
   \provPuissanceK}
   \label{fig:detection-online-puissance}
 \end{figure}
 
 % ============================ FIGURE SUPPLEMENTAIRE ================================
-% Pendant gaussien de la precedente. Resultat: le glrt structure hors ligne monte
-% a 1,00 a T=49, tandis que sa version recursive reste a 0,045 --- c'est-a-dire
-% sans puissance. L'article signale bien que les versions en ligne convergent
+% Pendant gaussien de la precedente. Resultat mesure apres correction des
+% detecteurs en ligne (2026-08-25): hors ligne K-SG 0,999 a T=49, recursif
+% K-SG-O 0,981; non structure SG 0,272 contre SG-O 0,244. Les recursifs
+% rattrapent, mais tard. L'article signale bien que les versions en ligne convergent
 % plus lentement en gaussien qu'en K-distribue, mais pas a ce point.
 %
 % TODO A VERIFIER AVANT D'EN FAIRE UN ARGUMENT. Trois pistes, dans l'ordre:
@@ -1620,14 +1621,15 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 % ====================================================================================
 \begin{figure}[h]
   \centering
-  \input{gfx/generated/sar_mc_power_gauss/puissance-gaussien/plot.tex}
+  \input{gfx/generated/sar_mc_power/puissance-gaussien/plot.tex}
   \provPuissanceGaussienQR[.5cm]
   \caption{Meme experience que la \cref{fig:detection-online-puissance}, mais en
-  fouillis gaussien ($\texture_\iobs=1$). Le glrt structure hors ligne atteint
-  la puissance maximale des $\Ntime=49$; sa contrepartie recursive, elle, ne
-  decolle pas sur cet horizon, alors qu'en environnement heterogene les deux
-  coincidaient. Le schema stochastique tire donc parti de l'heterogeneite qu'il
-  est cense combattre. \provPuissanceGaussien}
+  fouillis gaussien ($\texture_\iobs=1$). Les deux detecteurs recursifs
+  rejoignent leur contrepartie hors ligne, mais bien plus tard qu'en
+  environnement heterogene: la ou le Kronecker recursif collait au hors ligne
+  des $\Ntime=2$ en fouillis K, il lui faut ici toute la serie pour le
+  rattraper. Le schema stochastique tire donc parti de l'heterogeneite qu'il
+  est cense combattre. $10^3$ tirages. \provPuissanceGaussien}
   \label{fig:detection-online-puissance-gaussien}
 \end{figure}
 
@@ -1689,7 +1691,23 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 %      contribution la moins accessible et celle qu'un lecteur voudra verifier;
 %      les autres derivations renvoyees aux pdf joints. Prevoir dans ce cas une
 %      section « Complements » en fin de chapitre.
-%  (b) PDF JOINTS. Les versions publiees sont annoncees comme reproduites en
-%      fin de chapitre (encadre d'ouverture): cela demande \usepackage{pdfpages}
-%      et un \includepdf par article. A cabler quand les pdf seront choisis.
+%  (b) PDF JOINTS. FAIT: pdfpages et les macros \joinedpapers/\joinedpaper sont
+%      dans classicthesis-config.tex, les trois articles sont inclus en fin de
+%      fichier. Reste \fullcite{GRETSI23a}, annonce dans l'encadre d'ouverture
+%      mais sans pdf dans papers/.
 % ====================================================================================
+
+% ====================================================================================
+% Articles reproduits. L'ordre suit celui dans lequel le chapitre les mobilise:
+% Mills Cross (sections 1-2), FLS multi-pings (section 3), changement RSO
+% (section 4). \fullcite{GRETSI23a}, annonce dans l'encadre d'ouverture, n'a pas
+% de pdf dans papers/ : soit l'ajouter, soit le retirer de l'encadre.
+% ====================================================================================
+\joinedpapers{%
+  Les versions publiées des travaux dont rend compte ce chapitre sont reproduites
+  ci-après, dans l'ordre où le chapitre les mobilise.
+
+  \joinedpaper{\citeauthor{JOE24}, \citetitle{JOE24}}{papers/DEMR2023-031.pdf}
+  \joinedpaper{\citeauthor{JOE26}, \citetitle{JOE26}}{papers/Robust_Multiping_Forward-Looking_Sonar_Coherent_Detection.pdf}
+  \joinedpaper{\citeauthor{SP24}, \citetitle{SP24}}{papers/1-s2.0-S0165168424002081-main.pdf}
+}
