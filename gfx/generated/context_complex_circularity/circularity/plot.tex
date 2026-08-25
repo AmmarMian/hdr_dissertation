@@ -12,17 +12,17 @@ height=4.6cm,
 legend cell align={left},
 legend columns=2,
 legend style={
-  fill opacity=0.8,
+  fill opacity=0,
   draw opacity=1,
   text opacity=1,
-  at={(0,1.14)},
+  at={(0,1.25)},
   anchor=south west,
   draw=none
 },
 scaled x ticks=manual:{}{\pgfmathparse{#1}},
 tick align=outside,
 tick pos=left,
-title={\(\displaystyle C = 0\)},
+  title={\(\displaystyle \MPCov = [0+0j]\)},
 width=0.45\textwidth,
 x grid style={darkgray176},
 xmin=-2.995566311271, xmax=2.995566311271,
@@ -1040,7 +1040,7 @@ table {%
 1.51723898865749 -0.0238944406009845
 1.51742712938515 -3.71662455388175e-16
 };
-\addlegendentry{prédit par $\Gamma$ seule}
+\addlegendentry{prédit par $\MCov$ seule}
 \addplot [line width=0.56pt, darkorange25512714]
 table {%
 1.51742712938515 0
@@ -1452,7 +1452,7 @@ scaled x ticks=manual:{}{\pgfmathparse{#1}},
 scaled y ticks=manual:{}{\pgfmathparse{#1}},
 tick align=outside,
 tick pos=left,
-title={\(\displaystyle |C|/\Gamma = 0.5,\ \arg C = 0\pi\)},
+title={\(\displaystyle |\MPCov|/\MCov= 0.5,\ \arg (\MPCov) = 0\pi\)},
 width=0.45\textwidth,
 x grid style={darkgray176},
 xmin=-2.995566311271, xmax=2.995566311271,
@@ -2878,7 +2878,7 @@ table {%
 height=4.6cm,
 tick align=outside,
 tick pos=left,
-title={\(\displaystyle |C|/\Gamma = 0.5,\ \arg C = 0.3333\pi\)},
+title={\(\displaystyle |\MPCov|/\MPCov= 0.5,\ \arg (\MPCov) = 0.3333\pi\)},
 width=0.45\textwidth,
 x grid style={darkgray176},
 xlabel={\(\displaystyle \mathrm{Re}\,z\)},
@@ -4305,7 +4305,7 @@ height=4.6cm,
 scaled y ticks=manual:{}{\pgfmathparse{#1}},
 tick align=outside,
 tick pos=left,
-title={\(\displaystyle |C|/\Gamma = 0.9,\ \arg C = 0.3333\pi\)},
+title={\(\displaystyle |\MPCov|/\MCov= 0.9,\ \arg (\MPCov) = 0.3333\pi\)},
 width=0.45\textwidth,
 x grid style={darkgray176},
 xlabel={\(\displaystyle \mathrm{Re}\,z\)},

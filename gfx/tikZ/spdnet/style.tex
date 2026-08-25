@@ -1,0 +1,38 @@
+% Styles et briques communs aux figures du \cref{ch:spdnet}.
+% Les teintes reprennent celles de gfx/tikZ/riemann/style.tex pour que les
+% figures des deux chapitres se lisent comme une meme famille.
+% Le texte du memoire ne fait que 355pt (12,5 cm): toutes les figures de ce
+% chapitre s'ecoulent donc de haut en bas, jamais de gauche a droite.
+% Ce fichier peut etre \input plusieurs fois.
+\definecolor{slayer}{RGB}{90,90,90}      % boite de couche, gris neutre
+\definecolor{sspd}{RGB}{150,40,40}       % ce qui vit sur le cone SPD
+\definecolor{sstiefel}{RGB}{40,70,140}   % ce qui vit sur Stiefel
+\definecolor{seucl}{RGB}{50,110,120}     % ce qui vit dans un espace euclidien
+\definecolor{sback}{RGB}{175,95,45}      % retropropagation
+\tikzset{
+  spdnet/.style={
+    >={Stealth[length=5pt,width=4pt]},
+    line join=round,
+    font=\small,
+    node distance=5mm,
+  },
+  % Boite de couche generique. La largeur est fixee pour que la colonne soit
+  % alignee et que le texte respire.
+  slayerbox/.style={
+    draw=slayer!70, thick, rounded corners=2pt, align=center,
+    inner sep=4pt, minimum height=9mm, minimum width=42mm, fill=white,
+  },
+  sstiefelbox/.style={slayerbox, draw=sstiefel!75, fill=sstiefel!7},
+  splainbox/.style={slayerbox, fill=slayer!5},
+  seuclbox/.style={slayerbox, draw=seucl!75, fill=seucl!7},
+  smeanbox/.style={slayerbox, draw=sspd!75, fill=sspd!9},
+  % Boite etroite, pour les colonnes doubles.
+  snarrow/.style={slayerbox, minimum width=32mm},
+  sarrow/.style={->, thick, slayer!85},
+  sbackarrow/.style={->, thick, sback, dashed},
+  sblock/.style={draw=slayer!45, thick, dashed, rounded corners=3pt, inner sep=5pt},
+  slabel/.style={font=\footnotesize, inner sep=2pt},
+  stiny/.style={font=\scriptsize, inner sep=1.5pt},
+  % Accolade de regroupement a droite ou a gauche d'une colonne.
+  sbrace/.style={decorate, decoration={brace, amplitude=4pt}, slayer!70},
+}

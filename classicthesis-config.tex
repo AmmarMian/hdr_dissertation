@@ -53,7 +53,7 @@
 \newcommand{\myUni}{Université Savoie Mont-Blanc\xspace}
 \newcommand{\myLocation}{Annecy, France\xspace}
 \newcommand{\myTime}{2026\xspace}
-\newcommand{\myVersion}{v0.0.3}
+\newcommand{\myVersion}{v0.1.0}
 
 % ********************************************************************
 % Setup, finetuning, and useful commands
@@ -115,7 +115,7 @@
 \usepackage{tikz}
 \usepackage{pgfplots} % External TikZ/PGF support (thanks to Andreas Nautsch)
 \usepgfplotslibrary{groupplots}
-\usetikzlibrary{external,calc}
+\usetikzlibrary{external,calc,arrows.meta,positioning,decorations.markings,fit,backgrounds}
 \tikzexternalize[mode=list and make, prefix=ext-tikz/]
 \usepackage{qrcode}
 % ****************************************************************************************************
@@ -125,6 +125,7 @@
 % 4. Setup floats: tables, (sub)figures, and captions
 % ****************************************************************************************************
 \usepackage{tabularx} % better tables
+\usepackage{longtable} % tableaux multi-pages (table des notations)
   \setlength{\extrarowheight}{3pt} % increase table row height
 \usepackage{enumitem} % list spacing, needed by the CV chapter's dense lists
 \usepackage{needspace} % keep CV rubric rules with the heading they introduce
@@ -194,6 +195,10 @@
   \marginnote{#1}[\sidecite@shift]%
 }
 \makeatother
+% Les citations dans le corps du texte sont toujours parenthesees, de maniere a
+% rester coherentes avec le rendu de \sidecite ci-dessus, qui s'appuie sur
+% \parencite. \citet et \citep (mode natbib) ne sont pas affectes.
+\let\cite\parencite
 % ****************************************************************************************************
 
 
@@ -231,6 +236,20 @@
 % ********************************************************************
 \PassOptionsToPackage{hyperfootnotes=false}{hyperref}
 \usepackage{classicthesis}
+
+% ********************************************************************
+% Numerotation des chapitres relative a la partie
+% ********************************************************************
+% book/scrbook ne declarent pas `chapter' comme compteur fils de `part':
+% les chapitres se suivent donc de 1 a N sur tout le document. On les fait
+% repartir a 1 dans chaque partie. La forme etoilee laisse \thechapter tel
+% quel (1, 2, ...) plutot que de le prefixer par le numero de partie.
+% Consequence assumee: deux chapitres de parties differentes portent le meme
+% numero, et il en va de meme pour ce qui en derive (floatperchapter=true
+% construit figures, tables et equations sur \thechapter). Pour lever
+% l'ambiguite sur les seuls flottants sans toucher au numero de chapitre:
+%   \renewcommand{\thefigure}{\thepart.\thechapter.\arabic{figure}}
+\counterwithin*{chapter}{part}
 
 
 % ********************************************************************
@@ -433,6 +452,40 @@
 \addtotheorempostheadhook[definition]{\ctmarginhead{definition}}
 \addtotheorempostheadhook[property]{\ctmarginhead{property}}
 \addtotheorempostheadhook[remark]{\ctmarginhead{remark}}
+
+% ---------- Bloc « contributions présentées » ----------
+% Ouverture des chapitres de la partie contributions : rappelle en une fois les
+% travaux dont le chapitre rend compte, avant que le texte ne les reformule.
+% Meme mecanique que les blocs theoremes (label en marge, fond lave), mais non
+% numerote : il y en a un seul par chapitre.
+\definecolor{ctcontributions}{RGB}{60,110,70}
+
+\declaretheorem[
+  style=definitionstyle,
+  numbered=no,
+  name=Contributions
+]{contributions}
+
+\addtotheorempostheadhook[contributions]{\ctmarginhead{contributions}}
+
+% ---------- Algorithmes ----------
+% Les chapitres de contributions decrivent des schemas iteratifs (point fixe,
+% BCD/MM, descente stochastique) qu'un bloc d'equations rend mal. Le flottant
+% est regle pour rester discret: pas de regles pleines, titre au-dessus, meme
+% corps de texte que le reste.
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\captionsetup[algorithm]{labelfont={sc},font=small,labelsep=newline,singlelinecheck=off}
+\renewcommand{\algorithmicrequire}{\textbf{Entrée:}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie:}}
+\renewcommand{\algorithmicwhile}{\textbf{tant que}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicrepeat}{\textbf{répéter}}
+\renewcommand{\algorithmicuntil}{\textbf{jusqu'à}}
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicfor}{\textbf{pour}}
+\renewcommand{\algorithmicif}{\textbf{si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
 
 % ********************************************************************
 % Setup autoreferences (hyperref and babel)

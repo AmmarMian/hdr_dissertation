@@ -224,3 +224,194 @@
 
 
 
+
+%----------------------------------------------------------------------------------------
+% Geometrie riemannienne
+%----------------------------------------------------------------------------------------
+% Ensembles de matrices structurees. La convention est celle deja retenue pour
+% \SPD et \HPD : lettre calligraphiee, dimension en indice, contrainte en
+% exposant. Le tilde marque la normalisation par le determinant.
+\newcommand{\Sym}[1]{\mathcal{S}_{#1}} % Matrices symetriques reelles
+\newcommand{\Herm}[1]{\mathcal{H}_{#1}} % Matrices hermitiennes
+\newcommand{\SPDdet}[1]{\widetilde{\mathcal{S}}_{#1}^{++}} % SPD de determinant unite
+\newcommand{\HPDdet}[1]{\widetilde{\mathcal{H}}_{#1}^{++}} % HPD de determinant unite
+\newcommand{\Rpos}[1]{(\R_*^+)^{#1}} % Cone des vecteurs a entrees positives
+\newcommand{\Stiefel}[2]{\mathrm{St}(#1,#2)} % Variete de Stiefel
+\newcommand{\Grassmann}[2]{\mathrm{Gr}(#1,#2)} % Variete de Grassmann
+\newcommand{\Orthgroup}[1]{\mathcal{O}(#1)} % Groupe orthogonal
+\newcommand{\Unitgroup}[1]{\mathcal{U}(#1)} % Groupe unitaire
+
+% Objets de geometrie riemannienne
+\newcommand{\Manifold}{\mathcal{M}} % Variete generique
+\newcommand{\Manifoldbis}{\mathcal{N}} % Variete generique bis
+\newcommand{\ambient}{\mathcal{E}} % Espace ambiant euclidien
+\newcommand{\Tangent}[2]{\mathrm{T}_{#1}#2} % Espace tangent en un point
+\newcommand{\tvec}{\vector{\zeta}} % Vecteur tangent
+\newcommand{\tvecbis}{\vector{\eta}} % Vecteur tangent bis
+\newcommand{\tvecter}{\vector{\nu}} % Vecteur tangent ter
+\newcommand{\metric}[3]{\left\langle #1, #2 \right\rangle_{#3}} % Metrique riemannienne
+\newcommand{\normriem}[2]{\left\lVert #1 \right\rVert_{#2}} % Norme induite par la metrique
+\newcommand{\projman}{\mathcal{P}} % Projection orthogonale sur l'espace tangent
+\newcommand{\geod}{\gamma} % Geodesique
+\newcommand{\geodmean}{\#} % Moyenne geodesique : A #_t B
+\newcommand{\geodist}{\delta} % Distance geodesique
+\newcommand{\connection}{\nabla} % Connexion de Levi-Civita
+\newcommand{\transport}{\mathcal{T}} % Transport parallele
+\newcommand{\Retr}{\mathcal{R}} % Retraction
+\newcommand{\Fmean}{\overline{\MCov}} % Moyenne de Frechet
+\DeclareMathOperator{\dirderiv}{\mathrm{D}} % Derivee directionnelle
+\DeclareMathOperator*{\argmin}{arg\,min} % Argument du minimum
+\DeclareMathOperator*{\argmax}{arg\,max} % Argument du maximum
+\DeclareMathOperator{\Rgrad}{\operatorname{grad}} % Gradient riemannien
+\DeclareMathOperator{\Rhess}{\operatorname{Hess}} % Hessien riemannien
+\DeclareMathOperator{\symop}{\operatorname{sym}} % Partie symetrique
+\DeclareMathOperator{\hermop}{\operatorname{herm}} % Partie hermitienne
+\DeclareMathOperator{\expm}{\operatorname{expm}} % Exponentielle de matrice
+\DeclareMathOperator{\logm}{\operatorname{logm}} % Logarithme de matrice
+
+% Geometrie de l'information
+\newcommand{\Fisher}{\mat{F}} % Matrice d'information de Fisher
+\newcommand{\score}{\vector{s}} % Vecteur score
+\newcommand{\metriccoefa}{\alpha_\densgen} % Coefficient alpha de la metrique de Fisher CES
+\newcommand{\metriccoefb}{\beta_\densgen} % Coefficient beta de la metrique de Fisher CES
+\newcommand{\logderiv}{\phi} % phi(t) = g'(t)/g(t)
+\newcommand{\KL}{\mathrm{KL}} % Divergence de Kullback-Leibler
+
+%----------------------------------------------------------------------------------------
+% Detection (partie contributions)
+% Convention : on garde \vdim pour la dimension du vecteur teste, \Nobs pour le
+% nombre de donnees secondaires (le K des articles) et \MScatter pour la matrice
+% de speckle. Les grandeurs propres aux systemes (capteurs, pings, antennes)
+% recoivent leurs propres macros.
+%----------------------------------------------------------------------------------------
+
+% Geometrie du systeme
+\newcommand{\Nsensor}{m}              % nombre de capteurs d'une antenne
+\newcommand{\isensor}{i}              % index sur les capteurs
+\newcommand{\Narray}{A}               % nombre d'antennes
+\newcommand{\iarray}{a}               % index sur les antennes
+\newcommand{\Nping}{P}                % nombre de pings coherents
+\newcommand{\iping}{p}                % index sur les pings
+\newcommand{\wavelength}{\lambda_0}   % longueur d'onde centrale
+\newcommand{\doa}{\theta}             % direction d'arrivee
+
+% Modele de signal
+\newcommand{\z}{\vector{z}}           % bruit (clutter) observe
+\newcommand{\speckle}{\vector{c}}     % composante speckle gaussienne
+\newcommand{\amplitude}{\alpha}       % amplitude complexe de la cible
+\newcommand{\Vamplitude}{\vector{\amplitude}} % vecteur des amplitudes
+\newcommand{\steering}{\vector{p}}    % vecteur directionnel d'une antenne
+\newcommand{\steerfull}{\vector{s}}   % vecteur directionnel multi-ping / multi-antenne
+\newcommand{\Steermat}{\mat{P}}       % matrice bloc-diagonale des vecteurs directionnels
+\newcommand{\Steerspace}{\mat{H}}     % base du sous-espace signal
+\newcommand{\Nrank}{r}                % rang du sous-espace signal
+\newcommand{\projspace}[1]{\mat{\Pi}_{#1}} % projecteur (oblique) sur un sous-espace
+
+% Parametres de nuisance
+\newcommand{\powerscale}{\sigma}      % facteur d'echelle d'homogeneite partielle
+\newcommand{\escale}{\widetilde{\powerscale}} % echelle effective sigma * sqrt(tau)
+\newcommand{\Scalemat}{\mat{\Delta}}  % matrice diagonale des echelles effectives
+\newcommand{\paramtest}{\vector{\param}_{\mathrm{r}}} % parametres testes
+\newcommand{\paramnuis}{\vector{\param}_{\mathrm{s}}} % parametres de nuisance
+
+% Statistiques de test
+\newcommand{\statGLRT}{\DetectorStat_{\mathrm{glrt}}}
+\newcommand{\statRao}{\DetectorStat_{\mathrm{rao}}}
+\newcommand{\statWald}{\DetectorStat_{\mathrm{wald}}}
+\newcommand{\statANMF}{\DetectorStat_{\mathrm{anmf}}}
+\newcommand{\detname}[1]{\textsc{#1}} % nom d'un detecteur dans le texte
+\newcommand{\pfa}{P_{\mathrm{fa}}}    % probabilite de fausse alarme
+\newcommand{\pdet}{P_{\mathrm{d}}}    % probabilite de detection
+\newcommand{\snr}{\mathrm{rsb}}       % rapport signal a bruit
+
+% Structure de covariance
+\newcommand{\Kronleft}{\mat{A}}       % operande gauche du produit de Kronecker
+\newcommand{\Kronright}{\mat{B}}      % operande droit du produit de Kronecker
+\newcommand{\obsmat}{\mat{M}}         % remise en matrice d'une observation vectorisee
+\newcommand{\Toep}[1]{\mathrm{Toep}(#1)} % ensemble des matrices Toeplitz de taille donnee
+
+% Structure de Kronecker : dimensions des deux operandes (\vdim = \dimleft \dimright)
+\newcommand{\dimleft}{a}
+\newcommand{\dimright}{b}
+\newcommand{\had}{\odot}              % produit de Hadamard
+\newcommand{\hadinv}[1]{{#1}^{\had-1}} % inverse de Hadamard (terme a terme)
+
+%----------------------------------------------------------------------------------------
+% Apprentissage profond sur la variete SPD (partie contributions, ch:spdnet)
+% Convention : on reutilise sans les redefinir \MCov (matrice SPD circulant dans
+% le reseau), \SPD, \Stiefel, \Fmean, \projman, \Retr, \expm, \logm, \symop,
+% \geodmean, \dirderiv, \loss et \Nvar. Le batch est le cadre unificateur du
+% memoire : sa taille est \Nobs et son index \iobs, exactement comme la
+% collection de \cref{def:context-riemann-frechet}. \Nbatch designe le nombre
+% de batchs vus pendant une epoque, a ne pas confondre avec \Nobs.
+%----------------------------------------------------------------------------------------
+
+% Architecture : couches et dimensions
+\newcommand{\ilayer}{\ell}                 % index sur les couches
+\newcommand{\Nlayer}{L}                    % nombre de blocs BiRe
+\newcommand{\dlayer}[1]{\vdim_{#1}}        % dimension SPD en sortie de la couche #1
+\newcommand{\Wlayer}{\mat{W}}              % poids d'une couche BiMap (sur Stiefel)
+\newcommand{\reeigeps}{\varepsilon}        % seuil de rectification de ReEig
+\newcommand{\Covbias}{\mat{B}}             % biais SPD de la normalisation par batch
+\newcommand{\bnnorm}{\mat{\Delta}}         % batch normalise, avant biais
+\newcommand{\bnout}{\mat{\Omega}}          % sortie de la couche de normalisation
+\newcommand{\MSoftmax}{\mat{\Xi}}          % poids de la couche softmax
+\newcommand{\Vsoftmax}{\vector{\beta}}     % biais de la couche softmax
+\DeclareMathOperator{\softmax}{\operatorname{softmax}}
+\DeclareMathOperator{\vech}{\operatorname{vech}}
+\newcommand{\layername}[1]{\textsc{#1}}    % nom d'une couche dans le texte
+\newcommand{\BiMap}{\layername{bimap}}
+\newcommand{\ReEig}{\layername{reeig}}
+\newcommand{\LogEig}{\layername{logeig}}
+\newcommand{\BiRe}{\layername{bire}}
+\newcommand{\BatchNorm}{\layername{bn}}
+\newcommand{\CovPool}{\layername{covpool}}
+\newcommand{\SPDnet}{\layername{spdnet}}
+
+% Apprentissage
+\newcommand{\netfun}{f}                    % application realisee par le reseau
+\newcommand{\netparam}{\vector{\param}}    % ensemble des parametres du reseau
+\newcommand{\classlabel}{y}                % etiquette de classe
+\newcommand{\Nclass}{K}                    % nombre de classes
+\newcommand{\iclass}{c}                    % index sur les classes
+\newcommand{\ibatch}{b}                    % index sur les batchs
+\newcommand{\Nbatch}{B}                    % nombre de batchs (taille du batch : \Nobs)
+\newcommand{\lrate}{\eta}                  % pas d'apprentissage
+\newcommand{\momentum}{\gamma}             % momentum de la moyenne glissante
+% Erreur retropropagee : \err{\loss}{\MCov} imprime la derivee partielle.
+\newcommand{\err}[2]{\frac{\partial #1}{\partial #2}}
+
+% Moyennes sur le cone. \Fmean designe la moyenne generique du batch courant,
+% \Fmeanglob la moyenne globale accumulee pendant l'apprentissage.
+\newcommand{\Fmeanglob}{\Fmean^{\mathrm{g}}}
+\newcommand{\meanari}{\mat{A}}             % moyenne arithmetique
+\newcommand{\meanharm}{\mat{H}}            % moyenne harmonique
+\newcommand{\meanlabel}[1]{\mathrm{#1}}    % etiquette d'une moyenne en indice
+\newcommand{\Niterm}{\Niter}               % nombre d'iterations du point fixe
+
+% Mise en covariance apprise (section GPR)
+\newcommand{\imagegpr}{\mat{I}}            % vignette d'entree
+\newcommand{\Tstack}{\mat{T}}              % sorties de filtres mises en matrice
+\newcommand{\tensorfeat}{\mathcal{T}}      % tenseur des sorties de filtres
+\newcommand{\centermat}{\bar{\mat{I}}}     % matrice de centrage
+\newcommand{\Nfilter}{\vdim}               % nombre de filtres retenus
+\newcommand{\Npix}{M}                      % nombre de pixels par carte de filtre
+\newcommand{\CovPooled}{\mat{C}}           % covariance obtenue par covariance pooling
+
+% Apprentissage federe
+\newcommand{\clientset}{\mathcal{C}}       % ensemble des clients
+\newcommand{\Nclient}{C}                   % nombre de clients
+\newcommand{\iclient}{i}                   % index sur les clients
+\newcommand{\dataclient}{\mathcal{D}}      % jeu de donnees local
+\newcommand{\iround}{t}                    % index sur les tours de communication
+\newcommand{\Nround}{T}                    % nombre de tours de communication
+\newcommand{\selected}{\mathcal{S}}        % clients selectionnes a un tour
+\newcommand{\Nselected}{M}                 % nombre de clients selectionnes
+\newcommand{\Nepoch}{E}                    % nombre d'epoques locales
+\newcommand{\riskloc}{F}                   % risque empirique local
+% Le releve (lifting) est l'inverse approche d'une retraction. \Retr etant deja
+% \mathcal{R} et \loss deja \mathcal{L}, on prend un L sans empattement.
+\newcommand{\Lift}{\mathsf{L}}
+% Projection sur la variete de Stiefel (facteur orthogonal de la decomposition
+% polaire), a distinguer de \projman qui projette sur l'espace tangent.
+\DeclareMathOperator{\polarf}{\operatorname{uf}}

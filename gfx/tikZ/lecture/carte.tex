@@ -1,0 +1,148 @@
+% Carte des dependances du memoire: chapitres de l'etat des lieux (colonne de
+% gauche) vers les chapitres de contributions et de perspectives (colonne de
+% droite). Chaque arete porte les sections effectivement mobilisees; la couleur
+% designe la destination. Utilise dans FrontBackmatter/CommentLire.tex.
+%
+% Revision du 2026-08-24: le \cref{ch:spdnet} etant ecrit, ses dependances
+% reelles sont desormais connues et elles sont bien plus larges que la seule
+% arete depuis le chapitre 3 qui figurait ici. Il mobilise en fait les quatre
+% chapitres de l'etat des lieux --- c'est meme le seul chapitre du memoire dans
+% ce cas. Trois aretes ont donc ete ajoutees et une entree (§2.1.1, Wishart) a
+% ete ouverte dans le bloc du chapitre 2.
+\definecolor{lctx}{RGB}{90,90,90}
+\definecolor{lcinq}{RGB}{40,70,140}
+\definecolor{lsix}{RGB}{50,110,120}
+\definecolor{lsept}{RGB}{125,125,125}
+\begin{tikzpicture}[
+    >={Stealth[length=4pt,width=3pt]},
+    line join=round,
+    font=\footnotesize,
+    entry/.style={anchor=west, inner sep=1pt, font=\scriptsize, text depth=0.5ex},
+    ctitle/.style={anchor=west, inner sep=1pt, font=\scriptsize\bfseries, text=lctx},
+    frame/.style={draw=lctx!45, rounded corners=2pt, inner xsep=5pt, inner ysep=6pt},
+    dest/.style={draw, rounded corners=2pt, align=center, font=\scriptsize,
+                 text width=2.5cm, inner sep=5pt},
+    elab/.style={font=\tiny, fill=white, inner sep=1.5pt, align=center},
+    edge/.style={thin, ->},
+  ]
+
+  %--------------------------------------------------------------- etat des lieux
+  % Les numeros de chapitre repartent a 1 dans chaque partie
+  % (\counterwithin*{chapter}{part}): on les prefixe donc par la partie.
+  \node[font=\scriptsize\bfseries, text=lctx, anchor=west] at (0,1.35)
+    {Partie \textsc{ii} --- État des lieux};
+  \node[ctitle] (t1) at (0,0.62) {ch.\,1 --- Covariance};
+  \node[entry]  (a1) at (0, 0.00) {\S1.3 \ estimation, SCM};
+  \node[entry]  (a2) at (0,-0.55) {\S1.4 \ régularisation};
+  \node[entry]  (a3) at (0,-1.10) {\S1.5 \ cas complexe};
+
+  \node[ctitle] (t2) at (0,-2.05) {ch.\,2 --- Distributions};
+  \node[entry]  (b0) at (0,-2.67) {\S2.1.1 gaussienne, Wishart};
+  \node[entry]  (b1) at (0,-3.22) {\S2.1.2 elliptiques};
+  \node[entry]  (b2) at (0,-3.77) {\S2.1.3 M-estimation};
+  \node[entry]  (b3) at (0,-4.32) {\S2.2 \ cas complexe};
+
+  \node[ctitle] (t3) at (0,-5.27) {ch.\,3 --- Riemann};
+  \node[entry]  (c1) at (0,-5.89) {\S3.1 \ variétés, transport};
+  \node[entry]  (c2) at (0,-6.44) {\S3.2 \ cône SPD (AI, LE)};
+  \node[entry]  (c3) at (0,-6.99) {\S3.3 \ moyennes de Fréchet};
+  \node[entry]  (c4) at (0,-7.54) {\S3.4 \ matrices orthog.};
+  \node[entry]  (c5) at (0,-8.09) {\S3.5 \ optimisation};
+
+  \node[ctitle] (t4) at (0,-9.04) {ch.\,4 --- Géométrie de l'information};
+  \node[entry]  (d1) at (0,-9.66) {\S4.1 \ métrique de Fisher};
+  \node[entry]  (d2) at (0,-10.21) {\S4.2 \ modèle gaussien};
+  \node[entry]  (d3) at (0,-10.76) {\S4.5 \ BCR intrinsèque};
+  \node[entry]  (d4) at (0,-11.31) {\S4.6 \ divergences};
+
+  \coordinate (r) at (4.62,0); % garantit une largeur commune aux quatre cadres
+
+  \begin{scope}[on background layer]
+    \node[frame, fit=(t1)(a1)(a3)(r)]        (F1) {};
+    \node[frame, fit=(t2)(b0)(b3)(r|-b0)]    (F2) {};
+    \node[frame, fit=(t3)(c1)(c5)(r|-c1)]    (F3) {};
+    \node[frame, fit=(t4)(d1)(d4)(r|-d1)]    (F4) {};
+  \end{scope}
+
+  %--------------------------------------------------------------- destinations
+  \node[dest, draw=lcinq, text=lcinq, fill=lcinq!5] (ch5) at (10.9,-2.10)
+    {\textbf{\textsc{iii}.1}\\Test d'hypothèses robustes\\\textit{sonar, RSO}};
+  \node[dest, draw=lsix, text=lsix, fill=lsix!5] (ch6) at (10.9,-6.60)
+    {\textbf{\textsc{iii}.2}\\Apprentissage profond\\sur la variété SPD};
+  \node[dest, draw=lsept, dashed, text=lsept] (ch7a) at (10.9,-9.45)
+    {\textbf{\textsc{iii}.3}, \S2\\Transformers SPD};
+  \node[dest, draw=lsept, dashed, text=lsept] (ch7b) at (10.9,-11.05)
+    {\textbf{\textsc{iii}.3}, \S3\\Phase géométrique};
+
+  \node[font=\scriptsize\bfseries, text=lsept, anchor=south west] at (9.45,-8.65)
+    {Perspectives};
+  \node[font=\scriptsize\bfseries, text=lcinq!80, anchor=south] at (10.9,-1.05)
+    {Contributions};
+
+  %--------------------------------------------------------------- aretes
+  % ---- vers le chapitre III.1
+  \begin{scope}[edge, lcinq]
+    \draw (F1.east) to[out=0,in=165]
+      node[elab,pos=0.52,text=lcinq]{\S1.3 SCM \textperiodcentered\ \S1.4 régularisation\\\S1.5 circularité}
+      (ch5.west);
+    \draw ($(F2.east)+(0,0.30)$) to[out=0,in=195]
+      node[elab,pos=0.50,text=lcinq]{\S2.1.2 SIRV\\\S2.1.3 Tyler, $M$-estimation}
+      (ch5.west);
+    \draw ($(F3.east)+(0,0.95)$) to[out=25,in=215]
+      node[elab,pos=0.55,text=lcinq]{\S3.2 distance affine invariante\\\S3.3 moyennes \textperiodcentered\ \S3.5 descente}
+      (ch5.south);
+    % contournement par la droite: ne pas traverser le bloc III.2
+    \draw[rounded corners=4pt] ($(F4.east)+(0,0.55)$)
+      -- (9.05,-8.49) -- (9.05,-2.90)
+      node[elab,pos=0.55,text=lcinq]{\S4.1 test de Rao\\\S4.6 divergences}
+      -- ($(ch5.west)+(0,-0.45)$);
+  \end{scope}
+
+  % ---- vers le chapitre III.2
+  % Quatre aretes: c'est le seul chapitre du memoire a mobiliser les quatre
+  % chapitres de l'etat des lieux.
+  \begin{scope}[edge, lsix]
+    % ch.1: la covariance apprise est une SCM, et son conditionnement decide
+    % du seuil de ReEig. Contournement par le haut et par la droite.
+    \draw[rounded corners=4pt] ($(F1.east)+(0,0.20)$)
+      -- (12.85,0.20)
+      node[elab,pos=0.55,text=lsix]{\S1.3 covariance empirique\\\S1.4 conditionnement}
+      -- (12.85,-6.60) -- (ch6.east);
+    % ch.2: Wishart et Wishart inverse donnent la lecture statistique des
+    % moyennes arithmetique et harmonique.
+    \draw ($(F2.east)+(0,-0.50)$) to[out=-10,in=155]
+      node[elab,pos=0.55,text=lsix]{\S2.1.1 Wishart} ($(ch6.west)+(0,0.42)$);
+    % ch.3: le gros de la dependance.
+    \draw ($(F3.east)+(0,0.05)$) to[out=0,in=180]
+      node[elab,pos=0.48,text=lsix]{\S3.2 cône (AI, LE) \textperiodcentered\ \S3.3 moyennes\\\S3.4 Stiefel \textperiodcentered\ \S3.5 rétractions}
+      (ch6.west);
+    % ch.4: c'est lui qui fait de la liste des moyennes une famille indexee par
+    % un modele statistique.
+    \draw ($(F4.east)+(0,-0.35)$) to[out=10,in=250]
+      node[elab,pos=0.62,text=lsix]{\S4.2 distance de Rao gaussienne\\\S4.6 divergences}
+      ($(ch6.south)+(0.35,0)$);
+  \end{scope}
+
+  % ---- vers les perspectives
+  \begin{scope}[edge, lsept, dashed]
+    \draw ($(F3.east)+(0,-0.85)$) to[out=-15,in=180]
+      node[elab,pos=0.62,text=lsept]{\S3.3 moyenne de\\Karcher pondérée} (ch7a.west);
+    \draw ($(F3.east)+(0,-1.35)$) to[out=-30,in=180]
+      node[elab,pos=0.60,text=lsept]{\S3.1 transport\\parallèle} (ch7b.west);
+    \draw[rounded corners=4pt] ($(F1.east)+(0,-0.40)$)
+      -- (5.25,-0.95) -- (5.25,-12.05)
+      -- (10.9,-12.05)
+      node[elab,pos=0.88,text=lsept]{\S1.5 pseudo-covariance} (ch7b.south);
+    \draw ($(ch6.south east)+(-0.90,0)$) -- ($(ch7a.north east)+(-0.90,0)$);
+  \end{scope}
+
+  %--------------------------------------------------------------- legende
+  \node[anchor=north west, font=\tiny, text=lctx, align=left] at (0,-12.40)
+    {\textcolor{lcinq}{\rule[0.4ex]{7pt}{0.5pt}}~outil mobilisé en \textsc{iii}.1
+     \quad
+     \textcolor{lsix}{\rule[0.4ex]{7pt}{0.5pt}}~en \textsc{iii}.2
+     \quad
+     \textcolor{lsept}{\rule[0.4ex]{3pt}{0.5pt}\hspace{1.5pt}\rule[0.4ex]{3pt}{0.5pt}}~piste ouverte en \textsc{iii}.3
+     \qquad
+     (les numéros de chapitre repartent à 1 dans chaque partie)};
+\end{tikzpicture}

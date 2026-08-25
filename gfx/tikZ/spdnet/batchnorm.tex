@@ -1,0 +1,50 @@
+% Couche de normalisation par batch: passe avant a gauche, passe arriere a
+% droite, toutes deux de haut en bas. Ce qui rend la derivation non triviale est
+% que l'entree agit sur la sortie par deux chemins, directement et par la
+% moyenne: ils se rejoignent en bas a droite.
+% Utilise dans la \cref{sec:spdnet-batchnorm-couche}.
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[spdnet, node distance=6mm]
+
+  % ------------------------------- passe avant ------------------------------
+  \begin{scope}
+    \node[snarrow, splainbox] (in) {$\{\MCov_\iobs\}_{\iobs=1}^{\Nobs}$};
+    \node[snarrow, smeanbox, below=of in] (mean) {moyenne $\Fmean$};
+    \node[snarrow, splainbox, below=of mean] (norm)
+      {$\bnnorm_\iobs=\Fmean^{-1/2}\MCov_\iobs\Fmean^{-1/2}$};
+    \node[snarrow, sstiefelbox, below=of norm] (bias)
+      {$\bnout_\iobs=\Covbias\,\bnnorm_\iobs\,\Covbias$};
+    \node[snarrow, splainbox, below=of bias] (out) {$\{\bnout_\iobs\}_{\iobs=1}^{\Nobs}$};
+
+    \draw[sarrow] (in) -- (mean);
+    \draw[sarrow] (mean) -- (norm);
+    \draw[sarrow] (norm) -- (bias);
+    \draw[sarrow] (bias) -- (out);
+    % le chemin direct, qui court-circuite la moyenne
+    \draw[sarrow, rounded corners=3pt] (in.west) -- ++(-5mm,0)
+      |- node[stiny, slayer, pos=0.25, rotate=90, anchor=south] {chemin direct} (norm.west);
+
+    \node[slabel, slayer, above=3mm of in] {\textbf{passe avant}};
+  \end{scope}
+
+  % ------------------------------- passe arriere ----------------------------
+  \begin{scope}[xshift=62mm]
+    \node[snarrow, splainbox] (bout) {$\left\{\err{\loss}{\bnout_\iobs}\right\}$};
+    \node[snarrow, sstiefelbox, below=of bout] (bbias) {$\err{\loss_{\bnout}}{\Covbias}$};
+    \node[snarrow, splainbox, below=of bbias] (bnorm) {$\err{\loss_{\bnnorm}}{\MCov_\iobs}$};
+    \node[snarrow, smeanbox, below=of bnorm] (bmean)
+      {$\err{\loss_{\bnnorm}}{\Fmean}$ \ (Sylvester)};
+    \node[snarrow, splainbox, below=of bmean] (bin)
+      {$\err{\loss}{\MCov_\iobs}=\err{\loss_{\bnnorm}}{\MCov_\iobs}+\err{\loss_{\Fmean}}{\MCov_\iobs}$};
+
+    \draw[sbackarrow] (bout) -- (bbias);
+    \draw[sbackarrow] (bbias) -- (bnorm);
+    \draw[sbackarrow] (bnorm) -- (bmean);
+    \draw[sbackarrow] (bmean) -- (bin);
+    \draw[sbackarrow, rounded corners=3pt] (bnorm.east) -- ++(5mm,0)
+      |- node[stiny, sback, pos=0.25, rotate=90, anchor=north] {chemin direct} (bin.east);
+
+    \node[slabel, sback, above=3mm of bout] {\textbf{passe arrière}};
+  \end{scope}
+
+\end{tikzpicture}

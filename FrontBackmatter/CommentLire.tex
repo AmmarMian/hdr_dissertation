@@ -1,0 +1,301 @@
+%*******************************************************
+% Comment lire ce memoire
+% Chapitre non numerote, place apres la table des matieres.
+%*******************************************************
+\pdfbookmark[1]{Comment lire ce mémoire}{CommentLire}
+\addcontentsline{toc}{chapter}{\tocEntry{Comment lire ce mémoire}}
+
+\chapter*{Comment lire ce mémoire}
+\label{ch:commentlire}
+\markboth{Comment lire ce mémoire}{Comment lire ce mémoire}
+
+Ce mémoire s'adresse à des lecteurs venus d'horizons différents. Le traiteur de
+signal RADAR ou SONAR connaît déjà les modèles elliptiques et les estimateurs
+robustes, mais pas nécessairement le vocabulaire riemannien; le géomètre ou le
+praticien de l'apprentissage sur variétés se trouve dans la situation inverse.
+La \cref{pt:context}, qui rassemble quatre chapitres d'état des lieux, n'est
+donc pas un passage obligé: elle est là pour que chacun puisse combler ce qui
+lui manque, et rien de plus. Les contributions elles-mêmes sont regroupées dans
+la \cref{pt:contributions}.
+
+Ce chapitre propose quatre choses pour s'y retrouver: une carte des dépendances
+entre les chapitres, quelques parcours de lecture selon le profil du lecteur, un
+rappel des conventions typographiques et de reproductibilité employées dans tout
+le document, et enfin la table des notations.
+
+\section*{Carte des dépendances}
+\label{sec:commentlire-carte}
+
+La \cref{fig:commentlire-carte} donne, pour chaque chapitre de contribution ou
+de perspective, les sections de l'état des lieux qu'il mobilise effectivement.
+Elle se lit de gauche à droite: à gauche les quatre chapitres de mise à niveau
+avec le détail de leurs sections, à droite les chapitres qui s'en servent, et
+sur chaque flèche les outils empruntés. La couleur désigne la destination, les
+traits discontinus les pistes ouvertes du chapitre
+\hyperref[ch:perspectives]{\textsc{iii}.3}, qui ne sont
+pas des résultats acquis mais des directions de travail.
+
+Une lecture verticale de la carte est instructive: le chapitre
+\hyperref[ch:spdnet]{\textsc{iii}.2} est le seul à mobiliser les quatre
+chapitres de l'état des lieux, et il le fait pour des raisons de nature
+différente --- le régime dimensionnel pour former ses matrices, la loi de
+Wishart et les divergences pour choisir ses moyennes, la variété de Stiefel pour
+contraindre ses poids.
+
+Deux remarques sur l'usage de cette carte. D'abord, une flèche signale une
+dépendance réelle, pas un prérequis absolu: un lecteur pressé peut toujours
+accepter un outil sur parole et revenir plus tard sur sa construction. Ensuite,
+l'absence de flèche est aussi une information: la \cref{sec:context-geometry-icrb}
+sur la borne de Cramér-Rao intrinsèque, par exemple, n'est utilisée par aucune
+contribution de ce mémoire; elle est là parce qu'elle éclaire ce que mesure la
+métrique de Fisher, et peut être sautée sans dommage.
+
+\begin{figure}[p]
+  \centering
+  % la carte deborde legerement dans les marges pour rester lisible
+  \makebox[\textwidth][c]{\scalebox{1.06}{\input{gfx/tikZ/lecture/carte.tex}}}
+  \caption[Carte des dépendances du mémoire]{Carte des dépendances. Les
+    chapitres de l'état des lieux (\cref{pt:context}) sont à gauche avec le
+    détail de leurs sections; les chapitres de contribution
+    (\cref{pt:contributions}) et de perspective sont à droite. Chaque flèche
+    porte les sections effectivement mobilisées, et sa couleur désigne sa
+    destination. Les traits discontinus mènent aux pistes du chapitre
+    \textsc{iii}.3.}
+  \label{fig:commentlire-carte}
+\end{figure}
+
+\section*{Parcours de lecture}
+\label{sec:commentlire-parcours}
+
+Quatre entrées possibles, selon ce que l'on connaît déjà et ce que l'on cherche.
+
+\begin{figure}[htb]
+  \centering
+  \makebox[\textwidth][c]{\input{gfx/tikZ/lecture/parcours.tex}}
+  \caption[Les quatre parcours de lecture]{Les quatre parcours de lecture.}
+  \label{fig:commentlire-parcours}
+\end{figure}
+
+\paragraph{Traitement du signal RADAR ou SONAR.} Le contenu des chapitres
+\hyperref[ch:context-definition]{\textsc{ii}.1} et
+\hyperref[ch:context-distributions]{\textsc{ii}.2} est probablement acquis:
+on pourra n'en lire que les bilans, puis prendre la
+\cref{sec:context-riemann-spd} sur le cône SPD et la
+\cref{sec:context-riemann-moyennes} sur les moyennes, qui sont les deux seules
+véritables nouveautés de vocabulaire nécessaires, et enchaîner directement sur
+le chapitre \hyperref[ch:robust-detection]{\textsc{iii}.1}. La
+\cref{sec:context-geometry-fisher} rendra
+service au moment des tests de Rao.
+
+\paragraph{Géométrie riemannienne et apprentissage sur variétés.} La situation
+symétrique: le chapitre \hyperref[ch:context-riemann]{\textsc{ii}.3} sera du
+déjà-vu, mais la
+\cref{sec:context-distributions-reel} y est indispensable, en particulier ses
+sous-sections sur les distributions elliptiques et la M-estimation, qui portent
+toute la modélisation statistique du chapitre
+\hyperref[ch:robust-detection]{\textsc{iii}.1}. Pour le chapitre
+\hyperref[ch:spdnet]{\textsc{iii}.2}, ce sont plutôt la loi de Wishart
+(\cref{def:context-distributions-wishart}) et les divergences de la
+\cref{sec:context-geometry-divergences} qu'il faut avoir en tête: ce sont elles
+qui font des différentes moyennes du cône une famille indexée par un modèle
+statistique, et non un catalogue de recettes. Le chapitre
+\hyperref[ch:context-geometry]{\textsc{ii}.4} fait le pont entre les deux mondes et
+constitue, de ce point de vue, le chapitre le plus rentable du mémoire.
+
+\paragraph{Lecture rapide.} Pour prendre la mesure de l'ensemble sans entrer
+dans le détail: le \hyperref[ch:cv]{curriculum vitae}, puis la section de bilan qui clôt
+chacun des quatre chapitres de l'état des lieux, puis l'introduction et le bilan
+de chaque chapitre de contribution. Les blocs \textit{Contributions}, signalés
+en marge à l'ouverture des chapitres de la \cref{pt:contributions}, résument en
+un paragraphe les travaux dont chaque chapitre rend compte et les publications
+correspondantes.
+
+\paragraph{Lecture linéaire.} Enfin, pour qui découvre le sujet, l'ordre du
+mémoire est un ordre de construction: chaque chapitre de l'état des lieux naît
+d'une insuffisance du précédent, et la \cref{pt:contributions} ne fait
+qu'assembler ce qui a été mis en place. C'est le parcours le plus long, et le
+seul où les renvois croisés se lisent sans effort.
+
+\section*{Conventions}
+\label{sec:commentlire-conventions}
+
+\paragraph{Numérotation.} Les chapitres repartent à~1 dans chaque partie, ainsi
+que les figures, les équations et les blocs numérotés qui en dérivent. Deux
+chapitres de parties différentes portent donc le même numéro, et lorsque le
+contexte ne suffit pas à lever l'ambiguïté --- c'est le cas dans la carte
+ci-dessus --- le numéro de chapitre est préfixé par celui de la partie:
+\textsc{ii}.3 désigne le troisième chapitre de l'état des lieux,
+\textsc{iii}.1 le premier chapitre de contributions.
+
+\paragraph{Notations.} Les vecteurs et les matrices sont en gras
+($\x$, $\MCov$), les scalaires en italique, les ensembles et variétés en
+calligraphié ($\Manifold$). Sauf mention contraire, tout est écrit dans le
+\textbf{cas réel}: c'est le cas où les dimensions et les figures se lisent le
+plus facilement. Chaque chapitre de l'état des lieux se termine par une section
+consacrée au cas complexe, qui établit le dictionnaire vers les données
+effectivement traitées en RADAR, en SONAR et en RSO; les chapitres de
+contribution, eux, se placent d'emblée dans le cas complexe. La table des
+notations qui clôt ce chapitre rassemble l'ensemble des symboles employés.
+
+\paragraph{Marges.} Les marges de ce document sont larges et servent
+activement. Les références bibliographiques y apparaissent en regard de l'appel
+de citation, de sorte que l'on puisse identifier un travail cité sans aller à la
+bibliographie. Les blocs numérotés --- définitions, propositions, remarques ---
+portent leur intitulé en marge plutôt qu'en tête, ce qui permet de les repérer
+en feuilletant. Les notes de bas de page restent en bas de page.
+
+\paragraph{Figures reproductibles.} Toutes les figures de simulation de ce
+mémoire sont produites par des expériences numériques versionnées, et chacune
+porte en légende, en gris et en caractères à chasse fixe, la provenance exacte
+de ce qui est tracé. Ainsi, la \cref{fig:context-riemann-moyennes} affiche:
+\begin{center}
+  \provMoyennes
+\end{center}
+soit, dans l'ordre: le \texttt{sha} du commit du dépôt de simulations qui a
+produit la figure, la date d'exécution, la graine du générateur aléatoire, puis
+la valeur de \emph{tous} les paramètres de l'expérience --- ici quinze matrices
+tirées avec une dispersion de $0{,}9$ et un conditionnement de $4$, une moyenne
+calculée à $10^{-10}$ près en au plus cent itérations. Ces lignes sont
+volontairement exhaustives: elles suffisent, à elles seules, à rejouer la
+figure.
+
+Le QR code placé en marge de la même figure pointe vers la page de l'expérience
+correspondante, où l'on trouve le code source, les paramètres et les données
+produites\footnote{À l'adresse
+\url{https://ammarmian.fr/simulations_hdr/}.}. La chaîne complète est la
+suivante: chaque expérience est décrite par un fichier de configuration et
+exécutée sous \texttt{qanat}, qui enregistre le commit, les paramètres et les
+sorties; l'exécution exporte la figure en PGFPlots ainsi qu'un fichier de
+provenance; celui-ci est enfin traduit en commandes \LaTeX{} que la légende
+appelle. La ligne grise n'est donc pas recopiée à la main: elle est engendrée en
+même temps que la figure, et ne peut pas se désynchroniser d'elle.
+
+Les figures explicatives, elles --- schémas de géométrie, illustrations de
+définitions --- sont dessinées directement en Ti\emph{k}Z et ne portent pas de
+ligne de provenance: il n'y a rien à reproduire.
+
+\section*{Table des notations}
+\label{sec:commentlire-notations}
+
+Les symboles sont rassemblés ici par domaine, dans l'ordre où les chapitres les
+introduisent. Sauf mention contraire, ils sont donnés dans le cas réel; le
+passage au cas complexe remplace la transposition $(\cdot)^\T$ par la
+transposition conjuguée $(\cdot)^\herm$, les matrices symétriques par les
+matrices hermitiennes, et l'accent tilde marque les grandeurs correspondantes
+lorsqu'elles diffèrent.
+
+\newcommand{\notatable}[1]{%
+  \begingroup
+  \small
+  \setlength{\LTpre}{0.2\baselineskip}\setlength{\LTpost}{1.0\baselineskip}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{longtable}{@{}p{0.24\textwidth}p{0.72\textwidth}@{}}
+  #1
+  \end{longtable}
+  \endgroup}
+
+\subsection*{Généralités et algèbre linéaire}
+\notatable{
+  $\R$, $\C$, $\N$ & corps des réels, des complexes, entiers naturels \\
+  $\Nvar$ & dimension des vecteurs observés (nombre de variables) \\
+  $\Nobs$ & nombre d'observations disponibles \\
+  $\Id{\Nvar}$ & matrice identité de taille $\Nvar$ \\
+  $(\cdot)^\T$, $(\cdot)^\herm$, $\conj{(\cdot)}$ & transposition, transposition conjuguée, conjugaison \\
+  $\inv{(\cdot)}$, $\Det(\cdot)$, $\trace{\cdot}$ & inverse, déterminant, trace \\
+  $\Realp(\cdot)$, $\Imagp(\cdot)$ & parties réelle et imaginaire \\
+  $\Diag(\cdot)$, $\Cond(\cdot)$ & matrice diagonale, conditionnement \\
+  $\norm{\cdot}$, $\norm{\cdot}_\frob$, $\abs{\cdot}$ & norme, norme de Frobenius, module \\
+  $\expm(\cdot)$, $\logm(\cdot)$ & exponentielle et logarithme de matrice \\
+  $\symop(\cdot)$, $\hermop(\cdot)$ & parties symétrique et hermitienne \\
+  $\vecop(\cdot)$, $\Kmat$ & vectorisation, matrice de commutation \\
+  $\otimes$, $\had$ & produits de Kronecker et de Hadamard \\
+  $\eig$, $\eigset$ & valeur propre, matrice des valeurs propres \\
+  $\Sym{\Nvar}$, $\Herm{\Nvar}$ & matrices symétriques réelles, hermitiennes \\
+  $\SPD{\Nvar}$, $\HPD{\Nvar}$ & matrices définies positives, réelles et hermitiennes \\
+  $\SPDdet{\Nvar}$, $\HPDdet{\Nvar}$ & les mêmes, de déterminant unité \\
+  $\Toep{\Nvar}$ & matrices de Toeplitz de taille $\Nvar$ \\
+  $\complexform{\cdot}$ & forme réelle d'une matrice complexe \\
+  $\eqdef$, $\bigO(\cdot)$ & égalité par définition, ordre de grandeur \\
+}
+
+\subsection*{Statistiques et probabilités}
+\notatable{
+  $\Universe$, $\event$ & univers, événement élémentaire \\
+  $\Variable$, $\x$ & vecteur aléatoire, réalisation observée \\
+  $\X$, $\Xset$ & données rassemblées en matrice, en ensemble \\
+  $\E\{\cdot\}$, $\Prob$ & espérance, probabilité \\
+  $\Vmoy$, $\MCov$ & moyenne et matrice de covariance \\
+  $\MPCov$ & matrice de pseudo-covariance (cas complexe) \\
+  $\Smat$ & matrice des moments d'ordre deux $\X\X^\T$ \\
+  $\ddp{\param}$, $\likelihood$ & densité de probabilité, log-vraisemblance \\
+  $\param$ & paramètre générique d'un modèle \\
+  $\score$, $\Fisher$ & vecteur score, matrice d'information de Fisher \\
+  $\gaussian$, $\cgaussian$ & loi gaussienne réelle, complexe circulaire \\
+  $\gcgaussian$ & loi gaussienne complexe non circulaire \\
+  $\elliptical$, $\celliptical$ & lois elliptiques, réelles et complexes \\
+  $\compoundgaussian$, $\ccompoundgaussian$ & lois gaussiennes composées \\
+  $\studentdist$, $\kdist$, $\gengaussian$ & lois de Student, $K$ et gaussienne généralisée \\
+  $\gammadist$, $\chisquared$, $\uniform$ & lois gamma, du khi-deux, uniforme \\
+  $\wishart$, $\cwishart$ & lois de Wishart, réelle et complexe \\
+  $\angular$, $\cangular$ & lois angulaires elliptiques \\
+}
+
+\subsection*{Distributions elliptiques et estimation robuste}
+\notatable{
+  $\densgen$ & générateur de densité \\
+  $\logderiv$ & dérivée logarithmique $\densgen'/\densgen$ \\
+  $\densgenmoment{k}$, $\densgenconst{\Nvar}$ & moments et constante de normalisation du générateur \\
+  $\modvar$, $\quadvar$ & variable modulaire, forme quadratique aléatoire \\
+  $\sphere{\Nvar-1}$, $\spherearea{\Nvar}$ & sphère unité et son aire \\
+  $\texture$, $\dof$ & texture, paramètre de forme (degrés de liberté) \\
+  $\MScatter$, $\MShape$ & matrice de dispersion, matrice de forme \\
+  $\Mestim$, $\Tyler$ & $M$-estimateur de dispersion, estimateur de Tyler \\
+  $\weight$, $\scorefun$ & fonction de poids, fonction $\scorefun(t)=t\,\weight(t)$ \\
+  $\coefledoitwolf$, $\targetledoitwolf$ & coefficient et cible d'un estimateur régularisé \\
+  $\iiter$, $\Niter$ & indice et nombre d'itérations d'un algorithme \\
+}
+
+\subsection*{Géométrie riemannienne}
+\notatable{
+  $\Manifold$, $\ambient$ & variété, espace ambiant euclidien \\
+  $\Tangent{\param}{\Manifold}$ & espace tangent à $\Manifold$ en $\param$ \\
+  $\tvec$, $\tvecbis$ & vecteurs tangents \\
+  $\metric{\tvec}{\tvecbis}{\param}$ & métrique riemannienne au point $\param$ \\
+  $\normriem{\tvec}{\param}$ & norme induite par la métrique \\
+  $\projman_\param$ & projection orthogonale sur l'espace tangent \\
+  $\connection$, $\transport$ & connexion de Levi-Civita, transport parallèle \\
+  $\geod$, $\geodist$ & géodésique, distance géodésique \\
+  $\geodmean$ & moyenne géodésique de deux points \\
+  $\Fmean$ & moyenne de Fréchet (de Karcher) \\
+  $\Retr$ & rétraction \\
+  $\Rgrad$, $\Rhess$, $\dirderiv$ & gradient et hessien riemanniens, dérivée directionnelle \\
+  $\Stiefel{\Nvar}{\Nrank}$, $\Grassmann{\Nvar}{\Nrank}$ & variétés de Stiefel et de Grassmann \\
+  $\Orthgroup{\Nvar}$, $\Unitgroup{\Nvar}$ & groupes orthogonal et unitaire \\
+  $\Rpos{\Nvar}$ & cône des vecteurs à entrées strictement positives \\
+  $\loss$, $\risk$, $(\cdot)^\opt$ & fonction de coût, risque, point optimal \\
+  $\KL$ & divergence de Kullback-Leibler \\
+  $\metriccoefa$, $\metriccoefb$ & coefficients de la métrique de Fisher elliptique \\
+}
+
+\subsection*{Détection et modèles de signal}
+\notatable{
+  $\hypothesis_0$, $\hypothesis_1$ & hypothèses nulle et alternative \\
+  $\DetectorStat \detect$ & règle de décision au seuil $\DetectorTreshold$ \\
+  $\statGLRT$, $\statRao$ & statistiques du \detname{glrt} et du test de Rao \\
+  $\statWald$, $\statANMF$ & statistiques du test de Wald et de l'\detname{anmf} \\
+  $\pfa$, $\pdet$, $\snr$ & probabilités de fausse alarme, de détection, rapport signal à bruit \\
+  $\paramtest$, $\paramnuis$ & paramètres testés et paramètres de nuisance \\
+  $\z$, $\speckle$ & bruit observé, composante speckle gaussienne \\
+  $\amplitude$, $\Vamplitude$ & amplitude complexe de la cible, vecteur des amplitudes \\
+  $\steering$, $\steerfull$ & vecteurs directionnels, par antenne et complet \\
+  $\Steermat$, $\Steerspace$, $\Nrank$ & matrice directionnelle, base du sous-espace signal, son rang \\
+  $\projspace{\Steerspace}$ & projecteur sur le sous-espace signal \\
+  $\Nsensor$, $\Narray$, $\Nping$ & nombres de capteurs, d'antennes et de pings \\
+  $\wavelength$, $\doa$ & longueur d'onde centrale, direction d'arrivée \\
+  $\powerscale$, $\escale$, $\Scalemat$ & facteur d'échelle, échelle effective, matrice des échelles \\
+  $\Kronleft \otimes \Kronright$ & structure de Kronecker de la dispersion \\
+  $\dimleft$, $\dimright$ & dimensions des deux opérandes, $\Nvar=\dimleft\dimright$ \\
+  $\obsmat$ & remise en matrice d'une observation vectorisée \\
+  $\Ntime$, $\itime$ & nombre d'instants et indice temporel \\
+  $\HH$, $\HV$, $\VH$, $\VV$ & canaux de polarisation en imagerie RSO \\
+}

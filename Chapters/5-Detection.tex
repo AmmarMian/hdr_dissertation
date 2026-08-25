@@ -1,0 +1,1695 @@
+\chapter{Test d'hypothèses robustes en milieu non gaussien}
+\label{ch:robust-detection}
+\section{Introduction}
+\label{sec:detection-introduction}
+
+
+Ce chapitre reprend et reformule, tout en établissant des liens, un ensemble de résultats obtenus aux cours de deux collaborations différentes. 
+
+La première partie concerne la détection multivariée robuste dans un système  SONAR à multiples antennes, dont les résultats ont été obtenus dans la cadre de la thèse d'Olivier Lerda, que j'ai co-dirigé en compagnie de Guillaume Ginolhac et Jean-Philippe Ovarlez. Il s'agit de porter au monde de la détection SONAR les développements de la détection robuste pour les systèmes RADAR à multiples antennes\footnote{On pourra à se sujet se référer aux travaux de la thèse de Chin Yuan Chong \cite{chong:tel-00772006} pour un travail similaire effectué dans le monde RADAR à multiples antennes.}, tout en explorant de nouvelles directions sur la détection basée sur le test de Rao ou bien la détection par sous-espaces.
+
+
+La deuxième partie concerne une extension de mes travaux de thèse sur la détection de changements en imagerie RSO basées sur des tests d'égalité de matrices de covariances \cite{Mian_2019}. Avec la même équipe qu'à l'époque\footnote{Florent Bouchard et Gauillaume Ginolhac}, nous avons considéré une extension des travaux initiés dans \cite{Bouchard_2020} sur la détection de changements robuste en-ligne dans les séries temporelles d'images RSO. Encore non appliquée en pratique à l'époque, nous avons pu considérer une nouvelle modélisation du problème qui permet de diminuer le nombre de données nécéssaires à l'estimation des paramètres du problèmes, ce qui autorise une application sur données réelles.
+
+\begin{contributions}
+  Ce chapitre rend compte des travaux suivants, dont les versions publiées sont
+  reproduites en fin de chapitre:
+  \begin{itemize}
+    \item \fullcite{JOE24};
+    \item \fullcite{GRETSI23a};
+    \item \fullcite{JOE26};
+    \item \fullcite{SP24}.
+  \end{itemize}
+\end{contributions}
+
+% ============================ TODO decision ========================================
+% Cet encadre recapitulatif ouvre le chapitre; chaque section porte en outre
+% son propre encadre avec le ou les travaux qu'elle reprend. Si la redondance
+% gene, deux options: (a) garder celui-ci et alleger ceux des sections en
+% simples renvois; (b) le supprimer et ne garder que les encadres de section.
+% Voir aussi la question de \fullcite{EUSIPCO21}, signalee en
+% \cref{sec:detection-online-change-detection}: modele different (t de Student
+% et non gaussienne a echelle), donc a ne pas presenter comme un prolongement.
+% ====================================================================================
+% ============================ TODO texte (~1 paragraphe) ============================
+% Paragraphe de renvoi vers la partie de contexte, a placer apres
+% l'introduction. Principe retenu: ce chapitre doit pouvoir se lire sans y
+% revenir pour un lecteur familier --- les objets utilises sont rappeles sur
+% place, et la partie 2 n'est citee que pour le detail. Points d'appui a
+% mentionner: modele elliptique complexe (\cref{def:context-complex-ces}) et sa
+% representation stochastique (\cref{prop:context-complex-stochastic}); modele
+% de gaussienne composee deterministe
+% (\cref{def:context-distributions-detcompoundgaussian}); M-estimation
+% complexe (\cref{prop:context-complex-mlefixedpoint}) et estimateur de Tyler
+% (\cref{def:context-complex-tyler,prop:context-complex-tylerdf}); regime
+% dimensionnel (\cref{sec:context-covariance-regularized-estimation});
+% geometrie du cone (\cref{sec:context-riemann-spd}) et optimisation
+% riemannienne (\cref{sec:context-riemann-optimization}) pour la derniere
+% section.
+% ====================================================================================
+
+\section{Cadre commun: décider en environnement non gaussien}
+\label{sec:detection-cadre}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Ouvrir la section. Ce qu'il faut dire, dans cet ordre:
+%  1. cette section n'est dans aucun des trois articles: elle est ecrite pour
+%     ce memoire, et c'est elle qui fait du chapitre autre chose qu'une
+%     juxtaposition de travaux;
+%  2. les trois travaux resolvent le meme probleme --- decider en presence
+%     d'une dispersion inconnue et d'un bruit non gaussien;
+%  3. ils se distinguent par la contrainte supplementaire qu'ils exploitent:
+%     structure statistique (deux antennes, Kronecker, Toeplitz, sous-espace)
+%     dans les \cref{sec:detection-mills-antenna,sec:detection-fls}, structure
+%     geometrique (estimation en ligne) dans la
+%     \cref{sec:detection-online-change-detection};
+%  4. annoncer que la section pose le modele, les deux problemes de test, les
+%     trois recettes de construction, et le prix de l'estimation.
+% ====================================================================================
+
+\subsection{Modèle d'observation}
+\label{subsec:detection-modele}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Amener le modele depuis la physique, avant la definition qui suit:
+%  - la reverberation de fond n'est pas un bruit thermique: elle resulte de la
+%    somme des echos de facettes, et sa puissance fluctue d'une cellule de
+%    distance a l'autre;
+%  - a haute resolution, le nombre de diffuseurs par cellule chute et le
+%    theoreme central limite ne s'applique plus: les queues de distribution
+%    s'alourdissent, le modele gaussien sous-estime les fortes amplitudes et
+%    donc les fausses alarmes;
+%  - d'ou le recours au modele suivant, qui laisse la puissance libre
+%    observation par observation.
+% ====================================================================================
+
+\begin{definition}[{Mélange d'échelles gaussiennes}]
+\label{def:detection-msg}
+  Un vecteur $\z\in\C^{\vdim}$ suit un mélange d'échelles gaussiennes (\emph{mixture of scaled Gaussian}, msg) lorsqu'il admet la représentation
+  \begin{equation}
+    \z \overset{d}{=} \sqrt{\texture}\,\speckle,
+    \qquad
+    \speckle\sim\cgaussian\left(\vector{0},\,\powerscale^2\MScatter\right),
+    \label{eq:detection-msg}
+  \end{equation}
+  où le \emph{speckle} $\speckle$ est un vecteur gaussien complexe circulaire de matrice de dispersion $\MScatter\in\HPD{\vdim}$, et où la \emph{texture} $\texture\in\R_*^+$ est un paramètre déterministe inconnu, propre à chaque observation.
+\end{definition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Ecrire une remarque qui situe ce modele. Trois points, dans cet ordre:
+%  1. c'est le modele de gaussienne composee deterministe deja rencontre en
+%     \cref{def:context-distributions-detcompoundgaussian}, transpose au cas
+%     complexe de la \cref{sec:context-distributions-complex}: la texture n'est
+%     pas tiree selon une loi a priori mais traitee comme un parametre de
+%     nuisance, un par observation;
+%  2. la denomination « msg » est celle en usage dans la communaute sonar
+%     \sidecite{Ollila2012,Hippertferrer2022}; on la conserve ici pour rester
+%     lisible par rapport aux articles dont le chapitre rend compte;
+%  3. l'interet du choix deterministe plutot que stochastique: aucune d.d.p de
+%     texture n'est postulee, donc rien a mal specifier sur ce point --- c'est
+%     la forme de robustesse retenue dans tout le chapitre.
+% ====================================================================================
+
+\begin{definition}[{Hétérogénéité et homogénéité partielle}]
+\label{def:detection-heterogeneite}
+  Soit un jeu d'observations $\z_\iobs\overset{d}{=}\sqrt{\texture_\iobs}\,\speckle_\iobs$ au sens de la \cref{def:detection-msg}. On parle:
+  \begin{itemize}
+    \item d'\emph{hétérogénéité} lorsque les textures $\{\texture_\iobs\}$ diffèrent d'une observation à l'autre;
+    \item d'\emph{homogénéité partielle} lorsque la dispersion des données secondaires n'égale celle de la donnée testée qu'à un facteur d'échelle inconnu $\powerscale^2$ près.
+  \end{itemize}
+\end{definition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Ecrire une remarque qui explique pourquoi ces deux ecarts sont distincts et
+% pourquoi ils appellent deux reponses differentes:
+%  - l'heterogeneite se traite en amont, par une ponderation des observations
+%    dans l'estimation: c'est exactement la M-estimation, dont on rappelle
+%    l'equation de point fixe en \cref{eq:detection-tyler} ci-dessous;
+%  - l'homogeneite partielle se traite en aval, par une normalisation de la
+%    statistique de test: c'est elle qui commande la forme en quotient de tous
+%    les detecteurs du chapitre;
+%  - les deux se lisent toutefois comme la meme indetermination d'echelle:
+%    aucune des deux ne permet d'identifier $\MScatter$ autrement qu'a un
+%    facteur positif pres, c'est-a-dire au sens de la matrice de forme
+%    (\cref{def:context-distributions-scaleshape}).
+% ====================================================================================
+
+\subsection{Deux archétypes de test}
+\label{subsec:detection-archetypes}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Annoncer que les trois travaux du chapitre se rangent sous deux problemes de
+% test seulement, et que tout ce qui suit dans cette section (les trois
+% recettes, les invariances cfar, le prix de l'estimation) vaut pour les deux.
+% Preciser que le premier archetype gouverne les deux sections sonar et le
+% second la section RSO.
+% ====================================================================================
+
+\begin{definition}[{Détection d'une cible en présence de données secondaires}]
+\label{def:detection-archetype-cible}
+  Étant données une observation testée $\x\in\C^{\vdim}$ et $\Nobs$ données secondaires $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$ i.i.d, sans signal, disponibles sous les deux hypothèses, le problème s'écrit
+  \begin{equation}
+    \left\{
+    \begin{array}{lll}
+      \hypothesis_0: & \x = \z, & \x_\iobs = \z_\iobs, \quad \iobs\in\intrange{1}{\Nobs} \\[2pt]
+      \hypothesis_1: & \x = \amplitude\,\steering(\doa) + \z, \qquad & \x_\iobs = \z_\iobs, \quad \iobs\in\intrange{1}{\Nobs}
+    \end{array}
+    \right.
+    \label{eq:detection-test}
+  \end{equation}
+  où $\amplitude\in\C$ est une amplitude complexe déterministe inconnue et $\steering(\doa)\in\C^{\vdim}$ le vecteur directionnel, supposé connu, associé à la direction d'arrivée $\doa$.
+\end{definition}
+
+\begin{definition}[{Test d'égalité de dispersions}]
+\label{def:detection-archetype-egalite}
+  Étant donnés $\Ntime$ groupes d'observations, chacun de dispersion $\MScatter_\itime$, le problème s'écrit
+  \begin{equation}
+    \left\{
+    \begin{array}{lll}
+      \hypothesis_0: & \MScatter_\itime = \MScatter, & \forall \itime\in\intrange{1}{\Ntime} \\[2pt]
+      \hypothesis_1: & \exists\,(\itime_1,\itime_2)\ /\ \MScatter_{\itime_1}\neq\MScatter_{\itime_2}. &
+    \end{array}
+    \right.
+    \label{eq:detection-test-egalite}
+  \end{equation}
+\end{definition}
+
+% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
+% C'est la remarque qui porte l'unification du chapitre: a ecrire avec soin.
+% Les deux problemes ne different que par la *nature du parametre teste*, et
+% cette difference commande tout le reste:
+%  - dans \cref{eq:detection-archetype-cible}, le parametre teste est de
+%    dimension fixe ($2\Nrank$ reels pour $\Nrank$ amplitudes complexes) et la
+%    dispersion est un parametre de nuisance;
+%  - dans \cref{eq:detection-archetype-egalite}, c'est exactement l'inverse: le
+%    parametre teste *est* la dispersion, soit $\bigO(\vdim^2)$ reels par
+%    groupe, et il n'y a plus de parametre de nuisance distinct;
+%  - consequence directe, et c'est l'argument a marteler: le second probleme
+%    est structurellement bien plus exigeant en nombre d'observations, ce qui
+%    explique que la contrainte de structure y devienne une necessite et non un
+%    raffinement --- et pourquoi la \cref{sec:detection-online-change-detection}
+%    ne peut pas se contenter de la recette generique.
+% ====================================================================================
+
+\begin{definition}[{Invariances cfar}]
+\label{def:detection-cfar}
+  Une statistique de test $\DetectorStat$ est dite \emph{texture-cfar} si sa loi sous $\hypothesis_0$ ne dépend pas des textures, \emph{matrice-cfar} si elle ne dépend pas de la dispersion $\MScatter$, et \emph{cfar} au sens fort si elle ne dépend d'aucun paramètre inconnu du problème.
+\end{definition}
+
+% ======================= TODO texte (~4 lignes) ====================================
+% Dire pourquoi cette propriete est centrale et non decorative: c'est elle qui
+% permet de fixer une fois pour toutes le seuil $\DetectorTreshold$ associe a
+% une $\pfa$ visee. Sans elle, il faudrait re-regler le seuil pour chaque
+% scene, ce qui disqualifie un detecteur pour un usage operationnel. C'est le
+% critere qui justifie, dans tout le chapitre, de preferer des statistiques
+% normalisees a des statistiques d'energie.
+% ====================================================================================
+
+\subsection{Trois constructions de test: glrt, Rao et Wald}
+\label{subsec:detection-glrt-rao-wald}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Poser le probleme methodologique: les hypotheses etant composites (parametres
+% inconnus sous les deux hypotheses), le lemme de Neyman-Pearson ne fournit pas
+% de test optimal. On dispose seulement de *recettes* de construction, dont
+% aucune n'est optimale en general --- et c'est precisement ce qui rend le
+% choix entre elles interessant, cf. la remarque sur le test de Rao plus bas.
+% ====================================================================================
+
+Écrivons le vecteur des paramètres sous la forme $\param=(\paramtest,\paramnuis)$, où $\paramtest\in\R^{n_{\mathrm{r}}}$ rassemble les paramètres testés et $\paramnuis$ les paramètres de nuisance, de sorte que les deux archétypes \cref{eq:detection-test,eq:detection-test-egalite} s'écrivent
+\begin{equation}
+  \left\{
+  \begin{array}{ll}
+    \hypothesis_0: & \paramtest = \vector{0},\ \paramnuis \\
+    \hypothesis_1: & \paramtest \neq \vector{0},\ \paramnuis.
+  \end{array}
+  \right.
+  \label{eq:detection-test-parametre}
+\end{equation}
+
+\begin{definition}[{Rapport de vraisemblance généralisé}]
+\label{def:detection-glrt}
+  Le glrt substitue aux paramètres inconnus leur estimée au sens du maximum de vraisemblance sous chaque hypothèse \sidecite[-0.5cm]{Kay1998}:
+  \begin{equation}
+    \statGLRT(\x)
+    =
+    \frac{\displaystyle\max_{\paramtest,\,\paramnuis}\ \ddp{\x}(\x;\paramtest,\paramnuis)}
+         {\displaystyle\max_{\paramnuis}\ \ddp{\x}(\x;\vector{0},\paramnuis)}
+    \detect.
+    \label{eq:detection-glrt}
+  \end{equation}
+\end{definition}
+
+\begin{definition}[{Test de Rao}]
+\label{def:detection-rao}
+  En notant $\likelihood(\param)=\ln\ddp{\x}(\x;\param)$ et $\Fisher(\param)$ la matrice d'information de Fisher, partitionnée conformément à $\param=(\paramtest,\paramnuis)$, le test de Rao s'écrit
+  \begin{equation}
+    \statRao(\x)
+    =
+    \left.\frac{\partial\likelihood}{\partial\paramtest}\right|_{\hat{\param}_0}^{\T}
+    \left[\inv{\Fisher}(\hat{\param}_0)\right]_{\paramtest\paramtest}
+    \left.\frac{\partial\likelihood}{\partial\paramtest}\right|_{\hat{\param}_0}
+    \detect,
+    \label{eq:detection-rao}
+  \end{equation}
+  où $\hat{\param}_0=(\vector{0},\hat{\paramnuis}_0)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_0$, et où le bloc pertinent de l'inverse de l'information est le complément de Schur
+  \begin{equation}
+    \left[\inv{\Fisher}\right]_{\paramtest\paramtest}
+    =
+    \left(
+      \Fisher_{\paramtest\paramtest}
+      - \Fisher_{\paramtest\paramnuis}\inv{\Fisher_{\paramnuis\paramnuis}}\Fisher_{\paramnuis\paramtest}
+    \right)^{-1}.
+    \label{eq:detection-schur}
+  \end{equation}
+\end{definition}
+
+\begin{definition}[{Test de Wald}]
+\label{def:detection-wald}
+  Le test de Wald mesure l'écart de l'estimée non contrainte à l'origine, dans la métrique de l'information:
+  \begin{equation}
+    \statWald(\x)
+    =
+    \hat{\paramtest}_1^{\T}
+    \left(\left[\inv{\Fisher}(\hat{\param}_1)\right]_{\paramtest\paramtest}\right)^{-1}
+    \hat{\paramtest}_1
+    \detect,
+    \label{eq:detection-wald}
+  \end{equation}
+  où $\hat{\param}_1=(\hat{\paramtest}_1,\hat{\paramnuis}_1)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_1$.
+\end{definition}
+
+\begin{proposition}[{Équivalence asymptotique}]
+\label{prop:detection-equivalence}
+  Sous les conditions de régularité usuelles \sidecite[-1cm]{Kay1998}, les trois statistiques \cref{eq:detection-glrt,eq:detection-rao,eq:detection-wald} sont asymptotiquement équivalentes:
+  \begin{equation}
+    2\ln\statGLRT,\ \statRao,\ \statWald
+    \xrightarrow{d}
+    \left\{
+      \begin{array}{ll}
+        \chisquared_{n_{\mathrm{r}}} & \text{sous } \hypothesis_0, \\[2pt]
+        \chisquared_{n_{\mathrm{r}}}(\eta) & \text{sous } \hypothesis_1 \text{ locale},
+      \end{array}
+    \right.
+    \label{eq:detection-equivalence}
+  \end{equation}
+  avec le même paramètre de décentrage $\eta$.
+\end{proposition}
+
+% ========= TODO texte (remarque, ~12 lignes) --- LE POINT A NUANCER ================
+% Poser le label rem:detection-pourquoi-rao (il est appele depuis la
+% \cref{sec:detection-fls} et depuis le bilan).
+% Partir de la \cref{prop:detection-equivalence}: elle pourrait laisser croire
+% que le choix entre les trois constructions est affaire de commodite
+% algebrique. Dire que non, et donner les trois arguments dans cet ordre:
+%
+%  1. COUT. La statistique \cref{eq:detection-rao} ne fait intervenir que
+%     l'estimee sous $\hypothesis_0$. Or celle-ci ne depend pas de la direction
+%     testee $\doa$: dans un balayage angulaire, ou la meme cellule de distance
+%     est interrogee dans plusieurs centaines de directions, une seule
+%     estimation des nuisances sert toutes les voies, la ou le glrt en reclame
+%     une par direction. Sur un sonar d'imagerie, ce n'est pas un detail
+%     d'implementation.
+%
+%  2. OPTIMALITE. Le test de Rao est construit sur le score evalue en
+%     $\paramtest=\vector{0}$: il est donc, par construction, localement le plus
+%     puissant, c'est-a-dire optimal dans la limite des faibles rapports signal
+%     a bruit \sidecite{Kay1998,Kay2016} --- precisement le regime qui nous
+%     interesse. Le glrt, lui, n'a aucune propriete d'optimalite en general:
+%     c'est une recette, pas un test optimal.
+%
+%  3. SELECTIVITE. Face a un signal mal specifie (cible dont la reponse ne
+%     coincide pas exactement avec $\steering(\doa)$), les tests se comportent
+%     tres differemment: le test de Rao rejette plus vigoureusement les signaux
+%     desalignes que le glrt \sidecite{Bandiera2009}. Cela dessine un axe de
+%     conception du plus selectif au plus robuste, sur lequel le test de Rao et
+%     les detecteurs par sous-espaces de la \cref{sec:detection-fls} occupent
+%     les deux extremites et le glrt une position intermediaire. Choisir un
+%     test, c'est choisir un point sur cet axe selon ce que l'on redoute le
+%     plus: manquer une cible legerement desalignee, ou alarmer sur un lobe
+%     secondaire.
+%
+% Conclure: la contribution n'est donc pas « on a aussi derive le Rao », mais
+% « on a instrumente cet axe selectivite/robustesse pour le sonar a croix de
+% Mills ».
+% ====================================================================================
+
+\subsection{L'approche en deux étapes et le prix de l'estimation}
+\label{subsec:detection-deuxetapes}
+
+% ============================ TODO texte (~3 lignes) ===============================
+% Transition: les trois recettes ci-dessus supposent la dispersion connue, ce
+% qu'elle n'est jamais. D'ou la demarche suivante, universelle dans la
+% litterature radar et sonar.
+% ====================================================================================
+
+\begin{definition}[{Approche en deux étapes}]
+\label{def:detection-deuxetapes}
+  L'approche en deux étapes consiste à (i) dériver la statistique de test en supposant la dispersion $\MScatter$ connue, puis (ii) y substituer un estimateur $\widehat{\MScatter}$ construit sur les données secondaires. Le détecteur résultant est dit \emph{adaptatif}.
+\end{definition}
+
+\begin{proposition}[{Filtre adapté normalisé}]
+\label{prop:detection-anmf}
+  Sous le modèle \cref{eq:detection-msg} et pour un signal de rang $\Nrank=1$, l'approche en deux étapes appliquée au glrt conduit au filtre adapté normalisé (\emph{adaptive normalized matched filter}, anmf) \sidecite[-1cm]{Conte1995,Kraut1999,Ovarlez2016}:
+  \begin{equation}
+    \statANMF(\x,\doa)
+    =
+    \frac{\abs{\steering(\doa)^\herm\inv{\widehat{\MScatter}}\x}^2}
+         {\left(\steering(\doa)^\herm\inv{\widehat{\MScatter}}\steering(\doa)\right)
+          \left(\x^\herm\inv{\widehat{\MScatter}}\x\right)}
+    \detect.
+    \label{eq:detection-anmf}
+  \end{equation}
+\end{proposition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Lire la formule: la double normalisation du denominateur repond exactement
+% aux deux ecarts de la \cref{def:detection-heterogeneite} --- le terme
+% $\x^\herm\inv{\widehat{\MScatter}}\x$ annule la texture de la donnee testee,
+% le terme $\steering^\herm\inv{\widehat{\MScatter}}\steering$ annule
+% l'indetermination d'echelle sur l'estimee. La statistique est donc invariante
+% par $(\x,\widehat{\MScatter})\mapsto(c_1\x,c_2\widehat{\MScatter})$ pour tous
+% $c_1,c_2>0$: c'est un cosinus au carre entre la donnee et la reponse cible,
+% dans la geometrie induite par $\inv{\widehat{\MScatter}}$.
+% ====================================================================================
+
+\begin{definition}[{Estimateur de Tyler}]
+\label{def:detection-tyler}
+  L'estimateur employé dans tout ce chapitre pour l'étape (ii) est celui de Tyler \sidecite[-0.5cm]{Tyler1987,Pascal08a}, solution de l'équation de point fixe
+  \begin{equation}
+    \Tyler
+    =
+    \frac{\vdim}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \frac{\x_\iobs\x_\iobs^\herm}{\quadraticH{\x_\iobs}{\Tyler}},
+    \label{eq:detection-tyler}
+  \end{equation}
+  assortie de la normalisation $\trace{\Tyler}=\vdim$.
+\end{definition}
+
+% ======================= TODO texte (remarque, ~4 lignes) ==========================
+% Rappeler en deux phrases *pourquoi* c'est cet estimateur et pas un autre, de
+% sorte que le lecteur familier n'ait pas a revenir en partie 2: il ne fait
+% intervenir les observations que par leur direction, donc sa loi ne depend pas
+% du generateur de densite (propriete distribution-free,
+% \cref{prop:context-complex-tylerdf}), et c'est le mle de la matrice de forme
+% sous le modele \cref{eq:detection-msg} quelles que soient les textures. Pour
+% le detail de ses proprietes statistiques, renvoyer a la
+% \cref{subsec:context-complex-mestimation}.
+% ====================================================================================
+
+\begin{property}[{Loi sous $\hypothesis_0$ à dispersion connue}]
+\label{prop:detection-pfa}
+  Lorsque $\widehat{\MScatter}=\MScatter$, la statistique \cref{eq:detection-anmf} suit sous $\hypothesis_0$ une loi Bêta de paramètres $(1,\vdim-1)$, indépendamment de $\MScatter$ et des textures, de sorte que
+  \begin{equation}
+    \pfa(\DetectorTreshold)
+    =
+    \Prob\left(\statANMF>\DetectorTreshold\mid\hypothesis_0\right)
+    =
+    \left(1-\DetectorTreshold\right)^{\vdim-1}.
+    \label{eq:detection-pfa}
+  \end{equation}
+\end{property}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Dire ce que cette propriete devient en pratique: elle est perdue des que
+% $\MScatter$ est remplacee par une estimee. La loi de la statistique
+% adaptative depend alors de $\Nobs$ et de l'estimateur employe; elle n'est
+% connue en forme close que dans quelques cas (scm sous modele gaussien) et
+% doit sinon etre obtenue par simulation --- ce qui est fait systematiquement
+% dans ce chapitre, et justifie les courbes « seuil vs $\pfa$ » qui suivent.
+% Decision prise: on garde la figure seuil/Pfa (voir bloc ci-dessous), elle
+% justifie tous les seuils utilises ensuite.
+% ====================================================================================
+
+% CONVENTION FIGURES DU CHAPITRE (cf. discussion): une figure issue d'une
+% experience qanat porte ses macros \prov... de provenance, comme en partie 2;
+% une figure reprise telle quelle d'un article porte une citation a la place.
+% Le lecteur sait ainsi exactement ce qu'il peut rejouer --- les donnees sonar
+% n'etant pas distribuables, autant le dire plutot que de le taire.
+% ============================== FIGURE 1/9 =========================================
+% ATTENTION: figure produite par un RUN DEBUG (n_trials=200 au lieu de 10^4). La
+% chaine de production est validee, les courbes ne le sont pas. Pour la version
+% definitive, depuis ~/Research/HDR/simulations_hdr:
+%   uv run qanat experiment run sonar_pfa_threshold --n-trials 10000 --n-thresh 500
+% puis register_latex.py --id seuil-pfa et `just sync-figure sonar_pfa_threshold
+% seuil-pfa` (qui laisse un .bak a supprimer). La provenance affichee sous la
+% figure porte debug=True tant que ce n'est pas fait.
+%
+% TODO decision: le detecteur M-NMF-I est calcule mais retire des deux panneaux
+% (il est renvoye sous forme de log-statistique, ses seuils sont deux ordres de
+% grandeur au-dessus des autres et ecrasent les courbes glrt). Le remettre
+% supposerait un troisieme panneau; a trancher.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sonar_pfa_threshold/seuil-pfa/plot.tex}
+  \provSeuilPfaQR[1cm]
+  \caption{Relation entre $\pfa$ et seuil de detection, en fouillis gaussien, pour
+  $m=64$ capteurs par antenne et $\Nobs=2\times2m=256$ donnees secondaires. À
+  gauche le test de Rao \eqref{eq:detection-mills-rao}, à droite le glrt
+  \eqref{eq:detection-mills-glrt}. Dans chaque panneau, la courbe à dispersion
+  connue (bleu) est la reference; les versions adaptatives, construites sur la
+  scm (rouge) et sur l'estimateur à deux textures (orange), s'en ecartent vers
+  la droite: à $\pfa$ egale, il faut un seuil plus eleve, et c'est exactement le
+  prix de l'estimation. Le panneau de gauche porte en outre le filtre adapte
+  mimo à covariance connue (gris pointille), reference gaussienne. Les deux
+  panneaux ont des echelles de seuil distinctes: les statistiques ne partagent
+  pas d'unite, le glrt etant un rapport de produits d'echelles voisin de 1.
+  \provSeuilPfa}
+  \label{fig:detection-seuil-pfa}
+\end{figure}
+
+% ============ TODO texte (~1 paragraphe) --- ANNONCE DU PLAN =======================
+% Conclure la section par le prix de l'estimation et les deux leviers. Matiere
+% chiffree a utiliser:
+%  - sous modele gaussien, la regle de \sidecite{Reed1974} donne
+%    $\Nobs\simeq2\vdim$ donnees secondaires pour ne perdre que 3 dB de rapport
+%    signal a bruit par rapport au detecteur a dispersion connue;
+%  - sous modele msg, \cref{eq:detection-tyler} exige de surcroit
+%    $\Nobs>\vdim$ pour etre seulement definie;
+%  - or $\Nobs$ n'est pas un parametre libre: les donnees secondaires doivent
+%    etre i.i.d, donc prelevees dans un voisinage homogene dont l'etendue est
+%    fixee par la scene et non par l'ingenieur.
+% D'ou les deux contournements, qui sont le plan du chapitre:
+%  - contraindre le MODELE (\cref{sec:detection-mills-antenna,sec:detection-fls}):
+%    une structure connue reduit le nombre de parametres a estimer, donc le
+%    $\Nobs$ necessaire;
+%  - contraindre le CALCUL (\cref{sec:detection-online-change-detection}): la
+%    geometrie du cone permet de mettre a jour l'estimee a l'arrivee d'une
+%    nouvelle donnee, sans reprendre le point fixe depuis le debut.
+% ====================================================================================
+
+\section{Détection multivariée pour un sonar à croix de Mills}
+\label{sec:detection-mills-antenna}
+
+\begin{contributions}
+  Cette section reprend \fullcite{JOE24} et la communication \fullcite{GRETSI23a}.
+\end{contributions}
+
+% ============================ TODO texte (~2 paragraphes) ==========================
+% Poser le contexte, avant toute equation:
+%  1. le systeme: SEAPIX (Exail), sondeur multifaisceaux a croix de Mills, deux
+%    antennes lineaires orthogonales de 64 capteurs, l'une en emission l'autre
+%    en reception. Dire a quoi il sert (halieutique, bathymetrie, detection
+%    d'objets) et pourquoi la detection y est difficile;
+%  2. le cadre de la collaboration: these d'Olivier Lerda, co-encadrement avec
+%    Guillaume Ginolhac et Jean-Philippe Ovarlez, partenariat industriel;
+%  3. ce qui distingue le probleme du cas radar deja traite dans la
+%    litterature (renvoyer en note a la these de Chin Yuan Chong): bande
+%    relative large, reverberation dominante, pas de mouvement de plateforme a
+%    exploiter, et surtout deux antennes dont les statistiques n'ont aucune
+%    raison d'etre identiques --- c'est ce dernier point qui motive tout ce qui
+%    suit.
+% ====================================================================================
+
+\subsection{Modèle de données à deux antennes}
+\label{subsec:detection-mills-modele}
+
+% FIGURE 2/9 --- reprise de l'article \cite{JOE24}
+% Schema de la geometrie du systeme: deux antennes lineaires uniformes
+% orthogonales de $\Nsensor=64$ capteurs, l'une en emission l'autre en
+% reception, et le volume insonifie. Le lecteur ne peut pas se representer une
+% croix de Mills a partir du texte seul: cette figure doit venir AVANT la
+% \cref{def:detection-mills-modele}.
+% TODO decision: reprendre la figure de l'article (Multiswath_diagram_*.png) ou
+% la redessiner en TikZ pour l'homogeneite avec le reste du memoire ?
+% \begin{figure}[h]
+%   \begin{center}
+%     \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/mills_cross.png}
+%   \end{center}
+%   \caption{TODO}
+%   \label{fig:detection-mills-systeme}
+% \end{figure}
+
+\begin{definition}[{Modèle à deux antennes}]
+\label{def:detection-mills-modele}
+  Notons $\x_\iarray\in\C^{\Nsensor}$ le vecteur reçu par l'antenne $\iarray\in\intrange{1}{\Narray}$, avec $\Narray=2$, et
+  \begin{equation}
+    \x = \begin{bmatrix}\x_1\\\x_2\end{bmatrix}\in\C^{\Narray\Nsensor},
+    \qquad
+    \Steermat = \begin{bmatrix}\steering_1 & \vector{0}\\\vector{0} & \steering_2\end{bmatrix}\in\C^{\Narray\Nsensor\times\Narray},
+    \qquad
+    \Vamplitude = \begin{bmatrix}\amplitude_1\\\amplitude_2\end{bmatrix}\in\C^{\Narray}.
+    \label{eq:detection-mills-concat}
+  \end{equation}
+  Le problème de détection prend alors la forme de la \cref{def:detection-archetype-cible} avec $\Steermat\Vamplitude$ pour réponse cible:
+  \begin{equation}
+    \left\{
+    \begin{array}{lll}
+      \hypothesis_0: & \x = \z, & \x_\iobs = \z_\iobs, \quad \iobs\in\intrange{1}{\Nobs} \\[2pt]
+      \hypothesis_1: & \x = \Steermat\Vamplitude + \z, \qquad & \x_\iobs = \z_\iobs, \quad \iobs\in\intrange{1}{\Nobs}.
+    \end{array}
+    \right.
+    \label{eq:detection-mills-test}
+  \end{equation}
+\end{definition}
+
+\begin{definition}[{Modèle multi-textures}]
+\label{def:detection-mills-multitexture}
+  Chaque antenne porte sa propre texture et son propre facteur d'échelle. En posant $\escale_\iarray = \powerscale_\iarray\sqrt{\texture_\iarray}$ et
+  \begin{equation}
+    \Scalemat = \Diag\left(\escale_1,\escale_2\right)\otimes\Id{\Nsensor},
+    \qquad
+    \MScatter = \begin{bmatrix}\MScatter_{11} & \MScatter_{12}\\\MScatter_{21} & \MScatter_{22}\end{bmatrix},
+    \label{eq:detection-mills-scalemat}
+  \end{equation}
+  la dispersion de l'observation vaut
+  \begin{equation}
+    \MCov = \Scalemat\,\MScatter\,\Scalemat,
+    \label{eq:detection-mills-cov}
+  \end{equation}
+  où $\MScatter_{\iarray\iarray}$ est le bloc propre à l'antenne $\iarray$ et $\MScatter_{12}=\MScatter_{21}^\herm$ le bloc d'intercorrélation. Conditionnellement aux textures, les densités sous les deux hypothèses s'écrivent
+  \begin{equation}
+    \ddp{\x}(\x;\hypothesis_0) = \frac{\exp\left(-\quadraticH{\x}{\MCov}\right)}{\pi^{\Narray\Nsensor}\Det(\MCov)},
+    \qquad
+    \ddp{\x}(\x;\hypothesis_1) = \frac{\exp\left(-(\x-\Steermat\Vamplitude)^\herm\inv{\MCov}(\x-\Steermat\Vamplitude)\right)}{\pi^{\Narray\Nsensor}\Det(\MCov)}.
+    \label{eq:detection-mills-pdf}
+  \end{equation}
+\end{definition}
+
+% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
+% C'est ici qu'il faut dire ce que ce modele apporte, car c'est l'apport
+% principal de la section. Points a faire, dans l'ordre:
+%  - le modele autorise deux antennes de statistiques *dissemblables*: on peut
+%    modeliser une premiere antenne gaussienne ($\texture_1=1$) et homogene
+%    ($\powerscale_1=1$), et une seconde K-distribuee et non homogene. Le
+%    modele mono-texture usuel l'interdit;
+%  - c'est physiquement fonde ici: les deux antennes n'observent pas la meme
+%    portion de fond, n'ont pas la meme ouverture, et leurs reverberations
+%    respectives n'ont aucune raison de fluctuer de concert;
+%  - au regard de la \cref{def:detection-heterogeneite}, il s'agit d'une
+%    heterogeneite *par bloc*, intermediaire entre le cas homogene (une seule
+%    texture pour tout le vecteur) et le cas degenere ou chaque capteur aurait
+%    la sienne (auquel cas plus rien n'est identifiable);
+%  - $\MScatter_{12}$ est conserve: c'est lui qui porte le gain de
+%    l'exploitation conjointe des deux antennes, et c'est ce qui distingue ce
+%    travail d'un traitement antenne par antenne.
+% ====================================================================================
+
+\subsection{Détecteurs à dispersion connue}
+\label{subsec:detection-mills-tests}
+
+\begin{proposition}[{glrt à deux textures}]
+\label{prop:detection-mills-glrt}
+  Le glrt du problème \cref{eq:detection-mills-test} à $\MScatter$ connue s'écrit comme le quotient des échelles estimées sous chaque hypothèse:
+  \begin{equation}
+    \statGLRT(\x)
+    =
+    \frac{\hat{\escale}_{1,0}\,\hat{\escale}_{2,0}}{\hat{\escale}_{1,1}\,\hat{\escale}_{2,1}}
+    \detect,
+    \label{eq:detection-mills-glrt}
+  \end{equation}
+  où, en notant $\left[\inv{\MScatter}\right]_{\iarray\ivarbis}$ le bloc $(\iarray,\ivarbis)$ de $\inv{\MScatter}$,
+  \begin{equation}
+    \left(\hat{\escale}_{1,0}\,\hat{\escale}_{2,0}\right)^2
+    =
+    \frac{\Realp\left(\x_1^\herm\left[\inv{\MScatter}\right]_{12}\x_2\right)}{\Nsensor}
+    +
+    \sqrt{
+      \frac{\x_1^\herm\left[\inv{\MScatter}\right]_{11}\x_1}{\Nsensor}
+      \cdot
+      \frac{\x_2^\herm\left[\inv{\MScatter}\right]_{22}\x_2}{\Nsensor}
+    },
+    \label{eq:detection-mills-sigma0}
+  \end{equation}
+  et où $\left(\hat{\escale}_{1,1}\,\hat{\escale}_{2,1}\right)^2$ est donnée par la même expression en substituant $\inv{\MScatter}-\projspace{\MScatter}$ à $\inv{\MScatter}$, avec
+  \begin{equation}
+    \projspace{\MScatter}
+    =
+    \inv{\MScatter}\Steermat\left(\Steermat^\herm\inv{\MScatter}\Steermat\right)^{-1}\Steermat^\herm\inv{\MScatter}.
+    \label{eq:detection-mills-projecteur}
+  \end{equation}
+\end{proposition}
+
+% TODO decision (notation): dans l'article, $\mathbf{M}_{12}^{-1}$ designe le
+% bloc $(1,2)$ de $\mathbf{M}^{-1}$ et non l'inverse du bloc $\mathbf{M}_{12}$.
+% J'ai leve l'ambiguite en ecrivant $[\inv{\MScatter}]_{12}$, mais je n'ai pas
+% pu verifier les annexes A et D: merci de confirmer sur la version publiee
+% avant que ces expressions ne soient figees.
+
+\begin{proposition}[{Test de Rao à deux textures}]
+\label{prop:detection-mills-rao}
+  Le test de Rao du problème \cref{eq:detection-mills-test} s'écrit comme une énergie projetée:
+  \begin{equation}
+    \statRao(\x)
+    =
+    2\,\x^\herm\inv{\widehat{\MCov}_0}\Steermat
+    \left(\Steermat^\herm\inv{\widehat{\MCov}_0}\Steermat\right)^{-1}
+    \Steermat^\herm\inv{\widehat{\MCov}_0}\,\x
+    \detect,
+    \label{eq:detection-mills-rao}
+  \end{equation}
+  où $\widehat{\MCov}_0 = \widehat{\Scalemat}_0\,\MScatter\,\widehat{\Scalemat}_0$ et où $\widehat{\Scalemat}_0$ rassemble les échelles estimées sous $\hypothesis_0$ au sens de \cref{eq:detection-mills-sigma0}.
+\end{proposition}
+
+\begin{property}[{Invariance aux textures}]
+\label{prop:detection-mills-cfar}
+  Les statistiques \cref{eq:detection-mills-glrt,eq:detection-mills-rao} sont texture-cfar au sens de la \cref{def:detection-cfar}: leur loi sous $\hypothesis_0$ ne dépend ni de $\texture_1$ ni de $\texture_2$.
+\end{property}
+
+% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
+% Comparer les deux detecteurs, c'est le coeur de l'apport de la section:
+%  - le glrt \cref{eq:detection-mills-glrt} est un *rapport d'echelles*: il
+%    mesure de combien la prise en compte du signal reduit la puissance
+%    residuelle estimee;
+%  - le Rao \cref{eq:detection-mills-rao} est une *energie projetee* sur le
+%    sous-espace signal, evaluee avec les seules nuisances de $\hypothesis_0$;
+%  - renvoyer a la \cref{rem:detection-pourquoi-rao} pour la lecture
+%    selectivite/robustesse, et annoncer que les courbes de la
+%    \cref{subsec:detection-mills-perf} confirment le comportement attendu:
+%    performances comparables sur cible alignee, ecart net des que la reponse
+%    s'ecarte du modele;
+%  - dire aussi le gain pratique deja evoque: $\widehat{\MCov}_0$ ne depend pas
+%    de la direction testee, une seule estimation sert donc tout le balayage.
+% TODO decision: placer les preuves (annexes A a D de l'article) en annexe de
+% chapitre, ou renvoyer au pdf joint ? Mon avis: annexe de chapitre pour le
+% Rao, dont la derivation est la contribution la moins accessible.
+% ====================================================================================
+
+\subsection{Estimation robuste sous textures multiples}
+\label{subsec:detection-mills-estimation}
+
+\begin{proposition}[{Estimateur de Tyler à deux textures}]
+\label{prop:detection-mills-tyler}
+  Sous le modèle de la \cref{def:detection-mills-multitexture}, l'estimateur du maximum de vraisemblance de $\MScatter$ vérifie
+  \begin{equation}
+    \widehat{\MScatter}
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \inv{\widehat{\mat{T}}_\iobs}\,\x_\iobs\x_\iobs^\herm\,\inv{\widehat{\mat{T}}_\iobs},
+    \qquad
+    \widehat{\mat{T}}_\iobs = \Diag\left(\sqrt{\hat{\texture}_{1,\iobs}},\sqrt{\hat{\texture}_{2,\iobs}}\right)\otimes\Id{\Nsensor},
+    \label{eq:detection-mills-tyler}
+  \end{equation}
+  où les textures estimées valent
+  \begin{equation}
+    \hat{\texture}_{1,\iobs} = t_1 + \sqrt{\frac{t_1}{t_2}}\,t_{12},
+    \qquad
+    \hat{\texture}_{2,\iobs} = t_2 + \sqrt{\frac{t_2}{t_1}}\,t_{12},
+    \label{eq:detection-mills-textures}
+  \end{equation}
+  avec
+  \begin{equation}
+    t_\iarray = \frac{\x_{\iarray,\iobs}^\herm\left[\inv{\widehat{\MScatter}}\right]_{\iarray\iarray}\x_{\iarray,\iobs}}{\Nsensor},
+    \qquad
+    t_{12} = \frac{\Realp\left(\x_{1,\iobs}^\herm\left[\inv{\widehat{\MScatter}}\right]_{12}\x_{2,\iobs}\right)}{\Nsensor}.
+    \label{eq:detection-mills-tk}
+  \end{equation}
+\end{proposition}
+
+\begin{algorithm}[h]
+\caption{Estimation robuste à deux textures}
+\label{alg:detection-mills-tyler}
+\begin{algorithmic}[1]
+  \Require $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$, initialisation $\widehat{\MScatter}^{(0)}=\Id{\Narray\Nsensor}$
+  \State $\iiter \gets 0$
+  \While{convergence non atteinte}
+    \State calculer $\{t_1,t_2,t_{12}\}$ par \cref{eq:detection-mills-tk} à partir de $\widehat{\MScatter}^{(\iiter)}$
+    \State former $\widehat{\mat{T}}_\iobs^{(\iiter)}$ par \cref{eq:detection-mills-textures}, $\iobs\in\intrange{1}{\Nobs}$
+    \State $\widehat{\MScatter}^{(\iiter+1)} \gets \dfrac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\inv{\left(\widehat{\mat{T}}_\iobs^{(\iiter)}\right)}\x_\iobs\x_\iobs^\herm\inv{\left(\widehat{\mat{T}}_\iobs^{(\iiter)}\right)}$
+    \State $\iiter \gets \iiter+1$
+  \EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+% ======================= TODO texte (remarque, ~6 lignes) ==========================
+% Trois choses a dire sur cet estimateur:
+%  - il ne depend pas des textures, donc il est distribution-free par le meme
+%    mecanisme que l'estimateur de Tyler standard
+%    (\cref{eq:detection-tyler,prop:context-complex-tylerdf}): c'est une
+%    generalisation *multi-textures* de l'estimateur du point fixe de
+%    \sidecite{Pascal08a};
+%  - le terme croise $t_{12}$ est ce qui distingue reellement
+%    \cref{eq:detection-mills-textures} d'une estimation antenne par antenne:
+%    la texture d'une antenne est estimee en tenant compte de ce que l'autre
+%    observe;
+%  - ATTENTION, a formuler honnetement: l'existence et l'unicite de la solution
+%    de \cref{eq:detection-mills-tyler} ne sont pas etablies analytiquement.
+%    L'article ne les valide que *numeriquement* (convergence observee sur
+%    500 iterations, ecart relatif sous $10^{-6}$ des l'iteration 20, quelle
+%    que soit l'initialisation). A presenter comme une question ouverte, et
+%    eventuellement a renvoyer aux perspectives du bilan.
+% ====================================================================================
+
+\subsection{Invariance, robustesse et sélectivité en simulation}
+\label{subsec:detection-mills-perf}
+% TODO decision: titre de sous-section a valider --- il annonce desormais ce que
+% les courbes montrent plutot que le mot neutre « Performances ».
+
+% ============================ TODO texte + figures =================================
+% Trois figures retenues pour cette section (voir le plan de simulations).
+%
+% FIGURE 3/9 --- reproductible (qanat: sonar_pd_angle) --- LA FIGURE DE LA SECTION
+% $\pdet$ en fonction du desalignement angulaire, a $\pfa$ fixee, pour le glrt
+% \cref{eq:detection-mills-glrt}, le test de Rao \cref{eq:detection-mills-rao} et
+% l'anmf mono-antenne en reference. C'est elle qui *mesure* la selectivite
+% annoncee en \cref{rem:detection-pourquoi-rao}.
+% IMPORTANT: memes axes et memes unites que la figure de rang variable en
+% \cref{subsec:detection-fls-perf}, faute de quoi l'axe selectivite/robustesse
+% reste une affirmation au lieu d'etre une mesure.
+%
+% FIGURE 6/9 --- reprise de l'article \cite{JOE24}
+% Sorties des detecteurs sur donnees reelles SEAPIX. Non reproductible: les
+% donnees ne sont pas distribuables, et c'est a dire explicitement.
+% ====================================================================================
+
+% ============================== FIGURE 4/9 =========================================
+% ATTENTION: RUN DEBUG (n_h0 = n_h1 = 200, 12 points de rsb au lieu de 150).
+% Version definitive:
+%   uv run qanat experiment run sonar_pd_snr --n-trials-h0 10000 --n-trials-h1 10000
+% puis --k-dist pour le second panneau. La provenance porte debug=True tant que
+% ce n'est pas fait.
+%
+% TODO: cette figure n'a pour l'instant que le cas gaussien. Le plan en demande
+% deux, gaussien et K-distribue (nu = 0.5), cote a cote --- c'est la comparaison
+% qui porte l'argument (la robustesse coute peu sous modele gaussien et rapporte
+% beaucoup sinon). Relancer avec --k-dist et enregistrer sous l'id pd-rsb-k.
+%
+% TODO decision: le MATLAB de reference trace chaque famille de courbes sur SON
+% propre axe de rsb (snrP pour l'antenne 1, snrA pour l'antenne 2, snrPA pour le
+% bi-antenne), ce que l'article ne dit nulle part. Ici tout est sur un axe
+% commun, d'ou l'ecart mono-antenne 1 / mono-antenne 2 plus marque que dans
+% l'article. A trancher: axe commun (honnete mais different de l'article) ou
+% convention de l'article (comparable mais a expliquer en note).
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sonar_pd_snr/pd-rsb/plot.tex}
+  \provPdRsbQR[1cm]
+  \caption{$\pdet$ en fonction du rapport signal à bruit, à $\pfa=10^{-2}$, en
+  fouillis gaussien ($m=64$, $\Nobs=256$, pointage $\theta_1=\theta_2=45^\circ$).
+  Le filtre adapte mimo à dispersion connue borne les performances; les tests
+  glrt et de Rao à dispersion connue s'en approchent à quelques dixiemes de dB,
+  et leurs versions adaptatives paient l'estimation. Les detecteurs
+  mono-antenne restent en retrait: c'est le gain de la fusion des deux
+  antennes. \provPdRsb}
+  \label{fig:detection-mills-pd-rsb}
+\end{figure}
+
+% ============================== FIGURE 5/9 =========================================
+% ATTENTION: RUN DEBUG (64 tirages). Version definitive:
+%   uv run qanat experiment run sonar_tyler_conv --n-trials 1000
+%
+% Ce que la figure montre: une decroissance geometrique jusqu'a la precision
+% machine --- 1e-3 des la neuvieme iteration, 1e-6 a la vingtieme, 1e-15 vers la
+% cinquantieme. C'est le comportement attendu d'un point fixe de type Tyler.
+%
+% ATTENTION, ne pas reprendre la lecture precedente. Une premiere version de
+% cette figure montrait une decroissance sous-lineaire bloquee vers 1e-3, et
+% j'en avais tire un argument sur la question d'unicite. C'etait un artefact:
+% la fonction qui tracait la convergence etait une SECONDE COPIE de l'iteration,
+% restee a la version non corrigee de l'estimateur (mise a jour conjuguee,
+% normalisation en trace dont le determinant sous-deborde a 2m=128). La copie a
+% ete supprimee, le trace passe desormais par l'estimateur lui-meme.
+%
+% La figure ne dit donc RIEN sur l'unicite: elle montre que l'algorithme
+% converge vite et proprement. Si l'on veut parler d'unicite, il faut un autre
+% argument --- par exemple faire varier l'initialisation et verifier que le
+% point fixe atteint est le meme, ce qui n'est pas encore fait.
+% TODO: relancer avec plusieurs initialisations pour appuyer ou non l'unicite.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sonar_tyler_conv/convergence-tyler/plot.tex}
+  \provConvergenceTylerQR[.5cm]
+  \caption{Convergence de l'\cref{alg:detection-mills-tyler}: ecart relatif
+  $\|\widehat{\MScatter}_{k+1}-\widehat{\MScatter}_k\|_F/\|\widehat{\MScatter}_k\|_F$
+  entre iterees successives, moyenne sur les tirages, pour $m=64$ et
+  $\Nobs=256$. La decroissance est geometrique et atteint la precision machine:
+  $10^{-3}$ des la neuvieme iteration, $10^{-6}$ a la vingtieme. Le point fixe
+  est donc atteint bien avant les cent iterations usuellement allouees.
+  \provConvergenceTyler}
+  \label{fig:detection-mills-convergence}
+\end{figure}
+
+\section{Détection multi-pings et sous-espaces pour un sonar frontal}
+\label{sec:detection-fls}
+
+\begin{contributions}
+  Cette section reprend \fullcite{JOE26}.
+\end{contributions}
+
+% ============================ TODO texte (~2 paragraphes) ==========================
+% Transition depuis la section precedente, puis contexte:
+%  - on y exploitait une structure *entre antennes*; on exploite ici une
+%    structure *entre pings* successifs, c'est-a-dire une integration coherente
+%    dans le temps --- l'analogue sonar du traitement espace-temps (stap) du
+%    radar;
+%  - le gain attendu: sommer en phase $\Nping$ echos ameliore le rapport signal
+%    a bruit; le prix a payer: la dimension du probleme est multipliee par
+%    $\Nping$, et le nombre de donnees secondaires necessaires avec elle. C'est
+%    exactement le probleme annonce en fin de \cref{sec:detection-cadre};
+%  - second prix a payer, moins evident et c'est le fil de la section: sommer
+%    en phase suppose de connaitre la phase. Toute erreur de recalage degrade
+%    la detection, d'ou la seconde moitie de la section sur les sous-espaces.
+% ====================================================================================
+
+\subsection{Modèle multi-pings}
+\label{subsec:detection-fls-modele}
+
+\begin{definition}[{Modèle multi-pings}]
+\label{def:detection-fls-modele}
+  Après recalage, la concaténation des $\Nping$ pings s'écrit $\x = [\x_1^\T\ \cdots\ \x_{\Nping}^\T]^\T\in\C^{\Nsensor\Nping}$ et la réponse d'une cible ponctuelle vue dans la direction $\doa$ vaut
+  \begin{equation}
+    \x = \amplitude\,\steerfull(\doa) + \z,
+    \qquad
+    \steerfull(\doa) = \vector{1}_{\Nping}\otimes\steering(\doa),
+    \label{eq:detection-fls-modele}
+  \end{equation}
+  où $\vector{1}_{\Nping}\in\R^{\Nping}$ est le vecteur de composantes unité et $\steering(\doa)\in\C^{\Nsensor}$ le vecteur directionnel d'un ping.
+\end{definition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Lire la decomposition de Kronecker de \cref{eq:detection-fls-modele}, elle
+% structure toute la section: l'operande de gauche est *interferometrique* (il
+% somme en phase les echos ping a ping), celui de droite est purement
+% *angulaire* (il somme en phase les capteurs dans la direction $\doa$). Le
+% vecteur $\vector{1}_{\Nping}$ suppose un recalage parfait --- hypothese que
+% la \cref{subsec:detection-fls-sousespace} viendra relacher, et c'est
+% precisement sur cet operande de gauche que portera le sous-espace.
+% Renvoyer au pdf joint pour la chaine de recalage elle-meme, qui n'est pas
+% reprise ici.
+% ====================================================================================
+
+\subsection{Structure de Kronecker de la dispersion du fouillis}
+\label{subsec:detection-fls-kronecker}
+
+\begin{proposition}[{Structure de la dispersion du fouillis}]
+\label{prop:detection-fls-kronecker}
+  En modélisant le fouillis comme la somme des contributions indépendantes de $N_c$ facettes insonifiées, de réponses $\z_n = \amplitude_n\,\vector{1}_{\Nping}\otimes\steering(\doa_n)$ avec $\E\{\amplitude_\ivar\conj{\amplitude_\ivarbis}\}=0$ pour $\ivar\neq\ivarbis$, la dispersion du fouillis vaut
+  \begin{equation}
+    \MScatter_c
+    =
+    \sum_{n=1}^{N_c}\E\left\{\abs{\amplitude_n}^2\right\}\,
+    \vector{1}_{\Nping}\vector{1}_{\Nping}^\herm
+    \otimes
+    \steering(\doa_n)\steering(\doa_n)^\herm.
+    \label{eq:detection-fls-kronecker}
+  \end{equation}
+  Elle possède donc naturellement une structure de produit de Kronecker.
+\end{proposition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Souligner que la structure est *derivee* et non postulee: elle decoule du
+% modele physique de reverberation, alors que la litterature l'introduit le
+% plus souvent comme une hypothese de commodite \sidecite{Wirfalt2014}.
+% Ajouter que l'operande angulaire herite en outre d'une structure Toeplitz du
+% fait de l'antenne lineaire uniforme, et qu'une ponderation des fluctuations
+% de reflectivite ping a ping (intrinsic clutter motion, \sidecite{Lombardo2001})
+% ne remet pas en cause la forme \cref{eq:detection-fls-kronecker}.
+% ====================================================================================
+
+\begin{proposition}[{Nombre de paramètres}]
+\label{prop:detection-fls-comptage}
+  Une dispersion hermitienne non structurée de taille $\Nsensor\Nping$ compte $(\Nsensor\Nping)^2$ paramètres réels. Sous la contrainte $\MScatter=\Kronleft\otimes\Kronright$ avec $\Kronleft\in\HPD{\Nping}$ et $\Kronright\in\HPD{\Nsensor}$ Toeplitz, ce nombre tombe à
+  \begin{equation}
+    \Nping^2 + 2\Nsensor - 1 - 1,
+    \label{eq:detection-fls-comptage}
+  \end{equation}
+  le dernier terme retranchant l'indétermination d'échelle entre les deux opérandes.
+\end{proposition}
+
+% ======================= TODO texte (~4 lignes) --- CHIFFRE CLE ====================
+% Faire l'application numerique, c'est l'argument qui justifie toute la
+% section et il n'apparait pas dans l'article: pour $\Nsensor=64$ et
+% $\Nping=5$, on passe de $102\,400$ a $151$ parametres reels, soit un facteur
+% $\simeq 680$. Rapprocher ce chiffre de la regle $\Nobs\simeq2\vdim$ evoquee
+% en \cref{sec:detection-cadre}: sans structure, il faudrait $\Nobs=640$
+% donnees secondaires, soit environ 44 m de fond suppose homogene --- une
+% hypothese que la scene ne verifie pas. C'est la que se joue le passage du
+% principe a l'operationnel.
+% ====================================================================================
+
+\subsection{Estimation robuste structurée}
+\label{subsec:detection-fls-estimation}
+
+\begin{definition}[{Problème d'estimation structurée}]
+\label{def:detection-fls-optim}
+  En notant $\obsmat_\iobs$ la matrice telle que $\vecop(\obsmat_\iobs)=\x_\iobs$, l'estimation robuste sous contrainte de structure s'écrit \sidecite[-1cm]{sun2016robust}
+  \begin{equation}
+    \begin{array}{ll}
+      \displaystyle\min_{\Kronleft,\,\Kronright\succ\vector{0}} & \loss\left(\Kronleft,\Kronright\right) \\[4pt]
+      \text{sous contrainte} & \Kronright \in \Toep{\Nsensor}
+    \end{array}
+    \label{eq:detection-fls-optim}
+  \end{equation}
+  avec le critère de type Tyler
+  \begin{equation}
+    \loss\left(\Kronleft,\Kronright\right)
+    =
+    \Nsensor\ln\Det(\Kronleft)
+    + \Nping\ln\Det(\Kronright)
+    + \frac{\Nsensor\Nping}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+      \ln\trace{\Kronleft^{-\T}\obsmat_\iobs^\herm\inv{\Kronright}\obsmat_\iobs}.
+    \label{eq:detection-fls-cout}
+  \end{equation}
+\end{definition}
+
+% ======================= TODO texte (~3 lignes) ====================================
+% Signaler la seule difference avec \sidecite{sun2016robust}: la transposee de
+% $\inv{\Kronleft}$ dans la trace, qui est ce qui permet de traiter un operande
+% $\Kronleft$ *complexe* et non reel. C'est un ajout modeste mais necessaire
+% ici, l'operande interferometrique etant complexe par nature.
+% ====================================================================================
+
+\begin{proposition}[{Point fixe sur l'opérande interférométrique}]
+\label{prop:detection-fls-A}
+  À $\Kronright$ fixée, le minimiseur de \cref{eq:detection-fls-cout} sous la normalisation $\trace{\Kronleft}=1$ vérifie
+  \begin{equation}
+    \widehat{\Kronleft}
+    =
+    \frac{\Nping}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \frac{\left(\obsmat_\iobs^\herm\inv{\Kronright}\obsmat_\iobs\right)^\T}
+         {\trace{\widehat{\Kronleft}^{-\T}\obsmat_\iobs^\herm\inv{\Kronright}\obsmat_\iobs}}.
+    \label{eq:detection-fls-A}
+  \end{equation}
+\end{proposition}
+
+\begin{proposition}[{Opérande angulaire Toeplitz}]
+\label{prop:detection-fls-B}
+  À $\Kronleft$ fixée, la contrainte Toeplitz se traite par plongement circulant: on écrit $\Kronright = \Unit\eigset\Unit^\herm$ avec $\Unit = \left[\Id{\Nsensor}\ \vector{0}_{\Nsensor,\Nsensor-1}\right]\mat{F}_{2\Nsensor-1}$, où $\mat{F}_{2\Nsensor-1}$ est la matrice de Fourier normalisée, de sorte que l'estimation de $\Kronright$ se ramène à celle des éléments diagonaux de $\eigset$, obtenus par l'itération de majoration-minimisation de l'\cref{alg:detection-fls-bcd}.
+\end{proposition}
+
+\begin{algorithm}[h]
+\caption{Estimation robuste à structure Kronecker et Toeplitz}
+\label{alg:detection-fls-bcd}
+\begin{algorithmic}[1]
+  \Require $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$, $\Kronleft^{(0)}=\Id{\Nping}/\Nping$, $\eigset^{(0)}=\Id{2\Nsensor-1}$
+  \While{convergence non atteinte}
+    \State mettre à jour $\Kronleft$ par itération de \cref{eq:detection-fls-A} à $\Kronright$ fixée, puis normaliser par $\trace{\Kronleft}$
+    \State $\vector{w} \gets \Diag\left(\Unit^\herm\inv{\Kronright}\Unit\right)$
+    \State $\obsmat \gets \dfrac{\Nsensor}{\Nobs}\displaystyle\sum_{\iobs=1}^{\Nobs}\dfrac{\obsmat_\iobs\Kronleft^{-\T}\obsmat_\iobs^\herm}{\trace{\Kronleft^{-\T}\obsmat_\iobs^\herm\inv{\Kronright}\obsmat_\iobs}}$
+    \State $\vector{d} \gets \Diag\left(\eigset\Unit^\herm\inv{\Kronright}\obsmat\inv{\Kronright}\Unit\eigset\right)$
+    \State $\left[\vector{\eig}\right]_\ivar \gets \sqrt{\left[\vector{d}\right]_\ivar/\left[\vector{w}\right]_\ivar}$, \quad $\ivar\in\intrange{1}{2\Nsensor-1}$
+    \State $\Kronright \gets \Unit\Diag\left(\vector{\eig}\right)\Unit^\herm$, puis normaliser par $\trace{\Kronright}$
+  \EndWhile
+  \Ensure $\widehat{\MScatter} = \Kronleft\otimes\Kronright$
+\end{algorithmic}
+\end{algorithm}
+
+% ======================= TODO texte (remarque, ~6 lignes) ==========================
+% Deux remarques a ecrire ici:
+%  1. cas de l'antenne a element manquant: les deux antennes de la croix se
+%     croisent en un capteur central qui ne peut appartenir aux deux, si bien
+%     que l'antenne verticale est une ULA de 65 elements dont le central
+%     manque. Le raisonnement reste valable a une matrice de permutation pres,
+%     en modifiant $\Unit$ en consequence --- indispensable en pratique, faute
+%     de quoi les resultats se degradent nettement. Le detail va dans le pdf
+%     joint, une remarque suffit ici;
+%  2. lien avec la partie 2, en pointeur et non en detour: le point fixe
+%     \cref{eq:detection-fls-A} est une descente de gradient riemannienne sur
+%     le cone (\cref{sec:context-riemann-optimization}), et c'est justement la
+%     contrainte Toeplitz --- qui ne definit pas une sous-variete du cone
+%     stable par l'exponentielle --- qui interdit d'y rester et impose le
+%     detour par la majoration-minimisation.
+% ====================================================================================
+
+\subsection{Robustesse au désalignement: détection par sous-espace}
+\label{subsec:detection-fls-sousespace}
+
+\begin{definition}[{Sous-espace interférométrique}]
+\label{def:detection-fls-sousespace}
+  Soit $\Steerspace_{\Nrank}\in\C^{\Nsensor\Nping\times\Nrank}$, $\Nrank<\Nsensor\Nping$, de colonnes linéairement indépendantes, de la forme
+  \begin{equation}
+    \Steerspace_{\Nrank}
+    =
+    \mat{E}_{\Nrank}\otimes\steering(\doa),
+    \qquad
+    \left[\mat{E}_{\Nrank}\right]_{\iping\ivar}
+    =
+    \exp\left(-\frac{4\mathrm{j}\pi\,\xi_{\ivar,\iping}}{\wavelength}\right),
+    \label{eq:detection-fls-sousespace}
+  \end{equation}
+  où les $\xi_{\ivar,\iping}$ sont des décalages de phase ping à ping. Le signal recherché est supposé appartenir au sous-espace engendré par les colonnes de $\Steerspace_{\Nrank}$, de coordonnées inconnues.
+\end{definition}
+
+\begin{proposition}[{Détecteur par sous-espace}]
+\label{prop:detection-fls-anmf-sousespace}
+  Le détecteur exploitant conjointement la structure de la dispersion et celle de la réponse cible s'écrit \sidecite[-1cm]{Kraut2001,Raghavan2016}
+  \begin{equation}
+    \DetectorStat_{\Nrank}(\x,\doa)
+    =
+    \frac{\abs{\hat{\steerfull}_{\Nrank}^\herm\inv{\widehat{\MScatter}}\x}^2}
+         {\left(\hat{\steerfull}_{\Nrank}^\herm\inv{\widehat{\MScatter}}\hat{\steerfull}_{\Nrank}\right)
+          \left(\x^\herm\inv{\widehat{\MScatter}}\x\right)}
+    \detect,
+    \label{eq:detection-fls-anmf-sousespace}
+  \end{equation}
+  où le signal estimé est la projection oblique de l'observation sur le sous-espace, dans la métrique induite par $\inv{\widehat{\MScatter}}$:
+  \begin{equation}
+    \hat{\steerfull}_{\Nrank}
+    =
+    \Steerspace_{\Nrank}
+    \left(\Steerspace_{\Nrank}^\herm\inv{\widehat{\MScatter}}\Steerspace_{\Nrank}\right)^{-1}
+    \Steerspace_{\Nrank}^\herm\inv{\widehat{\MScatter}}\,\x.
+    \label{eq:detection-fls-projection}
+  \end{equation}
+\end{proposition}
+
+% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
+% C'est le lien le plus fort entre les deux sections sonar, a ne pas manquer:
+%  - la premiere colonne de $\mat{E}_{\Nrank}$ vaut $\vector{1}_{\Nping}$: on
+%    retrouve exactement le modele \cref{eq:detection-fls-modele} d'une cible
+%    parfaitement alignee en phase, et les colonnes suivantes ajoutent des
+%    dephasages residuels;
+%  - meme si le dephasage reel n'appartient pas exactement au sous-espace,
+%    projeter sur $\Steerspace_{\Nrank}$ reduit l'angle de desadaptation par
+%    rapport au cas $\Nrank=1$, d'ou le gain de robustesse;
+%  - le rang $\Nrank$ est donc le curseur explicite de l'axe annonce en
+%    \cref{rem:detection-pourquoi-rao}: chaque degre de liberte gagne en
+%    robustesse au desalignement se paie par une perte sur cible parfaitement
+%    alignee, puisque le detecteur accepte davantage de signaux;
+%  - conclure que les deux sections sonar instrumentent ainsi le meme axe par
+%    deux moyens opposes: le test de Rao en le parcourant vers le pole selectif,
+%    le sous-espace en le parcourant vers le pole robuste.
+% ====================================================================================
+
+\subsection{Ce que la structure achète}
+\label{subsec:detection-fls-perf}
+% TODO decision: titre de sous-section a valider (cf. remarque analogue en
+% \cref{subsec:detection-mills-perf}).
+
+% ============================ TODO texte + figures =================================
+% FIGURE 7/9 --- reproductible, A ECRIRE (rien n'existe cote qanat pour ce volet)
+% $\pdet$ vs rapport signal a bruit a $\Nobs=32$ et $\Nobs=640$, avec et sans la
+% structure Kronecker+Toeplitz. C'est la traduction en performance du comptage
+% de la \cref{prop:detection-fls-comptage}: a $\Nobs=32$, le detecteur non
+% structure est inutilisable et le detecteur structure fonctionne. Toute la
+% section tient dans cette comparaison.
+%
+% FIGURE 8/9 --- reproductible, A ECRIRE
+% $\pdet$ vs desadaptation de phase pour $\Nrank\in\{1,3,5\}$. Pendant exact de
+% la figure angulaire de \cref{subsec:detection-mills-perf}: memes axes, memes
+% unites, meme $\pfa$. Les deux figures lues ensemble donnent l'axe
+% selectivite/robustesse en entier, du pole selectif (Rao) au pole robuste
+% (sous-espace de rang eleve).
+%
+% Donnees reelles: sorties reprises de l'article \cite{JOE26}, non
+% reproductibles (donnees non distribuables).
+% ====================================================================================
+\section{Détection de changements en-ligne pour les séries temporelles d'images RSO}
+\label{sec:detection-online-change-detection}
+
+\begin{contributions}
+  Cette section reprend \fullcite{SP24}.
+\end{contributions}
+
+% ============================ TODO decision ========================================
+% \fullcite{EUSIPCO21} partage la machinerie (estimation en ligne d'une
+% covariance a structure de Kronecker par gradient riemannien) mais *pas* le
+% modele: t de Student la, gaussienne a echelle (ccg) ici. Ne pas presenter
+% l'un comme le prolongement de l'autre. Deux options:
+%  (a) le citer dans cet encadre en disant explicitement ce qui est commun (la
+%      geometrie et le schema recursif) et ce qui differe (le modele, donc le
+%      gradient et la borne);
+%  (b) ne le citer qu'en passant dans le texte, au moment ou le schema recursif
+%      est introduit.
+% ====================================================================================
+
+
+Phrase de transition sur la partie précédente.... : calculs lourds lié au point-fixe dans l'estimation qui reste un problème dans toutes les méthodes de détection robustes, notamment quand il s'agit d'ajouter des données pour améliorer une estimation précédente. Dans ce contexte, la géométrie riemannienne permet de considérer un cadre d'estimation en ligne basé sur un algorithme de décente de gradient stochastique \cite{Zhou_2019}.
+
+Blabla
+
+
+\subsection{Problématique de la détection de changements sur matrices de covariances}
+
+Commençons d'abord par introduire la problématique et les limitations pratiques des solutions proposées.
+
+Nous considérons le traitement d'une série temporelle d'images RSO multivariée telle que présentée en Figure \ref{fig:example_its}. Dans ce contexte, chaque pixel correspond à un vecteur $\x\in\C^\vdim$, où $\vdim$ correspond usuellement à une diversité polarimétrique ($\vdim=3$ ou $\vdim=4$ selon les modalités) ou bien spectrale ou encore fréquentielle\footnote{\`A noter que dans la plupart des cas, on n'observe jamais une scène avec un capteur ayant une telle diversité mais avec une image de résolution suffisante, il est possible de constuire des images plus basses résolution ayant cette diversité \cite{Mian_wavelet_2019}.}.
+
+\begin{figure*}
+  \input{gfx/tikZ/datasets/sliding_windows.tex}
+  \vspace{0.5em}
+  \caption{Illustration de la dimensionalité de nos données SITS et de la fenêtre sur laquelle on considère les données pour le test de détection. $\x_{\iobs}$ est l'observation de la variable sous-jacente $\Variable_{\iobs\itime}$. }
+  \label{fig:slidingwindows}
+\end{figure*}
+
+
+
+%TODO:: add figures of local neighborhood and global time series examples
+%TODO: add citations
+Pour effectuer une détection de changements, on se base sur la notion de voisinage spatial au cours du temps $\Xset_t = \{\x_{\iobs\itime}:1\leq \iobs \leq \Nobs\}$ comme illustré à la figure \ref{fig:slidingwindows}. En considérant que la distribution des données $\p{\Variable_{\iobs\itime}}$ est iid sur le voisinage : $\p{\Variable_{\iobs\itime}}(\x_{\iobs\itime})\equiv\p{\Variable_{t}}(\x_{\iobs\itime}),\,\forall \iobs\in\{1,\dots,\Nobs\}$, on peut identifier un changement à cet endroit à travers l'évolution de cette densité au cours du temps : si elle reste constante il n'y a pas eu de changements alors qu'une évolution de celle-ci indique qu'il s'est passé quelque chose. Formellement, on peut définir le problème de détection comme :
+
+
+
+\begin{figure*}[t]
+  \foreach \i in {1,...,16}{
+    \includegraphics[width=0.3\textwidth]{gfx/chapter-detection/sar/sar_its/image_\i.jpg}
+  }
+  % TODO: find back the reference of image time series
+  \caption{Exemple de SITS extraite de données UAVSAR polarimétriques en représentation de Pauli (Rouge: $|x_{\HH}-x_{\VV}|$, Rouge: $|x_{\HV}|$, Rouge: $|x_{\HH}+x_{\VV}|$). Images extraites à l'aide du code disponible à l'adresse: \url{https://github.com/AmmarMian/simulations_hdr/blob/main/2-detection/sar_experiments/visualisations/show_sar_its.py}.}
+  \label{fig:example_its}
+\end{figure*}
+
+\begin{figure*}[t]
+  \input{gfx/chapter-detection/sar/detection_results/gaussian_torch-cuda_Scene_3_20260303_110317.tex}
+  \input{gfx/chapter-detection/sar/detection_results/dcg_torch-cuda_Scene_3_20260303_110339.tex}
+  \vspace{-1em}
+  \caption{Sorties de détecteurs sur la SITS présentée en figure \ref{fig:example_its} avec une fenêtre de $\Nobs=7\times 7$. Le nombre d'itérations des points-fixes est fixé à 10.}
+  \label{fig:cd_maps}
+\end{figure*}
+
+
+
+\begin{equation}
+  \left\{ \begin{array}{lll} \hypothesis_0: &  \forall \itime, & \p{\Variable_\itime} \equiv \p{\Variable_1}   \\ 
+  \hypothesis_1: & \exists (\itime_1, \itime_2)\, / & \p{\Variable_{\itime_1}} \not\equiv  \p{\Variable_{\itime_2}}  \end{array}\right. .
+\end{equation}
+
+%TODO : find citations
+En pratique, il devient difficile de mettre en place une stratégie de décision à partir de ce modèle sans préciser la distribution à priori des données. En ce sens, tout comme pour les données SONAR vues précédemment, deux modèles existent pour les images RSO: le modèle gaussien multivarié centré pour les images à faible résolution \cite{lee2017polarimetric} et le modèle elliptique centré pour les images à très haute résolution \cite{413444, greco2007statistical}. Dans les deux cas, la distribution étant paramétrique : $\Variable_t \sim p_{\Variable_t}(\x_t;\param_t)$, on peut redéfinir le problème de détection à partir de l'évolution des paramètres du modèle :
+
+\begin{equation}
+  \left\{ \begin{array}{lll} \hypothesis_0: &  \forall \itime, & \param_t = \param_1   \\ 
+  \hypothesis_1: & \exists (\itime_1, \itime_2)\, / & \param_{t_1} = \param_{\itime_2} \end{array}\right. .
+\end{equation}
+
+Dans le cas gaussien, les données étant centrées par construction la détection se fait sur la matrice de covariance : $\param_t = \{\MCov_t\}$, ce qui revient à un problème très connu dans la littérature statistique : le test d'égalité de matrices de covariances \cite{anderson1958introduction}. Le GLRT du problème a été dérivé et se formule comme un rapport de déterminants :
+\begin{equation}
+  \DetectorStat_\gaussian \propto \dfrac{\Det(\sum_{\itime=1}^{\Ntime} \Smat_\itime)}{\prod_{\itime=1}^{\Ntime} \Det(\Smat_\itime)} \detect .
+  \label{eq:glrt_gaussian_cd}
+\end{equation}
+
+
+%TODO: lier à l'équation du modèle CCG en chapitre 1
+Dans le cas elliptique, la méconnaissance de la fonction génératrice de densité complique la dérivation d'un détecteur universel. Ainsi, nous avons pu proposer de passer par la modélisation en distribution gaussienne composée : $\param_t = \{\texture_{1\itime},\dots,\texture_{\Nobs\itime}, \MCov\}$. Dans ce cas, le GLRT est tractable et se formule comme \cite{Mian_2019}:
+\begin{equation}
+  \DetectorStat_\compoundgaussian \propto \dfrac{\Det(\Tyler_0)}{\prod_{\itime=1}^{\Ntime} \Det(\Tyler_t)} \prod_{\iobs=1}^{\Nobs} \dfrac{\sum_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_0}}{\prod_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_t}} \detect,
+  \label{eq:glrt_nongaussian_cd}
+\end{equation}
+
+où $\Tyler_0$ est une variante de l'estimateur de Tyler, défini comme étant la solution de l'équation de point-fixe:
+\begin{equation}
+  \Tyler_0 = \frac{\vdim}{\Nobs} \sum_{\iobs=1}^{\Nobs} \dfrac{\sum_{\itime=1}^{\Ntime} \Smat_\itime}{\sum_{\itime=1}^{\Ntime} \q{\x_{\iobs\itime}}{\Tyler_0}}.
+\end{equation}
+
+%TODO: make sure that quadratic form q is defined well beforehand
+%TODO: Parler des avantages théoriques du détecteur robuste
+
+À titre d'exemple, les résutlat du calcul de ces statistiques sur la séries d'images en figure \ref{fig:example_its} sont présentés en figure \ref{fig:cd_maps}.
+
+
+\subsection{Nécéssité d'une implémentation en ligne}
+
+L'analyse des résultats sur la série d'images précédents nous invite à considérer naturellement l'utilisation de la statistique de détection robuste pour les applications pratiques. Mais cela est sans compter la complexité algorithmique de la mise en place d'une telle approche dans de cas réels. Pour cela effectuons un analyse de complexité des deux méthodes gaussiennes et robuste, en nous intéressant notamment au cas pratique où l'on aurait déjà calculé une carte de détection de changements sur un ensemble d'images et l'on voudrait inclure dans celle-ci une nouvelle image observée.
+
+\subsubsection{Complexité du GLRT gaussien}
+
+La complexité dans le cas gaussien \eqref{eq:glrt_gaussian_cd} est liée au ratio de déterminants, qui sont les principales opérations couteuses dans ce cadre au regard des autres opérations linéaires. En admettant un calcul à l'aide de la décomposition de Cholesky, la complexité du déterminant est de $\bigO(\vdim^3)$, ce qui nous amène à une complexité finale $\bigO(\Ntime\vdim^3)$.
+
+Supposons maintenant que nous avons calculé une statistique $\DetectorStat_{1:\Ntime}$ à partir d'une fenêtre observée sur un horizon de $\Ntime$ dates. Pour calculer $\DetectorStat_{1:\Ntime+1}$ qui prendrait en compte une nouvelle, date, il n'est pas nécessaire d'avoir accès aux données brutes aux dates précédentes mais seulement la connaissance de $\sum_{\itime=1}^{\Ntime}\Smat_\itime$, $\Det(\sum_{\itime=1}^{\Ntime}\Smat_\itime)$ ainsi que de $\DetectorStat_{1:\Ntime}$\footnote{En pratique on stocke les logarithmes des déterminants et de la statistique car avec la dimension, la valeur numérique du déterminant peut exploser.}. En effet, on peut décomposer la statistique comme ceci\cite{Conradsen_2016}:
+$$
+\begin{aligned}
+  \DetectorStat_{1:\Ntime+1} &\propto \dfrac{\Det(\sum_{\itime=1}^{\Ntime+1} \Smat_\itime)}{\prod_{\itime=1}^{\Ntime+1} \Det(\Smat_\itime)} \\
+  &\propto \dfrac{\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )}{ \Det(\Smat_{\Ntime+1}) \prod_{\itime=1}^{\Ntime} \Det(\Smat_\itime)} \\
+  &\propto  \dfrac{\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )}{ \Det(\Smat_{\Ntime+1}) \Det(\sum_{\itime=1}^{\Ntime} \Smat_\itime)} \DetectorStat_{1:\Ntime}.
+\end{aligned}
+$$
+
+Comme on a déjà calculé $\Det(\sum_{\itime=1}^{\Ntime}\Smat_\itime)$, il est seulement nécessaire de calculer $\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )$ ainsi que $\Det(\Smat_{\Ntime+1})$. Au regard de la complexité, le déterminant étant encore l'élément limitant, on se retrouve avec une complexité de mise à jour de $\bigO(\vdim^3)$, ce qui est pratique.
+
+
+\subsubsection{Complexité du GLRT non-gaussien}
+
+Dans le cas non-gaussien \eqref{eq:glrt_nongaussian_cd}, la complexité du calcul est bien plus compliquée en raison de la nécessité de la résolution des équations de point fixes liées à l'estimation des matrices de covariances sous $\hypothesis_0$ et $\hypothesis_1$ pour lesquelles l'opération la plus couteuse correspond à l'inversion de matrice qui est typiquement $\bigO(\vdim ^3)$, qui est effectuée un certain nombre d'itérations $\Niter$ dans le pire cas. On arrive alors à une complexité de $\bigO(\Niter\Ntime\vdim^3)$.
+
+
+De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour l'estimation de la matrices de covariance $\Tyler_0$ comme une simple somme : l'addition d'un nouveau groupe de données nécéssite de résoudre à nouveau le point-fixe. On doit alors non-seulement avoir accès aux données brutes des temps précédents mais aussi faire un calcul de complexité $\bigO(\Niter\Ntime\vdim^3)$.
+
+\subsection{Expériences numériques}
+
+%TODO: trouver références images
+À titre de comparaison, effectuons une simulation sur une scène plus petite sur 4 dates en mesurant le temps de calcul total d'une carte de détection de changements à l'aide des deux détecteurs $\DetectorStat_\gaussian$ et $\DetectorStat_\compoundgaussian$. Pour une mesure significative, nous effectuons 15 détections successives (5 pour le temps de chauffe pour éliminer les optimisations liées au système d'exploitation et 10 pour la mesure) et présentons en Figure \ref{fig:benchmark_sar_offline}, les résultats.
+
+\begin{figure}[h]
+  \input{gfx/chapter-detection/sar/benchmarks/benchmark_chart_gaussian.tex}
+  \input{gfx/chapter-detection/sar/benchmarks/benchmark_chart_compoundgaussian.tex}
+  \caption{Comparaison des temps de calculs sur CPU et GPU des cartes de détection de changements sur la Scene 1 avec ($\vdim=12$) ou sans ($\vdim=3$) la décomposition en ondelettes \cite{Mian_wavelet_2019}. Nombre de répétions : 10 (après 5 répétitions de chauffe).}
+  \label{fig:benchmark_sar_offline}
+\end{figure}
+
+
+
+\subsection{Estimation récursive des matrices de covariances structurées par la géométrie riemannienne}
+\label{subsec:detection-online-riemann}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Transition depuis l'analyse de complexite qui precede. Ce qu'il faut dire:
+%  - le verrou identifie est l'impossibilite de mettre a jour le point fixe;
+%  - la voie retenue est de changer non pas de detecteur mais de *maniere de
+%    calculer l'estimee*: si l'on sait descendre le long des geodesiques de la
+%    variete ou vit le parametre, une seule iteration par nouvelle image suffit;
+%  - annoncer le plan de la sous-section: modele structure, geometrie de la
+%    variete, gradient, algorithme recursif, borne intrinseque.
+% ====================================================================================
+
+\begin{definition}[{Modèle gaussien à échelle et structure de Kronecker}]
+\label{def:detection-online-modele}
+  On suppose la dispersion structurée en produit de Kronecker $\MScatter = \Kronleft\otimes\Kronright$, avec $\vdim=\dimleft\dimright$, et l'on lève l'ambiguïté d'échelle entre les deux opérandes par une normalisation à déterminant unité. Les observations d'une fenêtre à la date $\itime$ suivent alors
+  \begin{equation}
+    \x_\iobs^{(\itime)} \sim \cgaussian\left(\vector{0},\,\texture_\iobs\,\Kronleft\otimes\Kronright\right),
+    \label{eq:detection-online-modele}
+  \end{equation}
+  et le paramètre $\param^{(\itime)}=\{\Kronleft^{(\itime)},\Kronright^{(\itime)},\vector{\texture}^{(\itime)}\}$ vit sur la variété produit
+  \begin{equation}
+    \Manifold = \HPDdet{\dimleft}\times\HPDdet{\dimright}\times\Rpos{\Nobs}.
+    \label{eq:detection-online-variete}
+  \end{equation}
+\end{definition}
+
+% ======================= TODO texte (remarque, ~5 lignes) ==========================
+% Justifier les deux choix de modelisation, ils ne sont pas cosmetiques:
+%  - d'ou vient la structure de Kronecker ici: de la transformee en ondelettes
+%    de \sidecite{Mian_wavelet_2019}, qui combine les canaux de polarisation
+%    avec une diversite spectro-angulaire; l'un des operandes est de taille 3
+%    (polarisations), l'autre du nombre d'intervalles frequence x angle. C'est
+%    donc, comme en \cref{prop:detection-fls-kronecker}, une structure *heritee
+%    du capteur* et non postulee;
+%  - pourquoi le determinant unite plutot que la trace: c'est la contrainte qui
+%    rend la metrique de la \cref{prop:detection-online-metrique} *separable*,
+%    donc la geometrie de la variete produit calculable composante par
+%    composante. Avec la trace, elle ne l'est pas. Renvoyer a la
+%    \cref{prop:context-riemann-detun}.
+% ====================================================================================
+
+\begin{proposition}[{glrt structuré}]
+\label{prop:detection-online-glrt}
+  Le glrt du problème \cref{eq:detection-test-egalite} sous le modèle \cref{eq:detection-online-modele} et pour $\Ntime$ images s'écrit
+  \begin{equation}
+    \ln\DetectorStat^{(\Ntime)}
+    =
+    \likelihood_{\hypothesis_1}\left(\{\hat{\param}^{(\itime)}\}_{\itime=1}^{\Ntime}\right)
+    - \likelihood_{\hypothesis_0}\left(\hat{\param}^{(0)}\right)
+    \detect,
+    \label{eq:detection-online-glrt}
+  \end{equation}
+  où, en notant $q_\iobs^{(\itime)}(\Kronleft,\Kronright) = \x_\iobs^{(\itime)\herm}\inv{(\Kronleft\otimes\Kronright)}\x_\iobs^{(\itime)}$,
+  \begin{equation}
+    \begin{aligned}
+      \likelihood_{\hypothesis_0}\left(\param^{(0)}\right)
+      &= -\Ntime\vdim\sum_{\iobs=1}^{\Nobs}\ln\texture_\iobs^{(0)}
+         - \sum_{\iobs=1}^{\Nobs}\sum_{\itime=1}^{\Ntime}
+           \frac{q_\iobs^{(\itime)}\left(\Kronleft^{(0)},\Kronright^{(0)}\right)}{\texture_\iobs^{(0)}},
+      \\
+      \likelihood_{\hypothesis_1}\left(\{\param^{(\itime)}\}\right)
+      &= -\vdim\sum_{\iobs=1}^{\Nobs}\sum_{\itime=1}^{\Ntime}\ln\texture_\iobs^{(\itime)}
+         - \sum_{\iobs=1}^{\Nobs}\sum_{\itime=1}^{\Ntime}
+           \frac{q_\iobs^{(\itime)}\left(\Kronleft^{(\itime)},\Kronright^{(\itime)}\right)}{\texture_\iobs^{(\itime)}},
+    \end{aligned}
+    \label{eq:detection-online-vraisemblances}
+  \end{equation}
+  les termes en log-déterminant disparaissant du fait de la normalisation à déterminant unité.
+\end{proposition}
+
+\begin{proposition}[{Estimateurs du maximum de vraisemblance}]
+\label{prop:detection-online-mle}
+  En notant $\obsmat_{\iobs\itime}\in\C^{\dimleft\times\dimright}$ la matrice telle que $\vecop(\obsmat_{\iobs\itime})=\x_\iobs^{(\itime)}$, les estimateurs sous $\hypothesis_0$ sont solutions du système de points fixes
+  \begin{equation}
+    \left\{
+    \begin{aligned}
+      \widehat{\Kronleft}^{(0)} &= \frac{1}{\Ntime\Nobs\dimright}
+        \sum_{\itime=1}^{\Ntime}\sum_{\iobs=1}^{\Nobs}
+        \frac{\obsmat_{\iobs\itime}^\T\,\conj{\left(\widehat{\Kronright}^{(0)}\right)^{-1}}\,\conj{\obsmat_{\iobs\itime}}}{\hat{\texture}_\iobs^{(0)}},
+      \\
+      \widehat{\Kronright}^{(0)} &= \frac{1}{\Ntime\Nobs\dimleft}
+        \sum_{\itime=1}^{\Ntime}\sum_{\iobs=1}^{\Nobs}
+        \frac{\obsmat_{\iobs\itime}\,\conj{\left(\widehat{\Kronleft}^{(0)}\right)^{-1}}\,\obsmat_{\iobs\itime}^\herm}{\hat{\texture}_\iobs^{(0)}},
+      \\
+      \hat{\texture}_\iobs^{(0)} &= \frac{1}{\Ntime\vdim}\sum_{\itime=1}^{\Ntime}
+        q_\iobs^{(\itime)}\left(\widehat{\Kronleft}^{(0)},\widehat{\Kronright}^{(0)}\right),
+    \end{aligned}
+    \right.
+    \label{eq:detection-online-mle}
+  \end{equation}
+  ceux sous $\hypothesis_1$ s'en déduisant en supprimant la sommation sur $\itime$ et les facteurs $\Ntime$ correspondants.
+\end{proposition}
+
+% ======================= TODO texte (remarque, ~4 lignes) ==========================
+% Deux points a signaler:
+%  - les estimateurs sous $\hypothesis_1$ coincident avec l'estimateur de Tyler
+%    a structure de Kronecker de \sidecite{sun2016robust} --- le meme objet que
+%    celui de la \cref{subsec:detection-fls-estimation}, a ceci pres qu'aucune
+%    contrainte Toeplitz n'est imposee ici;
+%  - ceux sous $\hypothesis_0$ en different par la sommation sur $\itime$, qui
+%    traduit le partage du parametre entre les dates. C'est cette sommation,
+%    prise dans un point fixe, qui interdit la mise a jour recursive.
+% ====================================================================================
+
+\begin{property}[{Non-récursivité du point fixe}]
+\label{prop:detection-online-nonrecursif}
+  À l'arrivée d'une nouvelle image, l'estimée sous $\hypothesis_0$ ne se met pas à jour comme une moyenne des estimées passées:
+  \begin{equation}
+    \widehat{\Kronleft}^{(0)}\left(\Xset_{1:\Ntime+1}\right)
+    \neq
+    \frac{\Ntime}{\Ntime+1}\widehat{\Kronleft}^{(0)}\left(\Xset_{1:\Ntime}\right)
+    + \frac{1}{\Ntime+1}\widehat{\Kronleft}^{(0)}\left(\Xset_{\Ntime+1}\right),
+    \label{eq:detection-online-nonrecursif}
+  \end{equation}
+  et il en va de même pour $\Kronright$ et pour les textures.
+\end{property}
+
+\begin{proposition}[{Métrique de Fisher sur $\Manifold$}]
+\label{prop:detection-online-metrique}
+  Pour $\param\in\Manifold$ et $\tvec=(\tvec_{\Kronleft},\tvec_{\Kronright},\tvec_{\vector{\texture}})$, $\tvecbis=(\tvecbis_{\Kronleft},\tvecbis_{\Kronright},\tvecbis_{\vector{\texture}})$ dans $\Tangent{\param}{\Manifold}$, la métrique de Fisher induite par le modèle \cref{eq:detection-online-modele} s'écrit
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\param}
+    =
+    \frac{\dimright}{\vdim}\trace{\inv{\Kronleft}\tvec_{\Kronleft}\inv{\Kronleft}\tvecbis_{\Kronleft}}
+    + \frac{\dimleft}{\vdim}\trace{\inv{\Kronright}\tvec_{\Kronright}\inv{\Kronright}\tvecbis_{\Kronright}}
+    + \frac{1}{\Nobs}\left(\tvec_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right)^\T
+      \left(\tvecbis_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right),
+    \label{eq:detection-online-metrique}
+  \end{equation}
+  où $\had$ désigne le produit de Hadamard. Les espaces tangents aux deux facteurs matriciels sont
+  \begin{equation}
+    \Tangent{\Kronleft}{\HPDdet{\dimleft}}
+    = \left\{\tvec_{\Kronleft}\in\Herm{\dimleft}\ :\ \trace{\inv{\Kronleft}\tvec_{\Kronleft}}=0\right\}.
+    \label{eq:detection-online-tangent}
+  \end{equation}
+\end{proposition}
+
+\begin{property}[{Exponentielle et distance}]
+\label{prop:detection-online-expdist}
+  La métrique \cref{eq:detection-online-metrique} étant séparable, l'exponentielle riemannienne et la distance géodésique se calculent composante par composante:
+  \begin{equation}
+    \exp_{\param}(\tvec)
+    =
+    \left(
+      \Kronleft\,\expm\left(\inv{\Kronleft}\tvec_{\Kronleft}\right),\
+      \Kronright\,\expm\left(\inv{\Kronright}\tvec_{\Kronright}\right),\
+      \vector{\texture}\had\exp\left(\hadinv{\vector{\texture}}\had\tvec_{\vector{\texture}}\right)
+    \right),
+    \label{eq:detection-online-exp}
+  \end{equation}
+  \begin{equation}
+    \geodist^2_{\Manifold}(\param_0,\param_1)
+    =
+    \frac{\dimright}{\vdim}\geodist^2_{\HPD{\dimleft}}(\Kronleft_0,\Kronleft_1)
+    + \frac{\dimleft}{\vdim}\geodist^2_{\HPD{\dimright}}(\Kronright_0,\Kronright_1)
+    + \frac{1}{\Nobs}\norm{\ln\left(\hadinv{\vector{\texture}_0}\had\vector{\texture}_1\right)}_2^2.
+    \label{eq:detection-online-dist}
+  \end{equation}
+\end{property}
+
+\begin{proposition}[{Gradient riemannien}]
+\label{prop:detection-online-gradient}
+  Le gradient riemannien de la vraisemblance de la seule nouvelle fenêtre $\likelihood^{(\Ntime+1)}$, au sens de la métrique \cref{eq:detection-online-metrique}, vaut
+  \begin{equation}
+    \Rgrad\likelihood^{(\Ntime+1)}(\param)
+    =
+    \left(
+      -\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronleft}\left(\obsmat_\iobs^\T\Kronright^{-\T}\conj{\obsmat_\iobs}\right)}{\dimright\texture_\iobs},\
+      -\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronright}\left(\obsmat_\iobs\Kronleft^{-\T}\obsmat_\iobs^\herm\right)}{\dimleft\texture_\iobs},\
+      \Nobs\left(\vector{q}^{(\Ntime+1)}-\vdim\,\vector{\texture}\right)
+    \right),
+    \label{eq:detection-online-gradient}
+  \end{equation}
+  où $\vector{q}^{(\Ntime+1)}$ rassemble les formes quadratiques $q_\iobs^{(\Ntime+1)}(\Kronleft,\Kronright)$ et où la projection sur l'espace tangent \cref{eq:detection-online-tangent} s'écrit
+  \begin{equation}
+    \projman_{\Kronleft}\left(\tvec_{\Kronleft}\right)
+    =
+    \tvec_{\Kronleft} - \frac{\trace{\inv{\Kronleft}\tvec_{\Kronleft}}}{\dimleft}\,\Kronleft.
+    \label{eq:detection-online-projection}
+  \end{equation}
+\end{proposition}
+
+\begin{definition}[{Descente de gradient naturel stochastique}]
+\label{def:detection-online-sgd}
+  L'estimée sous $\hypothesis_0$ est mise à jour, à l'arrivée de la fenêtre $\Xset_{\Ntime+1}$, par une unique itération
+  \begin{equation}
+    \hat{\param}^{(0)}_{\Xset_{1:\Ntime+1}}
+    =
+    \exp_{\hat{\param}^{(0)}_{\Xset_{1:\Ntime}}}
+    \left(
+      -\frac{\alpha_0}{\Ntime}\,\Rgrad\likelihood^{(\Ntime+1)}\left(\hat{\param}^{(0)}_{\Xset_{1:\Ntime}}\right)
+    \right).
+    \label{eq:detection-online-sgd}
+  \end{equation}
+\end{definition}
+
+\begin{algorithm}[h]
+\caption{Détection de changements en ligne}
+\label{alg:detection-online}
+\begin{algorithmic}[1]
+  \Require $\hat{\param}^{(0)}$ initialisée sur la première fenêtre, statistique courante $\ln\DetectorStat^{(\Ntime)}$
+  \For{chaque nouvelle image $\Ntime+1$}
+    \State calculer $\Rgrad\likelihood^{(\Ntime+1)}(\hat{\param}^{(0)})$ par \cref{eq:detection-online-gradient}
+    \State $\hat{\param}^{(0)} \gets \exp_{\hat{\param}^{(0)}}\left(-\dfrac{\alpha_0}{\Ntime}\Rgrad\likelihood^{(\Ntime+1)}(\hat{\param}^{(0)})\right)$ par \cref{eq:detection-online-exp}
+    \State estimer $\hat{\param}^{(\Ntime+1)}$ sous $\hypothesis_1$ sur la seule fenêtre courante par \cref{eq:detection-online-mle}
+    \State mettre à jour $\ln\DetectorStat^{(\Ntime+1)}$ par \cref{eq:detection-online-glrt}
+  \EndFor
+\end{algorithmic}
+\end{algorithm}
+
+% ======================= TODO texte (remarque, ~6 lignes) ==========================
+% Dire les deux raisons pour lesquelles c'est le gradient *naturel* qui est
+% employe, et non une descente riemannienne quelconque:
+%  - le pas optimal s'obtient analytiquement et ne depend que des dimensions
+%    intrinseques $(\dimleft,\dimright,\Nobs)$: aucune recherche lineaire, donc
+%    un cout par image reellement constant;
+%  - la descente stochastique associee est statistiquement efficace: l'estimee
+%    recursive tend vers le mle sous $\hypothesis_0$ quand $\Ntime\to\infty$
+%    \sidecite{Zhou_2019}, donc le glrt en ligne est asymptotiquement
+%    equivalent au glrt hors ligne --- c'est ce qui autorise a remplacer l'un
+%    par l'autre sans changer la regle de decision.
+% Conclure sur le gain: le cout par nouvelle image devient constant, a comparer
+% avec le $\bigO(\Niter\Ntime\vdim^3)$ etabli plus haut.
+% ====================================================================================
+
+\begin{proposition}[{Borne de Cramér-Rao intrinsèque}]
+\label{prop:detection-online-icrb}
+  Pour un estimateur non biaisé $\hat{\param}^{(\Ntime)}$ construit sur $\Ntime$ dates, l'erreur mesurée par la distance \cref{eq:detection-online-dist} est minorée par
+  \begin{equation}
+    \E\left\{\geodist^2_{\Manifold}\left(\param^{(\Ntime)},\hat{\param}^{(\Ntime)}\right)\right\}
+    \geq
+    \frac{\left(\dimleft^2-1\right)+\left(\dimright^2-1\right)+\Nobs}{\Ntime\,\vdim\,\Nobs},
+    \label{eq:detection-online-icrb}
+  \end{equation}
+  et, la métrique étant séparable, composante par composante:
+  \begin{equation}
+    \E\left\{\geodist^2_{\HPD{\dimleft}}\right\} \geq \frac{\dimleft^2-1}{\dimright\,\Ntime\,\Nobs},
+    \qquad
+    \E\left\{\geodist^2_{\HPD{\dimright}}\right\} \geq \frac{\dimright^2-1}{\dimleft\,\Ntime\,\Nobs},
+    \qquad
+    \E\left\{\geodist^2_{\Rpos{\Nobs}}\right\} \geq \frac{1}{\Ntime\,\vdim}.
+    \label{eq:detection-online-icrb-composantes}
+  \end{equation}
+\end{proposition}
+
+% ============================ TODO decision --- A VERIFIER =========================
+% Attention: la version publiee (et la preprint arXiv) ecrit ces inegalites
+% dans le sens $\leq$, alors qu'une borne de Cramer-Rao *minore* l'erreur
+% quadratique: j'ai retabli $\geq$ ici pour que l'enonce soit coherent avec le
+% mot « minoree » et avec l'usage qui en est fait ensuite (les courbes de mse
+% viennent buter sur la borne par le haut). Merci de confirmer --- s'il s'agit
+% bien d'une coquille de l'article, elle merite peut-etre d'etre signalee en
+% note de bas de page.
+% ====================================================================================
+
+% ======================= TODO texte (remarque, ~4 lignes) ==========================
+% Lire la borne: le numerateur est le nombre de parametres a estimer
+% ($\dimleft^2-1$ et $\dimright^2-1$ apres la contrainte de determinant, plus
+% les $\Nobs$ textures), le denominateur le nombre de donnees. C'est donc
+% exactement le comptage de la \cref{prop:detection-fls-comptage}, vu cette
+% fois du cote de l'erreur d'estimation. Annoncer que les simulations montrent
+% que l'estimateur recursif atteint cette borne.
+% ====================================================================================
+
+% ============================ TODO texte + figures =================================
+% ============================== FIGURE 9/9 =========================================
+% Elle porte la these de la section. Run pleine echelle (1000 tirages, T
+% jusqu'a 1000), qanat: sar_mc_kron_mse.
+%
+% ATTENTION aux parametres, ils ne sont PAS ceux annonces dans le corps de
+% \fullcite{SP24}: le texte du paragraphe 5.1 annonce $\dimleft=4$,
+% $\dimright=3$, $\Nobs=8$ et des facteurs aleatoires de conditionnement 10,
+% alors que les legendes des figures publiees et le code diffuse utilisent
+% $\dimleft=3$, $\dimright=4$, $\Nobs=13$ et des facteurs Toeplitz. Ce sont ces
+% derniers qui sont implementes ici, pour que la figure du memoire soit
+% comparable a celles de l'article. A signaler en note de bas de page.
+%
+% Deux erratum de l'article a redresser silencieusement dans le texte:
+%  - la proposition 2 intervertit les poids $a/p$ et $b/p$ de la metrique; la
+%    derivation donne $b/p$ devant le terme en $\Kronleft$, et l'eq. (25) est
+%    coherente avec ce choix, pas avec la proposition;
+%  - la troisieme ligne de l'eq. (25) oublie un facteur $\Nobs$ sur l'icrb de
+%    la texture: le decompte de dimensions donne $\Nobs/(\Ntime\vdim)$.
+% Le code de \cref{eq:detection-online-icrb-composantes} implemente les formules
+% corrigees; verifier que les equations du memoire les reprennent.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sar_mc_kron_mse/mse-icrb/plot.tex}
+  \provMseIcrbQR[1cm]
+  \caption{Erreur quadratique riemannienne sur chaque composante de
+  $\param=(\Kronleft,\Kronright,\vector{\texture})$ en fonction du nombre de
+  dates $\Ntime$, pour des donnees K-distribuees ($\nu=1$), $\dimleft=3$,
+  $\dimright=4$, $\Nobs=13$, moyennee sur $10^3$ tirages. L'estimateur hors
+  ligne suit les bornes intrinseques de Cramer-Rao
+  \eqref{eq:detection-online-icrb-composantes} (pointilles) sur toute la plage;
+  l'estimateur recursif \eqref{eq:detection-online-sgd}, qui n'effectue qu'un
+  seul pas de gradient par nouvelle image, les rejoint. À $\Ntime=10^3$ les
+  trois composantes sont à la borne: la mise en ligne ne se paie pas en
+  precision. \provMseIcrb}
+  \label{fig:detection-online-mse-icrb}
+\end{figure}
+
+% ============================ FIGURE SUPPLEMENTAIRE ================================
+% Ajoutee au plan initial (validee le 2026-08-25). Elle referme le fil du
+% chapitre: le \cref{sec:detection-fls} contraint le MODELE pour baisser le
+% $\Nobs$ necessaire, cette section contraint le CALCUL --- et cette figure
+% mesure le premier levier sur le modele de la detection de changements, donc
+% avec les memes outils que le second. Sans elle, l'annonce de plan faite en
+% \cref{sec:detection-cadre} n'est jamais verifiee.
+%
+% Chiffres a citer dans le texte: le rapport des dimensions vaut
+% $((\dimleft^2-1)+(\dimright^2-1)+\Nobs)/((\vdim^2-1)+\Nobs) = 36/156$ a
+% $\Nobs=13$, soit un facteur 4,3 sur la borne --- et l'experience donne 4,5.
+% Le gain mesure va de 5,9 a $\Nobs=4$ jusqu'a 2,3 a $\Nobs=70$: la structure
+% achete d'autant plus que la fenetre est petite.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sar_mc_kron_struct/structure-vs-n/plot.tex}
+  \provStructureVsNQR[.5cm]
+  \caption{Ce que la structure achete: erreur totale $\delta^2_\Manifold$ en
+  fonction de la taille $\Nobs$ de la fenetre, à nombre de dates fixe
+  ($\Ntime=25$), pour la dispersion contrainte en produit de Kronecker et pour
+  la dispersion libre dans $\HPDdet{\vdim}$. Meme geometrie, meme gradient,
+  meme recherche lineaire des deux cotes: seul l'espace de parametres change.
+  Chaque estimateur atteint sa propre borne (pointilles), et l'ecart entre les
+  deux bornes est un rapport de dimensions, large sur les petites fenetres et
+  qui se referme quand $\Nobs$ croit. \provStructureVsN}
+  \label{fig:detection-online-structure}
+\end{figure}
+
+% ============================ FIGURE SUPPLEMENTAIRE ================================
+% Remplace les trois planches de courbes roc de \fullcite{SP24} (figures 4 a 6),
+% jugees redondantes: douze courbes pour une conclusion qui tient en une phrase.
+% La puissance a $\pfa$ fixee en fonction de $\Ntime$ dit la meme chose sur un
+% seul axe, et c'est le seul axe dont la section a besoin: a quelle vitesse le
+% detecteur en ligne rattrape-t-il le hors ligne.
+%
+% Le pendant gaussien est la figure suivante. C'est la comparaison des deux qui
+% porte le propos: l'heterogeneite aide le schema stochastique.
+%
+% TODO a verifier avant redaction: a ce reglage ($\Nobs=13$, $\vdim=12$), les
+% deux detecteurs NON structures n'ont quasiment aucune puissance (0,03), alors
+% que les roc de l'article a $\Ntime=50$ les montrent utilisables. Vient
+% probablement de l'amplitude du changement ou du $\pfa$ retenu; a regarder
+% avant d'en tirer un argument, sinon la figure prouve trop.
+%
+% A commenter aussi: le creux du detecteur structure en ligne vers $\Ntime=7$
+% (0,96 a $\Ntime=2$, 0,71 a $\Ntime=7$, 1,00 a $\Ntime=49$). Ce n'est pas du
+% bruit: le demarrage se fait sur l'estimee mm de la premiere date, que les
+% premiers pas de gradient degradent avant que le moyennage en $\alpha_0/\Ntime$
+% ne reprenne la main.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sar_mc_power/puissance-k/plot.tex}
+  \provPuissanceKQR[.5cm]
+  \caption{Puissance de detection à $\pfa=10^{-2}$ en fonction du nombre de
+  dates, en fouillis K-distribue ($\nu=1$), pour les quatre detecteurs: glrt
+  hors ligne avec et sans structure de Kronecker, et leurs contreparties
+  recursives. Les seuils sont fixes par detecteur et par $\Ntime$ au quantile
+  empirique des statistiques sous $\hypothesis_0$, de sorte que toutes les
+  courbes se lisent à la meme fausse alarme. $5\times10^3$ tirages.
+  \provPuissanceK}
+  \label{fig:detection-online-puissance}
+\end{figure}
+
+% ============================ FIGURE SUPPLEMENTAIRE ================================
+% Pendant gaussien de la precedente. Resultat: le glrt structure hors ligne monte
+% a 1,00 a T=49, tandis que sa version recursive reste a 0,045 --- c'est-a-dire
+% sans puissance. L'article signale bien que les versions en ligne convergent
+% plus lentement en gaussien qu'en K-distribue, mais pas a ce point.
+%
+% TODO A VERIFIER AVANT D'EN FAIRE UN ARGUMENT. Trois pistes, dans l'ordre:
+%  1. avec une texture deterministe egale a 1, le schema recursif continue
+%     d'estimer $\vector{\texture}$ librement; le pas $\alpha_0/\Ntime$ met
+%     peut-etre beaucoup plus de dates a la ramener vers 1 qu'a l'estimer sous
+%     hypothese heterogene;
+%  2. les roc de l'article sont a $\Ntime=50$ et montrent les versions en ligne
+%     utilisables --- verifier si l'ecart vient du $\pfa$ retenu ici ($10^{-2}$)
+%     ou de l'amplitude du changement;
+%  3. relancer avec --step-rule armijo pour voir si le comportement tient au pas.
+% Tant que ce n'est pas tranche, presenter la figure comme une observation, pas
+% comme une propriete du detecteur.
+% ====================================================================================
+\begin{figure}[h]
+  \centering
+  \input{gfx/generated/sar_mc_power_gauss/puissance-gaussien/plot.tex}
+  \provPuissanceGaussienQR[.5cm]
+  \caption{Meme experience que la \cref{fig:detection-online-puissance}, mais en
+  fouillis gaussien ($\texture_\iobs=1$). Le glrt structure hors ligne atteint
+  la puissance maximale des $\Ntime=49$; sa contrepartie recursive, elle, ne
+  decolle pas sur cet horizon, alors qu'en environnement heterogene les deux
+  coincidaient. Le schema stochastique tire donc parti de l'heterogeneite qu'il
+  est cense combattre. \provPuissanceGaussien}
+  \label{fig:detection-online-puissance-gaussien}
+\end{figure}
+
+% ============================ TODO texte + figures =================================
+% Les benchmarks temps/memoire hors ligne vs en ligne (deja cables plus haut)
+% completent l'analyse de complexite: c'est le versant pratique de l'argument.
+%
+% Cartes de detection sur donnees UAVSAR reelles: a garder, et c'est ici que la
+% reproductibilite a le plus de valeur puisque les donnees, elles, sont
+% telechargeables (script download_sar.sh). Le volet repetition de la serie
+% (T=68, 340, 680) est deja outille: load_sits accepte --repeat-times, avec un
+% rebond palindrome plutot que la concatenation brute de l'article --- a signaler,
+% c'est une difference assumee qui evite une discontinuite a la couture.
+%
+% ABANDONNE: les courbes roc hors ligne vs en ligne sur donnees simulees font
+% doublon avec la figure mse et les cartes reelles.
+% ====================================================================================
+
+\section{Bilan}
+\label{sec:detection-synthese}
+
+% ============================ TODO texte (~1 page) =================================
+% Quatre choses a dire, dans cet ordre:
+%
+%  1. CE QUI CIRCULE ENTRE LES DEUX MOITIES. Le meme objet --- l'estimation au
+%     sens du maximum de vraisemblance de la matrice de forme d'un modele
+%     gaussien a echelle --- traverse tout le chapitre, contraint tantot par une
+%     structure statistique (deux antennes, Kronecker, Toeplitz, sous-espace),
+%     tantot par une structure geometrique (recursion sur la variete). Dans les
+%     deux cas c'est la contrainte qui rend le probleme faisable au $\Nobs$ dont
+%     on dispose reellement, et non un raffinement de performance.
+%
+%  2. L'AXE SELECTIVITE/ROBUSTESSE comme grille de lecture, pas comme
+%     catalogue: le test de Rao (\cref{prop:detection-mills-rao}) et les
+%     detecteurs par sous-espace (\cref{prop:detection-fls-anmf-sousespace})
+%     sont les deux poles d'un meme continuum, et le glrt s'y situe entre les
+%     deux. Renvoyer aux deux figures tracees sur les memes axes.
+%
+%  3. LES POINTS OUVERTS, a assumer explicitement --- c'est ce qu'un jury
+%     d'hdr attend:
+%       - l'unicite de l'estimateur a deux textures \cref{eq:detection-mills-tyler}
+%         n'est etablie que numeriquement;
+%       - les seuils en forme close manquent pour les detecteurs structures
+%         adaptatifs, d'ou le recours systematique a la simulation;
+%       - surtout: aucun des trois travaux ne combine les deux leviers, c'est-a-dire
+%         l'estimation *en ligne* d'une covariance *structuree sous contrainte*
+%         (Toeplitz), ou la contrainte n'est justement pas compatible avec la
+%         geometrie du cone. C'est la perspective la plus naturelle du chapitre.
+%
+%  4. TRANSITION vers le \cref{ch:spdnet}: apres avoir contraint le modele par
+%     la physique du capteur, on laisse la contrainte s'apprendre sur les
+%     donnees.
+% ====================================================================================
+
+% ============================ TODO decision ========================================
+% Deux points de mise en forme restes en suspens:
+%  (a) PREUVES. Mon avis: la derivation du test de Rao
+%      (\cref{prop:detection-mills-rao}) en annexe de chapitre, car c'est la
+%      contribution la moins accessible et celle qu'un lecteur voudra verifier;
+%      les autres derivations renvoyees aux pdf joints. Prevoir dans ce cas une
+%      section « Complements » en fin de chapitre.
+%  (b) PDF JOINTS. Les versions publiees sont annoncees comme reproduites en
+%      fin de chapitre (encadre d'ouverture): cela demande \usepackage{pdfpages}
+%      et un \includepdf par article. A cabler quand les pdf seront choisis.
+% ====================================================================================

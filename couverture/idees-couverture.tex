@@ -1,0 +1,255 @@
+% =====================================================================
+%  Planches d'exploration pour la page de garde du memoire d'HDR.
+%  Fichier autonome : ne fait partie d'aucune compilation du manuscrit.
+%      pdflatex -output-directory=couverture couverture/idees-couverture.tex
+%  Une page = une idee. Le texte de couverture est identique partout
+%  pour pouvoir comparer les compositions a armes egales.
+% =====================================================================
+\documentclass[a4paper,10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[margin=0pt]{geometry}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,decorations.pathmorphing,fadings}
+\pagestyle{empty}
+\parindent=0pt
+
+% --- Palette reprise du manuscrit (classicthesis + figures riemanniennes) ---
+\definecolor{ctitle}{RGB}{30,60,120}      % cttheorem
+\definecolor{cgeo}{RGB}{40,70,140}        % ctproposition
+\definecolor{ctan}{RGB}{50,110,120}       % ctlemma
+\definecolor{cvec}{RGB}{175,95,45}        % ctproperty
+\definecolor{cgray}{RGB}{110,110,110}
+\definecolor{cink}{RGB}{45,45,45}
+
+% --- Bloc de texte de couverture, pose a un point donne -----------------
+% #1 = options tikz, #2 = coordonnee d'ancrage (nord), #3 = couleur du titre
+\newcommand{\coverblock}[3]{%
+  \node[anchor=north,align=center,text width=15cm,#1] at #2 {%
+    {\color{cgray}\textls[300]{\scshape ammar mian}}\\[10mm]
+    {\color{#3}\Large\textls[200]{\scshape Habilitation à diriger des recherches}}\\[6mm]
+    {\color{cink}\large Matrices de covariances :\\[1mm] des statistiques multivariées à l'apprentissage profond}\\[12mm]
+    {\color{cgray}\footnotesize\textls[150]{\scshape Université Savoie Mont-Blanc}}%
+  };}
+
+% Etiquette de planche (n'apparaitrait pas sur la vraie couverture)
+\newcommand{\planche}[2]{%
+  \node[anchor=north west,font=\sffamily\tiny,color=cgray!70]
+    at (0.8,-0.8) {IDÉE #1 — #2};}
+
+% Cadre de page : chaque planche est un tikzpicture cale sur (0,0)--(21,29.7)
+\newenvironment{planchepage}
+  {\begin{tikzpicture}[x=1cm,y=1cm]
+     \useasboundingbox (0,0) rectangle (21,29.7);}
+  {\end{tikzpicture}\clearpage}
+
+\begin{document}
+
+% =====================================================================
+% IDEE 1 — CHAMP DE TENSEURS
+% Chaque noeud d'une grille porte l'ellipse d'une covariance locale :
+% l'orientation et l'excentricite suivent un champ lisse. C'est le geste
+% le plus direct : « une covariance par pixel », clin d'oeil au RSO et a
+% l'hyperspectral. Le champ s'efface au centre pour loger le texte.
+% =====================================================================
+\begin{planchepage}
+  \planche{1}{Champ de tenseurs — une covariance par pixel}
+  \foreach \i in {0,...,10}{
+    \foreach \j in {0,...,15}{
+      \pgfmathsetmacro{\px}{0.95+\i*1.91}
+      \pgfmathsetmacro{\py}{1.0+\j*1.85}
+      \pgfmathsetmacro{\ang}{55*sin(\i*32+\j*19)+18*cos(\j*41)}
+      \pgfmathsetmacro{\ecc}{0.30+0.55*abs(cos(\i*26-\j*15))}
+      \pgfmathsetmacro{\dist}{abs(\py-16.5)}
+      \pgfmathsetmacro{\op}{max(0.10,min(0.80,(\dist-2.5)/5))}
+      \draw[cgeo,opacity=\op,line width=0.5pt,rotate around={\ang:(\px,\py)}]
+        (\px,\py) ellipse (0.62 and 0.62*\ecc);
+    }}
+  \coverblock{}{(10.5,20.0)}{ctitle}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 2 — LE CONE DES MATRICES SPD
+% L'objet geometrique central du memoire, vu en coupe : le cone convexe,
+% une geodesique affine-invariante et la corde euclidienne entre les
+% memes deux points, chacun materialise par son ellipse. On voit du
+% premier coup d'oeil le « swelling effect » que corrige la geometrie.
+% =====================================================================
+\begin{planchepage}
+  \planche{2}{Le cône SPD — géodésique contre corde euclidienne}
+  \begin{scope}[shift={(10.5,3.2)},scale=1.35]
+    % nappe du cone
+    \fill[cgeo!6] (0,0) -- (-3.3,7.6) arc (180:360:3.3 and 0.95) -- cycle;
+    \draw[cgeo!55,line width=0.6pt] (0,0) -- (-3.3,7.6);
+    \draw[cgeo!55,line width=0.6pt] (0,0) -- (3.3,7.6);
+    \draw[cgeo!55,line width=0.6pt] (-3.3,7.6) arc (180:360:3.3 and 0.95);
+    \draw[cgeo!25,dashed,line width=0.5pt] (-3.3,7.6) arc (180:0:3.3 and 0.95);
+    % les deux extremites
+    \coordinate (A) at (-1.75,3.1);
+    \coordinate (B) at (2.05,5.6);
+    % corde euclidienne
+    \draw[cvec,dashed,line width=0.7pt] (A) -- (B);
+    \node[cvec,font=\scriptsize,above,rotate=32] at ($(A)!0.5!(B)+(0,0.12)$) {euclidien};
+    % geodesique affine-invariante
+    \draw[cgeo,line width=0.9pt] (A) .. controls (-0.55,2.85) and (0.9,3.55) .. (B);
+    \node[cgeo,font=\scriptsize,below] at (0.1,3.0) {géodésique};
+    % ellipses temoins
+    \draw[cink,line width=0.7pt,rotate around={20:(A)}] (A) ellipse (0.52 and 0.20);
+    \draw[cink,line width=0.7pt,rotate around={72:(B)}] (B) ellipse (0.50 and 0.21);
+    \draw[cvec,line width=0.6pt,rotate around={46:(0.15,4.35)}] (0.15,4.35) ellipse (0.60 and 0.44);
+    \draw[cgeo,line width=0.6pt,rotate around={46:(0.15,3.28)}] (0.15,3.28) ellipse (0.50 and 0.21);
+  \end{scope}
+  \coverblock{}{(10.5,25.2)}{ctitle}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 3 — LE RUBAN D'INTERPOLATION
+% Deux rangees d'ellipses interpolant entre les memes deux covariances :
+% en haut le chemin euclidien (les ellipses gonflent), en bas le chemin
+% geodesique (le volume est conserve). Tres sobre, tres classicthesis,
+% et le message theorique du memoire tient en une bande.
+% =====================================================================
+\begin{planchepage}
+  \planche{3}{Le ruban d'interpolation — gonflement contre volume conservé}
+  \foreach \k in {0,...,6}{
+    \pgfmathsetmacro{\t}{\k/6}
+    \pgfmathsetmacro{\px}{2.4+\k*2.7}
+    % chemin euclidien : moyenne arithmetique des axes
+    \pgfmathsetmacro{\ea}{(1-\t)*1.55+\t*0.34}
+    \pgfmathsetmacro{\eb}{(1-\t)*0.34+\t*1.55}
+    \draw[cvec,line width=0.7pt] (\px,10.6) ellipse ({\ea} and {\eb});
+    % chemin geodesique : moyenne geometrique des axes
+    \pgfmathsetmacro{\ga}{pow(1.55,1-\t)*pow(0.34,\t)}
+    \pgfmathsetmacro{\gb}{pow(0.34,1-\t)*pow(1.55,\t)}
+    \draw[cgeo,line width=0.7pt] (\px,6.2) ellipse ({\ga} and {\gb});
+  }
+  \node[cvec,font=\scriptsize,anchor=west] at (1.2,12.8) {\textls[150]{\scshape chemin euclidien}};
+  \node[cgeo,font=\scriptsize,anchor=west] at (1.2,8.4)  {\textls[150]{\scshape chemin géodésique}};
+  \draw[cgray!30,line width=0.4pt] (1.2,4.1) -- (19.8,4.1);
+  \coverblock{}{(10.5,22.8)}{ctitle}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 4 — LA MOYENNE DE FRECHET
+% Un nuage d'ellipses dispersees, palies, et une seule ellipse nette au
+% barycentre. Lecture immediate : de la multitude des observations (et,
+% en filigrane, des travaux) emerge une forme unique. Metaphore d'HDR
+% assez juste, et graphiquement tres calme.
+% =====================================================================
+\begin{planchepage}
+  \planche{4}{La moyenne de Fréchet — une forme émerge du nuage}
+  \pgfmathsetseed{2026}
+  \foreach \k in {1,...,46}{
+    \pgfmathsetmacro{\rr}{2.2+6.4*sqrt(rnd)}
+    \pgfmathsetmacro{\th}{360*rnd}
+    \pgfmathsetmacro{\px}{10.5+\rr*cos(\th)}
+    \pgfmathsetmacro{\py}{11.0+0.78*\rr*sin(\th)}
+    \pgfmathsetmacro{\ang}{360*rnd}
+    \pgfmathsetmacro{\aa}{0.42+0.34*rnd}
+    \pgfmathsetmacro{\bb}{0.14+0.22*rnd}
+    \pgfmathsetmacro{\op}{0.16+0.30*rnd}
+    \draw[cgray,opacity=\op,line width=0.5pt,rotate around={\ang:(\px,\py)}]
+      (\px,\py) ellipse ({\aa} and {\bb});
+  }
+  \draw[cgeo,line width=1.1pt,rotate around={28:(10.5,11.0)}]
+    (10.5,11.0) ellipse (1.45 and 0.78);
+  \draw[cgeo!45,line width=0.5pt,rotate around={28:(10.5,11.0)}]
+    (10.5,11.0) ellipse (2.35 and 1.26);
+  \coverblock{}{(10.5,24.0)}{ctitle}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 5 — LA GRILLE OPTIQUE (clin d'oeil Vasarely)
+% Meme brique, mais assumee comme motif : l'excentricite est modulee par
+% une onde radiale, ce qui creuse un relief dans la page. Plus graphique,
+% moins didactique — c'est la couverture qui accrochera le plus l'oeil,
+% au prix d'un lien au propos moins explicite.
+% =====================================================================
+\begin{planchepage}
+  \planche{5}{La grille optique — le motif comme identité}
+  \foreach \i in {0,...,12}{
+    \foreach \j in {0,...,17}{
+      \pgfmathsetmacro{\px}{0.8+\i*1.62}
+      \pgfmathsetmacro{\py}{0.9+\j*1.62}
+      \pgfmathsetmacro{\dd}{sqrt((\px-10.5)^2+(\py-9.0)^2)}
+      \pgfmathsetmacro{\ecc}{0.18+0.80*abs(sin(\dd*22))}
+      \pgfmathsetmacro{\ang}{atan2(\py-9.0,\px-10.5)}
+      \pgfmathsetmacro{\op}{max(0.12,1-\dd/13)}
+      \fill[cink,opacity=\op,rotate around={\ang:(\px,\py)}]
+        (\px,\py) ellipse (0.55 and 0.55*\ecc);
+    }}
+  \fill[white,opacity=0.88] (1.6,20.0) rectangle (19.4,27.6);
+  \coverblock{}{(10.5,26.6)}{ctitle}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 6 — LA TRAVERSEE
+% Le sous-titre mis en images, de haut en bas : nuage de points et
+% ellipses de confiance (statistiques multivariees), le cone SPD
+% (geometrie), puis des couches d'ellipses qui se contractent (SPDnet).
+% Une seule brique — l'ellipse — traverse les trois etages du memoire.
+% =====================================================================
+\begin{planchepage}
+  \planche{6}{La traversée — le sous-titre en trois étages}
+  \coverblock{}{(10.5,28.0)}{ctitle}
+  % --- etage 1 : nuage et ellipses de confiance ---
+  \begin{scope}[shift={(4.4,16.2)}]
+    \pgfmathsetseed{7}
+    \foreach \k in {1,...,120}{
+      \pgfmathsetmacro{\u}{rand}\pgfmathsetmacro{\v}{rand}
+      \pgfmathsetmacro{\px}{1.15*\u+0.55*\v}
+      \pgfmathsetmacro{\py}{0.45*\v}
+      \fill[cgray,opacity=0.55] (\px,\py) circle (0.024);
+    }
+    \foreach \s in {1,2,3}{
+      \draw[cgeo,opacity={1/\s},line width=0.6pt,rotate around={26:(0,0)}]
+        (0,0) ellipse ({\s*0.72} and {\s*0.30});
+    }
+  \end{scope}
+  % --- etage 2 : le cone ---
+  \begin{scope}[shift={(10.5,10.2)},scale=0.62]
+    \fill[cgeo!6] (0,0) -- (-3.0,5.6) arc (180:360:3.0 and 0.85) -- cycle;
+    \draw[cgeo!55,line width=0.7pt] (0,0) -- (-3.0,5.6);
+    \draw[cgeo!55,line width=0.7pt] (0,0) -- (3.0,5.6);
+    \draw[cgeo!55,line width=0.7pt] (-3.0,5.6) arc (180:360:3.0 and 0.85);
+    \draw[cgeo,line width=0.9pt] (-1.6,2.6) .. controls (-0.4,2.4) and (0.8,3.0) .. (1.9,4.3);
+    \draw[cink,line width=0.7pt,rotate around={15:(-1.6,2.6)}] (-1.6,2.6) ellipse (0.42 and 0.17);
+    \draw[cink,line width=0.7pt,rotate around={70:(1.9,4.3)}] (1.9,4.3) ellipse (0.42 and 0.18);
+  \end{scope}
+  % --- etage 3 : couches d'un reseau sur la variete ---
+  \begin{scope}[shift={(3.0,2.6)}]
+    \foreach \c/\n/\sc in {0/5/1.0, 5.5/4/0.82, 11.0/3/0.62, 15.6/2/0.46}{
+      \foreach \r in {1,...,\n}{
+        \pgfmathsetmacro{\py}{(\r-(\n+1)/2)*1.15}
+        \pgfmathsetmacro{\ang}{35*\r+18*\c}
+        \draw[cgeo,line width=0.6pt,rotate around={\ang:(\c,\py)}]
+          (\c,\py) ellipse ({0.52*\sc} and {0.26*\sc});
+      }}
+    \foreach \c in {0,5.5,11.0}{
+      \pgfmathsetmacro{\cb}{\c+3.6}
+      \draw[cgray!60,-{Stealth[length=4pt]},line width=0.5pt] (\c+1.1,0) -- (\cb,0);}
+  \end{scope}
+\end{planchepage}
+
+% =====================================================================
+% IDEE 7 — LA VERSION SOBRE
+% Si le manuscrit doit rester du classicthesis pur : une seule famille
+% d'ellipses concentriques decentree en pied de page, tres pale, et rien
+% d'autre. C'est le repli elegant, celui qui ne vieillira pas.
+% =====================================================================
+\begin{planchepage}
+  \planche{7}{La version sobre — un seul geste}
+  \begin{scope}[shift={(14.0,6.0)}]
+    \foreach \s in {1,...,7}{
+      \pgfmathsetmacro{\op}{0.55-0.06*\s}
+      \draw[cgeo,opacity=\op,line width=0.6pt,rotate around={-24:(0,0)}]
+        (0,0) ellipse ({\s*1.05} and {\s*0.42});
+    }
+  \end{scope}
+  \draw[cgray!40,line width=0.4pt] (3.0,22.2) -- (18.0,22.2);
+  \coverblock{}{(10.5,24.4)}{ctitle}
+\end{planchepage}
+
+\end{document}

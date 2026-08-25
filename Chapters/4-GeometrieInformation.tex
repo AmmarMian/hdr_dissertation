@@ -1,0 +1,410 @@
+\chapter{Une géométrie de l'information pour la covariance}
+\label{ch:context-geometry}
+
+Le chapitre précédent a construit une géométrie sur le cône en partant d'exigences d'invariance, puis une seconde en partant d'exigences de coût numérique. Ces deux points de départ sont légitimes, mais ils ont en commun d'être extérieurs au problème: à aucun moment nous n'avons utilisé le fait que les matrices que nous manipulons sont les paramètres d'une loi de probabilité. Or c'est précisément ce qu'elles sont depuis la \cref{ch:context-distributions}.
+
+La question de ce chapitre est donc celle-ci: le modèle probabiliste a-t-il, lui aussi, une métrique à proposer ? La réponse est oui, elle est essentiellement unique, et nous verrons qu'elle redonne exactement les objets de la \cref{ch:context-riemann}. Nous nous plaçons dorénavant dans le cas complexe circulaire, conformément au dictionnaire établi en \cref{sec:context-riemann-complexe}, puisque c'est celui des modèles exploités au \cref{ch:robust-detection}.
+
+
+\section{La métrique de Fisher et la variété statistique}
+\label{sec:context-geometry-fisher}
+
+\subsection{L'espace des paramètres comme variété}
+
+Considérons une famille paramétrique de densités $\{\ddp{\Variable}(\cdot;\param)\}_{\param\in\Manifold}$, où l'espace des paramètres $\Manifold$ est une variété au sens de la \cref{def:context-riemann-manifold}. C'est le cas de tous les modèles rencontrés jusqu'ici: $\Manifold=\HPD{\Nvar}$ pour la gaussienne complexe centrée, $\Manifold=\C^\Nvar\times\HPD{\Nvar}$ lorsqu'on ajoute la moyenne, et nous verrons en \cref{sec:context-geometry-compound-gaussian} un cas où $\Manifold$ est un produit plus élaboré.
+
+L'objet ainsi obtenu --- une variété dont chaque point \emph{est} une loi de probabilité --- porte le nom de \textbf{variété statistique}. Le seul ingrédient qui lui manque pour être riemannienne est une métrique, et l'exigence naturelle est que celle-ci mesure non pas un écart entre tableaux de nombres, mais un écart entre \emph{lois}: deux paramètres doivent être proches lorsque les distributions correspondantes sont difficiles à distinguer à partir des données. C'est ce qu'illustre la \cref{fig:context-riemann-statistique}.
+
+\begin{figure}
+  \centering
+  \input{gfx/tikZ/riemann/variete_statistique.tex}
+  \caption{La variété statistique: chaque point de $\Manifold$ \emph{est} une loi
+    de probabilité. Les paramètres $\param$ et $\param'$ engendrent des densités
+    presque superposées, donc difficiles à distinguer à partir d'un échantillon,
+    et doivent être proches; $\param''$ engendre une densité nettement
+    différente, et doit être loin. La métrique de Fisher est précisément celle
+    qui réalise cette exigence.}
+  \label{fig:context-riemann-statistique}
+\end{figure}
+
+\subsection{La métrique de Fisher}
+
+Cette exigence a une traduction directe. La quantité qui mesure la sensibilité de la vraisemblance à une variation du paramètre est le score, et sa dispersion mesure exactement l'information que les données apportent sur $\param$.
+
+\begin{definition}[{Métrique de Fisher}]
+\label{def:context-geometry-fisher}
+  Soit $\{\x_\iobs\}_{\iobs=1}^\Nobs$ un échantillon i.i.d de densité $\ddp{\Variable}(\cdot;\param)$, $\param\in\Manifold$, et $\likelihood(\X;\param)$ la log-vraisemblance associée. La \textbf{métrique de Fisher} est définie, pour $\tvec,\tvecbis\in\Tangent{\param}{\Manifold}$, par:
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\param}^{\mathrm{F}}
+    \eqdef
+    \E\left\{
+      \dirderiv\likelihood(\X;\param)[\tvec]\;
+      \dirderiv\likelihood(\X;\param)[\tvecbis]
+    \right\}
+    =
+    -\,\E\left\{
+      \dirderiv^2\likelihood(\X;\param)[\tvec,\tvecbis]
+    \right\},
+    \label{eq:context-geometry-fisher}
+  \end{equation}
+  où $\dirderiv^2$ désigne la dérivée directionnelle seconde. La variété $\Manifold$ munie de cette métrique est appelée \textbf{variété statistique}, ou \textbf{variété de Fisher-Rao}, et la distance géodésique associée est la \textbf{distance de Rao} \sidecite[-1cm]{rao1945information}.
+\end{definition}
+
+\begin{remark}[{Une définition sans coordonnées}]
+\label{rem:context-geometry-sanscoord}
+  Il faut souligner que \cref{eq:context-geometry-fisher} est écrite \emph{sans coordonnées}: elle prend en argument deux directions tangentes, et non deux indices de paramètres. La matrice d'information de Fisher $\Fisher$ familière au traiteur de signal en est la représentation dans une base $\{\tvec_q\}$ de l'espace tangent, $[\Fisher]_{q\ell}=\metric{\tvec_q}{\tvec_\ell}{\param}^{\mathrm{F}}$. Cette distinction, apparemment cosmétique, est en réalité ce qui rend la construction utilisable sur une variété contrainte: là où l'approche par coordonnées impose de paramétrer explicitement la contrainte et de gérer des multiplicateurs de Lagrange, l'approche intrinsèque n'a qu'à restreindre les directions tangentes admissibles. Nous en verrons la conséquence en \cref{sec:context-geometry-icrb}.
+\end{remark}
+
+Deux propriétés font de \cref{eq:context-geometry-fisher} un choix privilégié plutôt qu'un choix parmi d'autres.
+
+D'une part, c'est bien un produit scalaire: la forme est bilinéaire et symétrique par construction, et sa définie-positivité équivaut à l'identifiabilité locale du modèle --- une direction de norme nulle serait une direction le long de laquelle la loi ne change pas, donc un défaut d'identifiabilité.
+
+D'autre part, et c'est le point décisif, elle est \textbf{invariante par reparamétrisation}. La géométrie qu'elle induit ne dépend donc pas des coordonnées choisies pour décrire le modèle, mais uniquement de la famille de lois elle-même. Ce n'est pas une propriété partagée: la métrique euclidienne sur $\HPD{\Nvar}$, par exemple, donnerait une géométrie différente selon qu'on paramètre la loi par $\MCov$ ou par $\inv{\MCov}$, ce qui n'a aucun sens statistique. Un théorème dû à Chentsov établit d'ailleurs que la métrique de Fisher est, à un facteur multiplicatif près, la seule métrique invariante sous les transformations statistiques naturelles \sidecite[0cm]{cencov1982statistical}.
+
+\subsection{Ce que mesure la métrique de Fisher}
+
+L'interprétation se lit sur le développement local de la divergence de Kullback-Leibler. Pour $\diff\param$ petit,
+\begin{equation}
+  \KL\!\left(\ddp{\Variable}(\cdot;\param)\,\|\,\ddp{\Variable}(\cdot;\param+\diff\param)\right)
+  =
+  \frac{1}{2}\metric{\diff\param}{\diff\param}{\param}^{\mathrm{F}}
+  + o\!\left(\normriem{\diff\param}{\param}^2\right).
+  \label{eq:context-geometry-kl}
+\end{equation}
+
+\begin{remark}
+  C'est la phrase-clé de cette section: \emph{la métrique de Fisher mesure la discernabilité statistique}. Une longueur y est un nombre de «~pas~» au-delà desquels deux lois deviennent distinguables à partir d'un échantillon. C'est aussi ce qui donne son sens à la \cref{sec:context-covariance-estimation}, où nous avions signalé que la norme de Frobenius était un choix discutable pour mesurer une erreur d'estimation: mesurer cette erreur en distance de Rao, ce n'est pas raffiner géométriquement, c'est l'exprimer dans l'unité qui a un sens pour le problème d'inférence.
+\end{remark}
+
+\begin{remark}[{Un champ bien plus vaste}]
+\label{rem:context-geometry-ouverture}
+  La géométrie de Fisher-Rao, c'est-à-dire la métrique de Fisher associée à sa connexion de Levi-Civita, n'est que la porte d'entrée d'un domaine bien plus large, la \textbf{géométrie de l'information}. Celle-ci étudie plus généralement les variétés dont les points sont des lois de probabilité, en s'autorisant des connexions autres que celle de Levi-Civita: on obtient ainsi les connexions duales de Chentsov, puis la $\alpha$-géométrie d'Amari, qui relie la métrique de Fisher à toute une famille de divergences \sidecite[-0.5cm]{amari2000methods,amari2016information}. S'y greffent les divergences de Bregman, les extensions non paramétriques, et plus récemment des ponts avec le transport optimal. Nous ne nous aventurerons pas dans cette direction et renvoyons aux panoramas de \sidecite[3cm]{nielsen2020elementary,nielsen2022many}; il nous suffira ici de la seule métrique de Fisher.
+\end{remark}
+
+
+\section{Géométrie sous modèle gaussien}
+\label{sec:context-geometry-gaussian}
+
+Appliquons la \cref{def:context-geometry-fisher} au modèle le plus simple, la gaussienne complexe centrée de la \cref{def:context-complex-cgaussian}. La log-vraisemblance d'un échantillon i.i.d s'écrit, à une constante additive près,
+\begin{equation}
+  \likelihood(\X;\MCov)
+  =
+  -\Nobs\log\Det(\MCov)
+  -\sum_{\iobs=1}^{\Nobs}\quadraticH{\x_\iobs}{\MCov}.
+  \label{eq:context-geometry-vraisemblancegauss}
+\end{equation}
+En dérivant deux fois dans les directions $\tvec,\tvecbis\in\Herm{\Nvar}$ au moyen des identités de la \cref{rem:context-riemann-calculdiff}, puis en prenant l'espérance, on obtient le résultat suivant.
+
+\begin{property}[{Métrique de Fisher du modèle gaussien complexe centré}]
+\label{prop:context-geometry-fishergauss}
+  Pour $\Variable\sim\cgaussian(\vector{0},\MCov)$ et $\tvec,\tvecbis\in\Tangent{\MCov}{\HPD{\Nvar}}=\Herm{\Nvar}$,
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\MCov}^{\mathrm{F}}
+    =
+    \Nobs\,\Realp\trace{\inv{\MCov}\tvec\inv{\MCov}\tvecbis}.
+    \label{eq:context-geometry-fishergauss}
+  \end{equation}
+\end{property}
+
+\begin{remark}[{Le point de rencontre}]
+\label{rem:context-geometry-rencontre}
+  Comparons \cref{eq:context-geometry-fishergauss} à \cref{eq:context-riemann-metriquecomplexe}: à un facteur $\Nobs$ près, sans conséquence sur la géométrie, \textbf{la métrique de Fisher du modèle gaussien centré est la métrique affine invariante naturelle}, celle du cas $(\alpha,\beta)=(1,0)$ \sidecite[0cm]{skovgaard1984riemannian}. La distance de Rao entre deux gaussiennes complexes centrées est donc exactement la distance géodésique du cône établie en \cref{eq:context-riemann-distspd}:
+  \begin{equation}
+    \geodist_{\cgaussian}^2(\MCov_0,\MCov_1)
+    =
+    \norm{\logm\!\left(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2}\right)}_\frob^2
+    =
+    \sum_{\ivar=1}^{\Nvar}\log^2\eig_\ivar\!\left(\inv{\MCov_0}\MCov_1\right).
+    \label{eq:context-geometry-raogauss}
+  \end{equation}
+  Nous étions partis, en \cref{sec:context-riemann-spd}, d'exigences d'invariance qui pouvaient passer pour esthétiques. Elles ne l'étaient pas: le modèle gaussien les impose.
+\end{remark}
+
+Cette coïncidence n'en est pas une, et il vaut la peine de dire pourquoi. La congruence $\MCov\mapsto\mat{A}\MCov\mat{A}^\herm$, que nous avions imposée en \cref{eq:context-riemann-invcongruence}, n'est rien d'autre que la trace, sur l'espace des paramètres, du changement de variable $\x\mapsto\mat{A}\x$ qui laisse la famille gaussienne globalement invariante (\cref{prop:context-definition-lineartraonsformation}). L'invariance de la métrique n'est donc que la traduction, dans le langage des paramètres, de l'équivariance du modèle dans le langage des données. Deux chemins qui partent de la même symétrie ne pouvaient pas mener ailleurs.
+
+\begin{remark}[{Le cas réel}]
+  Pour $\Variable\sim\gaussian(\vector{0},\MCov)$ réelle, le même calcul donne $\metric{\tvec}{\tvecbis}{\MCov}^{\mathrm{F}}=\tfrac{\Nobs}{2}\trace{\inv{\MCov}\tvec\inv{\MCov}\tvecbis}$. Le facteur $2$ est celui déjà rencontré au \cref{tab:context-complex-summary}; il ne change ni les géodésiques ni le classement des estimateurs, seulement l'échelle absolue des distances.
+\end{remark}
+
+\begin{remark}[{Le cas avec moyenne inconnue}]
+\label{rem:context-geometry-avecmoyenne}
+  Il serait tentant de croire que tout est aussi simple lorsqu'on ajoute la moyenne, $\param=(\Vmoy_\Variable,\MCov)\in\C^\Nvar\times\HPD{\Nvar}$. La métrique de Fisher est bien bloc-diagonale entre les deux paramètres, ce qui est la traduction géométrique de l'orthogonalité classique entre estimation de la moyenne et estimation de la covariance. Mais cela ne suffit pas: la variété produit n'est pas totalement géodésique dans chaque facteur, les géodésiques couplent les deux blocs, et \textbf{la distance de Rao n'est pas connue en forme close} dans ce cas, y compris en dimension $\Nvar=1$ où elle relève de la géométrie hyperbolique. Des expressions existent par plongement dans le groupe de Siegel, et de bonnes approximations numériques ont été proposées récemment \sidecite[0.5cm]{atkinson1981rao,micchelli2005rao,nielsen2023simple}. C'est l'une des raisons pratiques pour lesquelles on travaille le plus souvent à moyenne connue ou préalablement retranchée, comme nous le ferons au \cref{ch:robust-detection}.
+\end{remark}
+
+
+\section{Géométrie des modèles elliptiques}
+\label{sec:context-geometry-elliptical}
+
+Le modèle gaussien nous a donné une métrique. Que devient-elle lorsque l'on relâche l'hypothèse gaussienne au profit de la famille elliptique de la \cref{def:context-complex-ces} ? La réponse est le résultat central de cette section.
+
+\begin{proposition}[{Métrique de Fisher des distributions elliptiques complexes}]
+\label{prop:context-geometry-fisherces}
+  Soit $\{\x_\iobs\}_{\iobs=1}^\Nobs$ i.i.d de loi $\celliptical(\vector{0},\MScatter,\densgen)$. La métrique de Fisher sur $\HPD{\Nvar}$ s'écrit, pour $\tvec,\tvecbis\in\Herm{\Nvar}$,
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\MScatter}^{\mathrm{F}}
+    =
+    \Nobs\,\Realp\left(
+      \metriccoefa\,\trace{\inv{\MScatter}\tvec\inv{\MScatter}\tvecbis}
+      +
+      \metriccoefb\,\trace{\inv{\MScatter}\tvec}\trace{\inv{\MScatter}\tvecbis}
+    \right),
+    \label{eq:context-geometry-fisherces}
+  \end{equation}
+  où les coefficients ne dépendent que du générateur de densité et de la dimension:
+  \begin{equation}
+    \metriccoefa
+    =
+    1 - \frac{\E\{\quadvar^2\logderiv'(\quadvar)\}}{\Nvar(\Nvar+1)},
+    \qquad
+    \metriccoefb = \metriccoefa - 1,
+    \qquad
+    \logderiv(t) \eqdef \frac{\densgen'(t)}{\densgen(t)},
+    \label{eq:context-geometry-alphabeta}
+  \end{equation}
+  $\quadvar$ étant la variable aléatoire associée à la forme quadratique introduite en \cref{prop:context-complex-quadform}.
+\end{proposition}
+
+\begin{proof}
+  La démonstration procède comme celle de la \cref{prop:context-geometry-fishergauss}, en dérivant deux fois la log-vraisemblance elliptique puis en évaluant l'espérance au moyen de la représentation stochastique de la \cref{prop:context-complex-stochastic}, qui découple la variable modulaire $\quadvar$ du vecteur uniforme sur la sphère complexe. Le détail se trouve dans \sidecite[0cm][Théorème 1]{bouchard2024fisherrao}, à la suite de \sidecite[2cm]{besson2013fisher,mitchell1989information}.
+\end{proof}
+
+\begin{remark}[{La boucle se referme}]
+\label{rem:context-geometry-boucle}
+  Il faut mettre \cref{eq:context-geometry-fisherces} en regard de \cref{def:context-riemann-affineinvariante}: c'est \emph{mot pour mot} la famille à deux paramètres que nous avions obtenue par le seul argument d'invariance, avec $(\alpha,\beta)=(\metriccoefa,\metriccoefb)$. Nous avions annoncé que la conservation des deux paramètres n'était pas une généralisation gratuite; en voici la raison. Le générateur de densité ne change pas la géométrie du cône: il se contente de \emph{sélectionner un point} dans la famille de métriques déjà décrite en \cref{sec:context-riemann-spd}. Le cas gaussien, pour lequel $\densgen(t)=\exp(-t)$ donne $\logderiv'\equiv 0$ et donc $(\metriccoefa,\metriccoefb)=(1,0)$, en est un cas particulier, comme il se doit.
+\end{remark}
+
+Ce constat a deux conséquences pratiques considérables, que nous énonçons séparément car elles sont souvent confondues.
+
+\begin{property}[{Tous les modèles elliptiques partagent les mêmes géodésiques}]
+\label{prop:context-geometry-memesgeodesiques}
+  D'après la \cref{rem:context-riemann-alphabeta}, la connexion de Levi-Civita associée à \cref{eq:context-riemann-metriquecomplexe} ne dépend ni de $\alpha$ ni de $\beta$. Il en va donc de même des géodésiques, de l'exponentielle et du logarithme riemanniens. Autrement dit, \emph{toutes} les géométries de Fisher-Rao des modèles elliptiques complexes centrés possèdent les mêmes droites; seule la distance, qui intègre la métrique le long de celles-ci, dépend du générateur:
+  \begin{equation}
+    \geodist^2_\densgen(\MScatter_0,\MScatter_1)
+    =
+    \metriccoefa\,\norm{\logm\!\left(\inv{\MScatter_0}\MScatter_1\right)}_\frob^2
+    +
+    \metriccoefb\,\left(\log\Det\!\left(\inv{\MScatter_0}\MScatter_1\right)\right)^2.
+    \label{eq:context-geometry-distces}
+  \end{equation}
+\end{property}
+
+\begin{property}[{La géométrie de la matrice de forme ne dépend pas du générateur}]
+\label{prop:context-geometry-formeuniverselle}
+  Restreignons-nous à la sous-variété $\HPDdet{\Nvar}$ des matrices de forme normalisées par le déterminant. Ses directions tangentes vérifient $\trace{\inv{\MShape}\tvec}=0$ (\cref{prop:context-riemann-detun}), de sorte que le second terme de \cref{eq:context-geometry-fisherces} \emph{s'annule identiquement}. La métrique de Fisher y est donc
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\MShape}^{\mathrm{F}}
+    =
+    \Nobs\,\metriccoefa\,\Realp\trace{\inv{\MShape}\tvec\inv{\MShape}\tvecbis},
+    \label{eq:context-geometry-fisherforme}
+  \end{equation}
+  c'est-à-dire la métrique affine invariante naturelle à un facteur scalaire $\metriccoefa$ près.
+\end{property}
+
+\begin{remark}[{Ce qui légitime la pratique courante}]
+\label{rem:context-geometry-legitimation}
+  La \cref{prop:context-geometry-formeuniverselle} est le résultat qui justifie rigoureusement un usage extrêmement répandu et rarement argumenté: appliquer à des données non gaussiennes les outils riemanniens «~gaussiens~» --- distance affine invariante, moyenne de Fréchet, partitionnement --- en se contentant de remplacer la scm par un estimateur robuste. Ce n'est pas une approximation. Sur la matrice de forme, la géométrie de Fisher-Rao est \emph{la même} pour toute la famille elliptique, à une constante multiplicative globale près qui ne modifie ni les géodésiques, ni les moyennes de Fréchet, ni le classement des distances --- donc ni un partitionnement, ni une règle du plus proche voisin.
+
+  Il faut cependant mesurer la portée exacte de l'énoncé: la constante $\metriccoefa$ n'est sans effet que tant qu'on ne compare pas des distances issues de générateurs différents, et le raisonnement ne vaut que sur $\HPDdet{\Nvar}$. Dès que l'échelle revient dans le paramètre --- c'est-à-dire dès qu'on travaille sur $\HPD{\Nvar}$ tout entier --- le terme en $\metriccoefb$ réapparaît et le générateur pèse réellement sur la distance. C'est exactement ce qui se produit au \cref{ch:robust-detection}, où la puissance est une information utile et non une nuisance.
+\end{remark}
+
+Le \cref{tab:context-geometry-alphabeta} donne les coefficients pour les modèles les plus courants.
+
+\begin{table}[h]
+  \centering
+  \caption{Coefficients de la métrique de Fisher \cref{eq:context-geometry-fisherces} pour quelques modèles elliptiques complexes centrés en dimension $\Nvar$. Le modèle gaussien s'obtient comme cas limite $\dof\to\infty$ du modèle de Student.}
+  \label{tab:context-geometry-alphabeta}
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Modèle & $\metriccoefa$ & $\metriccoefb$ \\
+    \midrule
+    Gaussien $\cgaussian$ & $1$ & $0$ \\[0.5ex]
+    Student $\studentdist$, $\dof$ d.d.l & $\dfrac{\dof+\Nvar}{\dof+\Nvar+1}$ & $\dfrac{-1}{\dof+\Nvar+1}$ \\[1.2ex]
+    Général & $1-\dfrac{\E\{\quadvar^2\logderiv'(\quadvar)\}}{\Nvar(\Nvar+1)}$ & $\metriccoefa-1$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{remark}
+  On lit sur ce tableau que $\metriccoefa\leq 1$ et $\metriccoefb\leq 0$ pour le modèle de Student, avec égalité dans le cas gaussien limite. Le fait que $\metriccoefb=\metriccoefa-1$ dans le cas général n'est pas un accident: il traduit que la famille des métriques de Fisher elliptiques ne parcourt en réalité qu'une courbe à un paramètre dans la famille à deux paramètres de la \cref{def:context-riemann-affineinvariante}. On vérifie au passage que la condition d'admissibilité $\metriccoefb>-\metriccoefa/\Nvar$ de la \cref{def:context-riemann-affineinvariante} impose $\metriccoefa>\Nvar/(\Nvar+1)$, ce qui est bien satisfait pour le modèle de Student dès que $\dof>0$.
+\end{remark}
+
+
+\section{Géométrie du modèle de gaussienne-composée déterministe}
+\label{sec:context-geometry-compound-gaussian}
+
+Nous en venons au modèle qui nous intéresse le plus directement, celui de la \cref{def:context-distributions-detcompoundgaussian}, où chaque observation possède sa propre puissance:
+\begin{equation}
+  \x_\iobs \sim \cgaussian(\vector{0}, \texture_\iobs\,\MShape),
+  \qquad \iobs\in\intrange{1}{\Nobs},
+  \label{eq:context-geometry-ccgmodel}
+\end{equation}
+avec $\MShape\in\HPDdet{\Nvar}$ et $\vector{\texture}=[\texture_1,\dots,\texture_\Nobs]^\T\in\Rpos{\Nobs}$. Ce modèle rend compte d'une hétérogénéité de la puissance rétrodiffusée d'un pixel à l'autre, ce qui en fait l'outil de choix pour les images radar à haute résolution.
+
+Sa particularité, du point de vue qui nous occupe, est que le paramètre n'est plus une matrice mais un \emph{couple}. C'est ici, et pas avant, que nous avons besoin de la notion de variété produit --- il aurait été prématuré de l'introduire en \cref{ch:context-riemann}, où elle n'aurait servi à rien.
+
+\begin{definition}[{Variété produit}]
+\label{def:context-geometry-produit}
+  Le produit cartésien $\Manifold\times\Manifoldbis$ de deux variétés est une variété, d'espace tangent $\Tangent{(\param,\param')}{(\Manifold\times\Manifoldbis)}=\Tangent{\param}{\Manifold}\times\Tangent{\param'}{\Manifoldbis}$. Nous poserons
+  \begin{equation}
+    \Manifold_{\Nvar,\Nobs}
+    \eqdef
+    \HPDdet{\Nvar}\times\Rpos{\Nobs},
+    \label{eq:context-geometry-varieteccg}
+  \end{equation}
+  dont chaque facteur a été muni d'une géométrie en \cref{prop:context-riemann-detun,rem:context-riemann-rplus}.
+\end{definition}
+
+Rien ne garantit \emph{a priori} que la métrique de Fisher du modèle \cref{eq:context-geometry-ccgmodel} respecte cette structure produit. Le paramètre d'échelle et le paramètre de forme sont en effet couplés dans la vraisemblance, et une métrique comportant des termes croisés obligerait à construire une géométrie entièrement nouvelle sur $\Manifold_{\Nvar,\Nobs}$. C'est ici qu'intervient la seconde vertu de la normalisation par le déterminant, annoncée en \cref{rem:context-riemann-normalisation}.
+
+\begin{proposition}[{Métrique de Fisher du modèle de gaussienne-composée déterministe}]
+\label{prop:context-geometry-fisherccg}
+  Sous le modèle \cref{eq:context-geometry-ccgmodel} avec la normalisation $\Det(\MShape)=1$, la métrique de Fisher sur $\Manifold_{\Nvar,\Nobs}$ est \textbf{bloc-diagonale}: pour $\param=(\MShape,\vector{\texture})$ et $\tvec=(\tvec_{\MShape},\tvec_{\vector{\texture}})$, $\tvecbis=(\tvecbis_{\MShape},\tvecbis_{\vector{\texture}})$ dans $\Tangent{\param}{\Manifold_{\Nvar,\Nobs}}$,
+  \begin{equation}
+    \metric{\tvec}{\tvecbis}{\param}^{\mathrm{F}}
+    =
+    \metric{\tvec_{\MShape}}{\tvecbis_{\MShape}}{\MShape}^{\HPDdet{\Nvar}}
+    +
+    \metric{\tvec_{\vector{\texture}}}{\tvecbis_{\vector{\texture}}}{\vector{\texture}}^{\Rpos{\Nobs}}.
+    \label{eq:context-geometry-metriqueccg}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}[{L'origine du découplage}]
+\label{rem:context-geometry-decouplage}
+  Le résultat repose entièrement sur le fait, établi par \sidecite[0cm]{Hallin2007}, que la matrice d'information de Fisher d'une distribution elliptique devient bloc-diagonale entre paramètres de forme et paramètres d'échelle lorsque la forme est normalisée par le déterminant --- ce qui n'est pas vrai pour la normalisation par la trace. Nous avions justifié ce choix, en \cref{rem:context-riemann-normalisation}, par un argument purement géométrique: la contrainte $\Det(\MShape)=1$ définit une sous-variété totalement géodésique. Nous voyons maintenant qu'il possède une seconde justification, statistique celle-là, et que les deux se conjuguent exactement là où nous en avons besoin. C'est l'argument qui achève de trancher la question de normalisation ouverte en \cref{subsec:context-distributions-elliptical}.
+\end{remark}
+
+La conséquence est que toute la géométrie de $\Manifold_{\Nvar,\Nobs}$ se lit composante par composante, sans aucun calcul supplémentaire \sidecite[0cm]{Bouchard_2020}: la projection, la géodésique, l'exponentielle et le logarithme s'appliquent séparément à chaque facteur, et la distance est
+\begin{equation}
+  \geodist_{\Manifold_{\Nvar,\Nobs}}^2\!\left((\MShape_0,\vector{\texture}_0),(\MShape_1,\vector{\texture}_1)\right)
+  =
+  \underbrace{\norm{\logm\!\left(\inv{\MShape_0}\MShape_1\right)}_\frob^2}_{\text{écart de forme}}
+  +
+  \underbrace{\sum_{\iobs=1}^{\Nobs}\log^2\!\left(\frac{\texture_{1,\iobs}}{\texture_{0,\iobs}}\right)}_{\text{écart de puissance}}.
+  \label{eq:context-geometry-distanceccg}
+\end{equation}
+
+\begin{remark}
+  Cette distance est celle qui sera exploitée au \cref{ch:robust-detection}. Sa lecture est directe: elle sépare additivement ce qui relève de la structure de corrélation entre canaux et ce qui relève du profil de puissance le long de la série. C'est précisément la séparation que l'on veut opérer en détection de changements, où un changement de nature et un changement d'intensité n'ont pas la même signification physique. On notera cependant, et ce point sera discuté au \cref{ch:robust-detection}, qu'une distance ne possède aucune des propriétés statistiques d'un test --- en particulier aucune propriété de constance du taux de fausse alarme --- et ne saurait donc se substituer purement et simplement à une statistique de détection.
+\end{remark}
+
+
+\section{Borne de Cramér-Rao intrinsèque}
+\label{sec:context-geometry-icrb}
+
+Il nous reste à refermer le fil ouvert à la \cref{sec:context-covariance-estimation}, où nous avions signalé sans le résoudre que la norme euclidienne était un choix contestable pour mesurer une erreur d'estimation. Nous disposons maintenant de tout ce qu'il faut.
+
+Le principe est le suivant. Dans le cas euclidien, l'erreur d'estimation est le vecteur $\hat{\MCov}-\MCov$; or cette différence n'est autre que le logarithme riemannien pour la métrique euclidienne. Il suffit donc de la remplacer par le logarithme riemannien de la géométrie choisie, $\log_{\MCov}(\hat{\MCov})\in\Tangent{\MCov}{\HPD{\Nvar}}$, dont la norme est par construction la distance $\geodist(\MCov,\hat{\MCov})$. En décomposant ce vecteur sur une base orthonormée $\{\tvec_q\}_{q=1}^{\Nvar^2}$ de l'espace tangent, on obtient un vecteur d'erreur en coordonnées $\vector{\varepsilon}$ tel que $\norm{\vector{\varepsilon}}_2^2=\geodist^2(\MCov,\hat{\MCov})$, et l'on peut alors énoncer une inégalité de type Cramér-Rao.
+
+\begin{property}[{Borne de Cramér-Rao intrinsèque}]
+\label{prop:context-geometry-icrb}
+  Soit $\hat{\MCov}$ un estimateur non biaisé de $\MCov$ construit à partir d'un échantillon i.i.d de loi $\celliptical(\vector{0},\MCov,\densgen)$, et $\geodist$ la distance associée à une géométrie choisie sur $\HPD{\Nvar}$. Alors \sidecite[0cm]{smith2005covariance}:
+  \begin{equation}
+    \E\left\{\geodist^2(\MCov,\hat{\MCov})\right\}
+    \geq
+    \trace{\inv{\Fisher}}
+    + \text{termes de courbure},
+    \label{eq:context-geometry-icrb}
+  \end{equation}
+  où $[\Fisher]_{q\ell}=\metric{\tvec_q}{\tvec_\ell}{\MCov}^{\mathrm{F}}$ est la matrice d'information de Fisher exprimée dans la base orthonormée retenue.
+\end{property}
+
+Trois remarques suffisent à en donner la portée.
+
+\begin{remark}[{La métrique de performance et le modèle sont deux choix distincts}]
+  La lecture attentive de \cref{eq:context-geometry-icrb} montre que deux géométries y interviennent, et qu'il ne faut pas les confondre. La distance $\geodist$ est celle avec laquelle on \emph{mesure} la performance; la métrique de Fisher $\metric{\cdot}{\cdot}{\cdot}^{\mathrm{F}}$ est celle que \emph{dicte le modèle}. Rien n'oblige à prendre la même dans les deux rôles, et il est parfaitement légitime d'évaluer un estimateur en distance affine invariante alors que les données suivent un modèle de Student. On obtient ainsi une famille de bornes, une par métrique de performance, dont le calcul est mené pour les cas usuels dans \sidecite[0.5cm]{breloy2019intrinsic}.
+\end{remark}
+
+\begin{remark}[{Le cas structuré}]
+  L'intérêt principal de cette formulation apparaît lorsque le paramètre est contraint --- matrice de rang réduit plus bruit blanc, structure de Kronecker, forme normalisée. L'approche euclidienne classique impose alors de paramétrer explicitement la contrainte, ou de recourir à une borne de Cramér-Rao contrainte faisant intervenir des projecteurs et des multiplicateurs de Lagrange. Ici, la contrainte \emph{est} la variété: il suffit de restreindre la base $\{\tvec_q\}$ à l'espace tangent de la sous-variété, et \cref{eq:context-geometry-icrb} s'applique telle quelle avec la bonne dimension \sidecite[0cm]{boumal2013intrinsic,bouchard2021lowrank}. C'est la conséquence, annoncée en \cref{rem:context-geometry-sanscoord}, de la définition sans coordonnées de la métrique de Fisher. Nous en verrons une application à une structure particulière au \cref{ch:robust-detection}.
+\end{remark}
+
+\begin{remark}[{Un biais qui n'existe que dans la bonne géométrie}]
+\label{rem:context-geometry-biaisintrinseque}
+  Les termes de courbure de \cref{eq:context-geometry-icrb} sont en général négligeables et nous ne les développons pas; ils s'annulent d'ailleurs dans le cas euclidien, où l'on retrouve l'inégalité de Cramér-Rao usuelle. Mais leur simple présence signale un phénomène qui mérite d'être noté, car il conclut le fil de la \cref{sec:context-covariance-estimation} de la manière la plus nette qui soit. La borne intrinsèque complète fait intervenir un \emph{biais riemannien}, défini comme l'espérance du logarithme riemannien de l'erreur. Or il se trouve que l'estimateur du maximum de vraisemblance de la covariance gaussienne, que nous avions établi non biaisé au sens euclidien en \cref{prop:context-distributions-mlegaussian}, est en réalité \textbf{biaisé} au sens de la métrique de Fisher \sidecite[1cm]{smith2005covariance}. Autrement dit, ce que nous appelions absence de biais était une propriété de la norme choisie, et non de l'estimateur.
+\end{remark}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{gfx/generated/context_riemann_frobenius_rao/erreurrao/plot.tex}
+  \end{center}
+  \provErreurraoQR[.5cm]
+  \caption{Erreur d'estimation de la \textsc{scm} et de l'estimateur de Tyler
+    en fonction du nombre d'observations $\Nobs$, pour des données de Student
+    en dimension $\Nvar=7$, mesurée en norme de Frobenius (à gauche) et en
+    distance de Rao (à droite). Les deux estimateurs et la vraie matrice sont
+    normalisés à déterminant unité, Tyler ne fixant qu'une forme. Les deux
+    règles ne changent pas d'avis au même endroit: dans le régime des très
+    petits échantillons, la norme de Frobenius préfère déjà Tyler quand la
+    distance de Rao préfère encore la \textsc{scm}. Le classement de deux
+    estimateurs est donc une propriété de la métrique choisie autant que des
+    estimateurs. À rapprocher de la \cref{fig:context-estimation-errorscm} et
+    de la note qui l'accompagne. \provErreurrao}
+  \label{fig:context-geometry-erreurrao}
+\end{figure}
+
+
+\section{Divergences}
+\label{sec:context-geometry-divergences}
+
+Terminons par une ouverture. La distance de Rao n'est pas la seule manière de quantifier un écart entre deux lois, et elle est souvent la plus coûteuse. La divergence de Kullback-Leibler, déjà rencontrée en \cref{eq:context-geometry-kl}, admet ainsi une forme close immédiate entre gaussiennes complexes centrées:
+\begin{equation}
+  \KL(\MCov_0\,\|\,\MCov_1)
+  =
+  \trace{\inv{\MCov_1}\MCov_0}
+  - \log\Det\!\left(\inv{\MCov_1}\MCov_0\right)
+  - \Nvar,
+  \label{eq:context-geometry-kldivergence}
+\end{equation}
+qui ne demande qu'une inversion et un déterminant, là où \cref{eq:context-geometry-raogauss} demande une décomposition spectrale généralisée.
+
+Le prix à payer est que \cref{eq:context-geometry-kldivergence} n'est pas une distance: elle n'est ni symétrique ni ne vérifie l'inégalité triangulaire. Elle ne dérive donc pas d'une métrique riemannienne, et l'on ne peut lui associer ni géodésique ni moyenne de Fréchet. Ce n'est pas rédhibitoire pour toutes les tâches --- une règle de décision n'a pas besoin d'une vraie distance --- mais cela exclut tout ce qui relève de l'interpolation ou du barycentre. Entre les deux extrêmes se placent des divergences symétrisées, telles la divergence de Stein ou de Jensen-Bregman, qui approchent la distance affine invariante à moindre coût. C'est ici que se rebranche l'ouverture de la \cref{rem:context-geometry-ouverture}: la $\alpha$-géométrie d'Amari fournit précisément le cadre qui unifie métrique de Fisher et familles de divergences, et à laquelle nous renvoyons le lecteur intéressé \sidecite[0.5cm]{amari2016information,nielsen2022many}.
+
+
+\section{Bilan}
+\label{sec:context-geometry-bilan}
+
+Le \cref{tab:context-geometry-summary} rassemble les géométries établies dans ce chapitre.
+
+\begin{table}[h]
+  \centering
+  \caption{Géométries de Fisher-Rao des modèles rencontrés dans ce chapitre, dans le cas complexe circulaire centré.}
+  \label{tab:context-geometry-summary}
+  \footnotesize
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    Modèle & Variété & Métrique de Fisher & Distance de Rao \\
+    \midrule
+    Gaussien $\cgaussian(\vector{0},\MCov)$
+      & $\HPD{\Nvar}$
+      & affine inv. $(1,0)$
+      & \cref{eq:context-geometry-raogauss} \\
+    Elliptique $\celliptical(\vector{0},\MScatter,\densgen)$
+      & $\HPD{\Nvar}$
+      & affine inv. $(\metriccoefa,\metriccoefb)$
+      & \cref{eq:context-geometry-distces} \\
+    Elliptique, forme seule
+      & $\HPDdet{\Nvar}$
+      & affine inv. $\metriccoefa\cdot(1,0)$
+      & idem, $\metriccoefb$ inopérant \\
+    Gaussienne-composée dét.
+      & $\HPDdet{\Nvar}\times\Rpos{\Nobs}$
+      & bloc-diagonale
+      & \cref{eq:context-geometry-distanceccg} \\
+    Gaussien avec moyenne
+      & $\C^\Nvar\times\HPD{\Nvar}$
+      & bloc-diagonale
+      & inconnue \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Trois enseignements se dégagent de cette partie, et ce sont eux qui seront mis à l'\oe uvre dans la suite de ce mémoire.
+
+Le premier est que la matrice de covariance n'est pas un tableau de nombres. Elle vit dans un cône, et la géométrie de ce cône n'est pas une élégance formelle: elle dicte comment estimer (\cref{sec:context-riemann-optimization}), comment moyenner (\cref{sec:context-riemann-moyennes}) et comment évaluer (\cref{sec:context-geometry-icrb}).
+
+Le deuxième est que cette géométrie n'est pas arbitraire. Nous y sommes parvenus deux fois, par deux chemins indépendants --- l'invariance par filtrage d'une part, la métrique de Fisher du modèle gaussien d'autre part --- et le fait qu'ils convergent est ce qui donne à la métrique affine invariante son statut particulier.
+
+Le troisième est que le passage du modèle gaussien au modèle elliptique, qui avait considérablement compliqué l'estimation en \cref{subsec:context-robust-m-estimation}, ne complique presque pas la géométrie: il déplace un point dans une famille de métriques déjà décrite, sans toucher aux géodésiques. C'est cette stabilité qui permet, au \cref{ch:robust-detection}, d'articuler estimation robuste et traitement géométrique sans avoir à reconstruire l'un pour l'autre.
+

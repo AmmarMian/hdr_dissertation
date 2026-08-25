@@ -1,0 +1,29 @@
+% Projection orthogonale d'un vecteur de l'espace ambiant sur l'espace tangent.
+% Utilise dans la \cref{sec:context-riemann-notion}.
+\input{gfx/tikZ/riemann/style.tex}
+\begin{tikzpicture}[riemann]
+  \coordinate (P) at (-0.45,1.35);
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85] at (2.55,1.80) {$\Manifold$};
+
+  \path (P) pic {rplane};
+  \node[rtangent!90, anchor=east] at ($(P)+(-1.30,0.50)$)
+    {$\Tangent{\param}{\Manifold}$};
+
+  % vecteur ambiant, hors du plan tangent
+  \draw[rmanifold!85, very thick, ->] (P) -- ($(P)+(1.10,1.15)$);
+  \node[rmanifold, anchor=south west, inner sep=1pt] at ($(P)+(1.08,1.13)$)
+    {$\mat{Z}\in\ambient$};
+
+  % sa projection
+  \draw[rvector, very thick, ->] (P) -- ($(P)+(1.32,-0.18)$);
+  \node[rvector, anchor=north, inner sep=2pt] at ($(P)+(1.05,-0.22)$)
+    {$\projman_{\param}(\mat{Z})$};
+
+  % trait de projection
+  \draw[rmanifold!60, dashed] ($(P)+(1.10,1.15)$) -- ($(P)+(1.32,-0.18)$);
+
+  \fill (P) circle (1.7pt);
+  \node[anchor=north east, inner sep=2pt] at (P) {$\param$};
+\end{tikzpicture}

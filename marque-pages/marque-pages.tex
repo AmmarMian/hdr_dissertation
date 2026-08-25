@@ -1,0 +1,460 @@
+%*******************************************************
+% Marque-pages de notations
+%
+% Document independant du memoire: 9 marque-pages a decouper, 3 par feuille
+% A4, imprimes en RECTO-VERSO RETOURNEMENT SUR LE BORD LONG.
+%
+%   - le RECTO de chaque marque-page porte les notations propres a un chapitre;
+%   - le VERSO porte les memes notations communes sur les neuf, de sorte que
+%     n'importe quel marque-page, pris isolement, donne toujours l'essentiel.
+%
+% C'est pour cela que l'ordre des colonnes est inverse sur les pages paires:
+% avec un retournement sur le bord long, la colonne de gauche du recto tombe
+% en face de la colonne de droite du verso.
+%
+% Compilation: pdflatex marque-pages.tex (depuis ce dossier ou depuis la racine).
+%*******************************************************
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[osf,sc]{mathpazo}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{bm}
+\usepackage[margin=0.6cm]{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\IfFileExists{../Notations.tex}{\input{../Notations.tex}}{\input{Notations.tex}}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+% Palette reprise de la carte de lecture du memoire.
+\definecolor{lctx}{RGB}{90,90,90}
+\definecolor{lcinq}{RGB}{40,70,140}
+\definecolor{lsix}{RGB}{50,110,120}
+\definecolor{lsept}{RGB}{125,125,125}
+\definecolor{lcontext}{RGB}{60,110,70}
+
+% ---------------------------------------------------------------- geometrie
+% Tout est place par rapport au coin de la FEUILLE, et le bloc des trois
+% marque-pages est centre sur elle dans les deux directions. C'est la condition
+% pour que les colonnes du recto et celles du verso se superposent une fois la
+% feuille retournee, quel que soit le bord de retournement.
+%
+%   largeur du bloc = 2*\bmstep + \bmw = 2*6.5 + 6.2 = 19.2 cm
+%   marges laterales = (21 - 19.2)/2 = 0.9 cm de chaque cote
+%   marges haut/bas  = (29.7 - 22)/2 = 3.85 cm
+%
+% Toute modification de \bmw, \bmh ou \bmstep impose de recalculer \bmleft
+% et \bmtop.
+\newlength{\bmw}\setlength{\bmw}{6.2cm}   % largeur d'un marque-page
+\newlength{\bmh}\setlength{\bmh}{22cm}    % hauteur d'un marque-page
+\newcommand{\bmstep}{6.5}                 % pas entre deux colonnes, en cm
+\newcommand{\bmleft}{0.9cm}               % (21 - 19.2)/2
+\newcommand{\bmtop}{-3.85cm}              % -(29.7 - 22)/2
+
+% ---------------------------------------------------------------- contenus
+% Bandeau de titre d'un marque-page: #1 couleur, #2 surtitre, #3 titre.
+\newcommand{\bmhead}[3]{%
+  \begingroup\color{#1}%
+  {\footnotesize\textsc{#2}}\\[1pt]
+  \rule{\linewidth}{0.8pt}\\[2pt]
+  {\normalsize\textbf{#3}}\\[1pt]
+  \rule{\linewidth}{0.4pt}
+  \endgroup\\[4pt]}
+
+% Sous-titre de groupe a l'interieur d'un marque-page.
+\newcommand{\bmgroup}[1]{\\[3pt]{\footnotesize\itshape\color{lctx}#1}\\[1pt]}
+
+% Table a deux colonnes: symbole, signification.
+\newcommand{\bmtable}[1]{%
+  \begingroup
+  \footnotesize
+  \setlength{\tabcolsep}{0pt}
+  \renewcommand{\arraystretch}{1.22}
+  \begin{tabular}{@{}p{1.8cm}@{}p{4.0cm}@{}}#1\end{tabular}
+  \endgroup}
+
+% Pied de marque-page.
+\newcommand{\bmfoot}[1]{\vfill{\scriptsize\color{lsept}#1}}
+
+% ---------------------------------------------------------------- mise en page
+% Un marque-page = une boite de taille fixe, tracee en pointilles pour la coupe.
+\newcommand{\bmbox}[2]{% #1 = indice de colonne (0,1,2), #2 = contenu
+  \begin{scope}[shift={({#1*\bmstep},0)}]
+    \draw[lsept!45, dashed, line width=0.2pt] (0,0) rectangle (\bmw,-\bmh);
+    % traits de coupe aux quatre coins
+    \foreach \x in {0,\bmw} {
+      \draw[lctx!70, line width=0.3pt] (\x,0.25) -- (\x,0.05);
+      \draw[lctx!70, line width=0.3pt] (\x,-\bmh-0.05) -- (\x,-\bmh-0.25);
+    }
+    \node[anchor=north west, inner sep=0pt] at (0.2,-0.2)
+      {\begin{minipage}[t][\dimexpr\bmh-0.4cm\relax][t]{\dimexpr\bmw-0.4cm\relax}#2\end{minipage}};
+  \end{scope}}
+
+% Une feuille = trois marque-pages cote a cote, cales sur le coin du papier.
+\newcommand{\bmsheet}[4]{% #1 = mention de pied de page, #2..#4 = contenus
+  \null
+  \begin{tikzpicture}[remember picture, overlay]
+    \begin{scope}[shift={($(current page.north west)+(\bmleft,\bmtop)$)}]
+      \bmbox{0}{#2}\bmbox{1}{#3}\bmbox{2}{#4}
+      % mention centree sur la feuille: elle tombe au meme endroit au verso
+      \node[anchor=north, inner sep=0pt, font=\tiny, text=lsept]
+        at (9.6,-\bmh-0.8) {#1};
+    \end{scope}
+  \end{tikzpicture}
+  \newpage}
+
+%*******************************************************
+% Contenu commun, au verso des neuf marque-pages
+%*******************************************************
+\newcommand{\bmcommun}{%
+  \bmhead{lctx}{Notations communes}{Valable dans tout le mémoire}
+  \bmtable{
+    $\R$, $\C$, $\N$ & réels, complexes, entiers \\
+    $\Nvar$ & dimension des vecteurs \\
+    $\Nobs$ & nombre d'observations \\
+    $\ivar$, $\iobs$ & indices variable, observation \\
+    $\eqdef$ & égalité par définition \\
+    $\bigO(\cdot)$ & ordre de grandeur \\
+  }
+  \bmgroup{Algèbre linéaire}
+  \bmtable{
+    $\Id{\Nvar}$ & identité de taille $\Nvar$ \\
+    $(\cdot)^\T$, $(\cdot)^\herm$ & transposée, transposée conjuguée \\
+    $\conj{(\cdot)}$ & conjugué \\
+    $\inv{(\cdot)}$, $\Det(\cdot)$ & inverse, déterminant \\
+    $\trace{\cdot}$ & trace \\
+    $\Diag(\cdot)$, $\Cond(\cdot)$ & diagonale, conditionnement \\
+    $\eig$, $\eigset$ & valeur propre, matrice spectrale \\
+    $\norm{\cdot}_\frob$ & norme de Frobenius \\
+    $\expm(\cdot)$, $\logm(\cdot)$ & exponentielle, logarithme de matrice \\
+    $\symop(\cdot)$, $\hermop(\cdot)$ & parties sym., hermitienne \\
+    $\vecop(\cdot)$, $\Kmat$ & vectorisation, commutation \\
+    $\otimes$, $\had$ & Kronecker, Hadamard \\
+  }
+  \bmgroup{Ensembles de matrices}
+  \bmtable{
+    $\Sym{\Nvar}$, $\Herm{\Nvar}$ & symétriques, hermitiennes \\
+    $\SPD{\Nvar}$, $\HPD{\Nvar}$ & définies positives \\
+    $\SPDdet{\Nvar}$, $\HPDdet{\Nvar}$ & \dots{} de déterminant unité \\
+    $\Toep{\Nvar}$ & matrices de Toeplitz \\
+    $\complexform{\cdot}$ & forme réelle d'une matrice complexe \\
+  }
+  \bmgroup{Statistiques}
+  \bmtable{
+    $\Variable$, $\x$ & vecteur aléatoire, réalisation \\
+    $\X$, $\Xset$ & données en matrice, en ensemble \\
+    $\E\{\cdot\}$, $\Prob$ & espérance, probabilité \\
+    $\Var$, $\Cov$ & variance, covariance \\
+    $\Vmoy$, $\MCov$ & moyenne, covariance \\
+    $\MPCov$ & pseudo-covariance \\
+    $\Smat$ & $\X\X^\T$ \\
+    $\ddp{\param}$, $\likelihood$ & densité, log-vraisemblance \\
+    $\param$ & paramètre d'un modèle \\
+    $\argmin$, $\argmax$ & argument du min., du max. \\
+  }
+  \bmfoot{Au recto: les notations propres à un chapitre.\\
+    A.~Mian --- mémoire d'HDR.}}
+
+%*******************************************************
+% Rectos, un par chapitre
+%*******************************************************
+\newcommand{\bmdeuxun}{%
+  \bmhead{lcontext}{Partie \textsc{ii} --- chapitre 1}{Définition et estimation de la covariance}
+  \bmgroup{Second ordre}
+  \bmtable{
+    $\moy$, $\var$, $\std$ & moyenne, variance, écart-type \\
+    $\Vmoy$, $\MCov$ & moyenne et covariance \\
+    $\MCov_{\ivar\ivarbis}$ & terme $(\ivar,\ivarbis)$ de $\MCov$ \\
+    $\Smat$ & moments d'ordre deux $\X\X^\T$ \\
+  }
+  \bmgroup{Estimation}
+  \bmtable{
+    $\hat{\MCov}$ & \textsc{scm}, estimateur empirique \\
+    $\Nobs/\Nvar$ & régime d'échantillonnage \\
+    $\Cond(\hat{\MCov})$ & conditionnement de l'estimée \\
+    $\coefledoitwolf$ & coefficient de régularisation \\
+    $\targetledoitwolf$ & matrice cible du \emph{shrinkage} \\
+    $\norm{\hat{\MCov}-\MCov}_\frob$ & erreur d'estimation euclidienne \\
+  }
+  \bmgroup{Cas complexe}
+  \bmtable{
+    $\Realp$, $\Imagp$ & parties réelle et imaginaire \\
+    $\MCov$, $\MPCov$ & covariance et pseudo-covariance \\
+    $\complexform{\cdot}$ & forme réelle associée \\
+    $\abs{\MPCov}\leq\MCov$ & domaine d'admissibilité \\
+    $\arg(\MPCov)/2$ & orientation du nuage \\
+  }
+  \bmfoot{Circularité: $\MPCov=\mat{0}$. Hypothèse tenue pour acquise\\
+    dans toute la suite du mémoire.}}
+
+\newcommand{\bmdeuxdeux}{%
+  \bmhead{lcontext}{Partie \textsc{ii} --- chapitre 2}{Distributions à paramètre de covariance}
+  \bmgroup{Lois, cas réel}
+  \bmtable{
+    $\gaussian$ & gaussienne \\
+    $\elliptical$, $\angular$ & elliptique, angulaire \\
+    $\compoundgaussian$ & gaussienne composée \\
+    $\studentdist$, $\kdist$ & Student, $K$ \\
+    $\gengaussian$, $\gammadist$ & gaussienne généralisée, gamma \\
+    $\chisquared$, $\uniform$, $\wishart$ & khi-deux, uniforme, Wishart \\
+  }
+  \bmgroup{Lois, cas complexe}
+  \bmtable{
+    $\cgaussian$ & gaussienne circulaire \\
+    $\gcgaussian$ & gaussienne non circulaire \\
+    $\celliptical$, $\cangular$ & elliptique, angulaire \\
+    $\ccompoundgaussian$, $\cwishart$ & gaussienne composée, Wishart \\
+  }
+  \bmgroup{Générateur de densité}
+  \bmtable{
+    $\densgen$ & générateur de densité \\
+    $\logderiv$ & $\densgen'/\densgen$ \\
+    $\densgenmoment{k}$ & moment d'ordre $k$ \\
+    $\densgenconst{\Nvar}$ & constante de normalisation \\
+    $\modvar$, $\quadvar$ & variable modulaire, forme quadratique \\
+    $\sphere{\Nvar-1}$, $\spherearea{\Nvar}$ & sphère unité, son aire \\
+    $\texture$, $\dof$ & texture, degrés de liberté \\
+  }
+  \bmgroup{Estimation robuste}
+  \bmtable{
+    $\MScatter$, $\MShape$ & dispersion, forme \\
+    $\Mestim$ & $M$-estimateur de dispersion \\
+    $\Tyler$ & estimateur de Tyler \\
+    $\weight$, $\scorefun$ & poids, $\scorefun(t)=t\,\weight(t)$ \\
+    $\iiter$, $\Niter$ & itération, nombre d'itérations \\
+  }
+  \bmfoot{Le calcul de Wirtinger fournit les dérivées\\
+    du cas complexe.}}
+
+\newcommand{\bmdeuxtrois}{%
+  \bmhead{lcontext}{Partie \textsc{ii} --- chapitre 3}{Géométrie du cône SPD}
+  \bmgroup{Variétés}
+  \bmtable{
+    $\Manifold$, $\Manifoldbis$ & variétés \\
+    $\ambient$ & espace ambiant euclidien \\
+    $\Tangent{\param}{\Manifold}$ & espace tangent en $\param$ \\
+    $\tvec$, $\tvecbis$, $\tvecter$ & vecteurs tangents \\
+    $\metric{\tvec}{\tvecbis}{\param}$ & métrique au point $\param$ \\
+    $\normriem{\tvec}{\param}$ & norme induite \\
+    $\projman_\param$ & projection orthogonale \\
+  }
+  \bmgroup{Boîte à outils}
+  \bmtable{
+    $\connection$ & connexion de Levi-Civita \\
+    $\transport$ & transport parallèle \\
+    $\geod$, $\geodist$ & géodésique, distance \\
+    $\geodmean$ & moyenne géodésique de deux points \\
+    $\Fmean$ & moyenne de Fréchet \\
+    $\Retr$ & rétraction \\
+    $\Rgrad$, $\Rhess$ & gradient, hessien riemanniens \\
+    $\dirderiv$ & dérivée directionnelle \\
+  }
+  \bmgroup{Variétés rencontrées}
+  \bmtable{
+    $\SPD{\Nvar}$, $\SPDdet{\Nvar}$ & cône SPD, cône normalisé \\
+    $\Stiefel{\Nvar}{\Nrank}$ & variété de Stiefel \\
+    $\Grassmann{\Nvar}{\Nrank}$ & variété de Grassmann \\
+    $\Orthgroup{\Nvar}$, $\Unitgroup{\Nvar}$ & groupes orthogonal, unitaire \\
+    $\Rpos{\Nvar}$ & vecteurs à entrées positives \\
+  }
+  \bmgroup{Optimisation}
+  \bmtable{
+    $\loss$, $\risk$ & coût, risque \\
+    $(\cdot)^\opt$ & point optimal \\
+    $\iiter$, $\Niter$ & itération, nombre d'itérations \\
+  }
+  \bmfoot{Métriques: affine invariante, log-euclidienne,\\
+    Bures-Wasserstein, euclidienne.}}
+
+\newcommand{\bmdeuxquatre}{%
+  \bmhead{lcontext}{Partie \textsc{ii} --- chapitre 4}{Géométrie de l'information}
+  \bmgroup{Variété statistique}
+  \bmtable{
+    $\param$ & paramètre, point de la variété \\
+    $\ddp{\param}$, $\likelihood$ & densité, log-vraisemblance \\
+    $\score$ & vecteur score \\
+    $\Fisher$ & information de Fisher \\
+    $\metric{\cdot}{\cdot}{\param}$ & métrique de Fisher \\
+    $\geodist$ & distance de Rao \\
+  }
+  \bmgroup{Modèles elliptiques}
+  \bmtable{
+    $\densgen$, $\logderiv$ & générateur, $\densgen'/\densgen$ \\
+    $\metriccoefa$, $\metriccoefb$ & coefficients de la métrique \\
+    $\texture$, $\dof$ & texture, degrés de liberté \\
+    $\compoundgaussian$ & gaussienne composée \\
+  }
+  \bmgroup{Performances}
+  \bmtable{
+    $\E\{\geodist^2\}$ & erreur quadratique intrinsèque \\
+    $\Rhess$ & courbure de la vraisemblance \\
+    $\KL$ & divergence de Kullback-Leibler \\
+  }
+  \bmfoot{La borne de Cramér-Rao intrinsèque se lit\\
+    dans la métrique, pas dans les coordonnées.}}
+
+\newcommand{\bmtroisun}{%
+  \bmhead{lcinq}{Partie \textsc{iii} --- chapitre 1}{Test d'hypothèses robuste}
+  \bmgroup{Décision}
+  \bmtable{
+    $\hypothesis_0$, $\hypothesis_1$ & hypothèses \\
+    $\DetectorStat \detect$ & règle de décision \\
+    $\statGLRT$, $\statRao$ & \textsc{glrt}, test de Rao \\
+    $\statWald$, $\statANMF$ & Wald, \textsc{anmf} \\
+    $\pfa$, $\pdet$ & fausse alarme, détection \\
+    $\snr$ & rapport signal à bruit \\
+    $\paramtest$, $\paramnuis$ & paramètres testés, de nuisance \\
+  }
+  \bmgroup{Modèle de signal}
+  \bmtable{
+    $\z$, $\speckle$ & bruit observé, speckle \\
+    $\texture$ & texture \\
+    $\amplitude$, $\Vamplitude$ & amplitude, vecteur d'amplitudes \\
+    $\steering$, $\steerfull$ & vecteurs directionnels \\
+    $\Steermat$ & matrice directionnelle \\
+    $\Steerspace$, $\Nrank$ & sous-espace signal, son rang \\
+    $\projspace{\Steerspace}$ & projecteur associé \\
+  }
+  \bmgroup{Système}
+  \bmtable{
+    $\Nsensor$, $\isensor$ & capteurs, indice \\
+    $\Narray$, $\iarray$ & antennes, indice \\
+    $\Nping$, $\iping$ & pings, indice \\
+    $\wavelength$, $\doa$ & longueur d'onde, direction \\
+    $\Ntime$, $\itime$ & instants, indice temporel \\
+  }
+  \bmgroup{Structure de la dispersion}
+  \bmtable{
+    $\MScatter$, $\Mestim$ & dispersion, $M$-estimateur \\
+    $\powerscale$, $\escale$ & échelle, échelle effective \\
+    $\Scalemat$ & matrice des échelles \\
+    $\Kronleft\otimes\Kronright$ & structure de Kronecker \\
+    $\dimleft$, $\dimright$ & $\Nvar=\dimleft\dimright$ \\
+    $\obsmat$ & observation remise en matrice \\
+    $\Toep{\Nvar}$ & contrainte de Toeplitz \\
+    $\HH$, $\VV$, \dots & polarisations, imagerie RSO \\
+  }
+  \bmfoot{Deux étapes: estimer la dispersion,\\
+    puis décider à seuil constant.}}
+
+\newcommand{\bmtroisdeux}{%
+  \bmhead{lsix}{Partie \textsc{iii} --- chapitre 2}{Apprentissage profond sur la variété SPD}
+  \bmgroup{Espace de représentation}
+  \bmtable{
+    $\SPD{\Nvar}$, $\HPD{\Nvar}$ & cône des covariances \\
+    $\logm$, $\expm$ & passage log-euclidien \\
+    $\Tangent{\param}{\Manifold}$ & espace tangent \\
+    $\geodist$ & distance entre représentations \\
+    $\Fmean$ & moyenne de Fréchet \\
+  }
+  \bmgroup{Couches}
+  \bmtable{
+    $\Orth$, $\Stiefel{\Nvar}{\Nrank}$ & poids orthogonaux, Stiefel \\
+    $\Unit$, $\Unitgroup{\Nvar}$ & cas complexe \\
+    $\eig$, $\eigset$ & rectification spectrale \\
+    $\projman_\param$ & projection sur le tangent \\
+  }
+  \bmgroup{Apprentissage}
+  \bmtable{
+    $\loss$, $\risk$ & coût, risque \\
+    $\Rgrad$, $\Retr$ & gradient riemannien, rétraction \\
+    $\iiter$, $\Niter$ & itération, nombre d'itérations \\
+    $(\cdot)^\opt$ & optimum \\
+  }
+  \bmfoot{Chapitre en cours de rédaction: ce marque-page\\
+    sera complété avec lui.}}
+
+\newcommand{\bmtroistrois}{%
+  \bmhead{lsept}{Partie \textsc{iii} --- chapitre 3}{Perspectives}
+  \bmgroup{Transformers sur la variété SPD}
+  \bmtable{
+    $\SPD{\Nvar}$ & espace des jetons \\
+    $\geodist$ & dissimilarité entre jetons \\
+    $\Fmean$ & moyenne de Fréchet pondérée \\
+    $\geodmean$ & interpolation géodésique \\
+    $\Stiefel{\Nvar}{\Nrank}$ & projections apprises \\
+    $\loss$ & coût d'entraînement \\
+  }
+  \bmgroup{Phase géométrique}
+  \bmtable{
+    $\connection$ & connexion de Levi-Civita \\
+    $\transport$ & transport parallèle \\
+    $\geod$ & boucle sur la variété \\
+    $\Grassmann{\Nvar}{\Nrank}$ & sous-espace propre \\
+    $\MPCov$ & pseudo-covariance, non-circularité \\
+    $\arg(\cdot)$ & phase accumulée \\
+  }
+  \bmfoot{Pistes ouvertes: les notations sont provisoires\\
+    et fixées chapitre par chapitre.}}
+
+\newcommand{\bmgeneral}{%
+  \bmhead{lctx}{Marque-page passe-partout}{L'essentiel, tous chapitres}
+  \bmgroup{Objets centraux}
+  \bmtable{
+    $\MCov$, $\MPCov$ & covariance, pseudo-covariance \\
+    $\hat{\MCov}$, $\Mestim$, $\Tyler$ & \textsc{scm}, $M$-estimateur, Tyler \\
+    $\MScatter$, $\MShape$ & dispersion, forme \\
+    $\texture$, $\dof$ & texture, degrés de liberté \\
+    $\densgen$, $\logderiv$ & générateur, $\densgen'/\densgen$ \\
+  }
+  \bmgroup{Lois}
+  \bmtable{
+    $\gaussian$, $\cgaussian$ & gaussienne, complexe circulaire \\
+    $\elliptical$, $\celliptical$ & elliptiques \\
+    $\compoundgaussian$, $\wishart$ & gaussienne composée, Wishart \\
+  }
+  \bmgroup{Géométrie}
+  \bmtable{
+    $\Manifold$, $\Tangent{\param}{\Manifold}$ & variété, espace tangent \\
+    $\metric{\tvec}{\tvecbis}{\param}$, $\geodist$ & métrique, distance \\
+    $\geod$, $\Fmean$ & géodésique, moyenne de Fréchet \\
+    $\Rgrad$, $\Retr$, $\transport$ & gradient, rétraction, transport \\
+    $\Stiefel{\Nvar}{\Nrank}$, $\Grassmann{\Nvar}{\Nrank}$ & Stiefel, Grassmann \\
+  }
+  \bmgroup{Information}
+  \bmtable{
+    $\Fisher$, $\score$ & information de Fisher, score \\
+    $\metriccoefa$, $\metriccoefb$ & coefficients elliptiques \\
+    $\KL$ & Kullback-Leibler \\
+  }
+  \bmgroup{Détection}
+  \bmtable{
+    $\hypothesis_0$, $\hypothesis_1$ & hypothèses \\
+    $\DetectorStat$, $\DetectorTreshold$ & statistique, seuil \\
+    $\pfa$, $\pdet$ & fausse alarme, détection \\
+    $\steering$, $\Steerspace$ & direction, sous-espace signal \\
+  }
+  \bmfoot{Pour une lecture qui traverse tout le mémoire.}}
+
+%*******************************************************
+\begin{document}
+
+% --- feuille 1 ---------------------------------------------------- recto
+\bmsheet{Feuille 1/3 --- recto. Impression recto-verso \`a l'\'echelle 100\,\% (sans ajustement \`a la page).}
+  {\bmdeuxun}{\bmdeuxdeux}{\bmdeuxtrois}
+% --- feuille 1 ---------------------------------------------------- verso
+% ordre inverse: le verso de la colonne 1 tombe en colonne 3
+\bmsheet{Feuille 1/3 --- verso.}
+  {\bmcommun}{\bmcommun}{\bmcommun}
+
+% --- feuille 2 ---------------------------------------------------- recto
+\bmsheet{Feuille 2/3 --- recto.}
+  {\bmdeuxquatre}{\bmtroisun}{\bmtroisdeux}
+% --- feuille 2 ---------------------------------------------------- verso
+\bmsheet{Feuille 2/3 --- verso.}
+  {\bmcommun}{\bmcommun}{\bmcommun}
+
+% --- feuille 3 ---------------------------------------------------- recto
+\bmsheet{Feuille 3/3 --- recto.}
+  {\bmtroistrois}{\bmgeneral}{\bmgeneral}
+% --- feuille 3 ---------------------------------------------------- verso
+\bmsheet{Feuille 3/3 --- verso.}
+  {\bmcommun}{\bmcommun}{\bmcommun}
+
+\end{document}

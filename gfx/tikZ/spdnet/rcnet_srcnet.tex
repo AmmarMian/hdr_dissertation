@@ -1,0 +1,53 @@
+% Les deux facons de former la matrice a partir d'un ResNet: RCNet ne garde que
+% la derniere couche, SRCNet empile une partie des sorties de chacune des
+% couches apres interpolation a une taille commune.
+% Utilise dans la \cref{sec:spdnet-covpool-archi}.
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[spdnet, node distance=4mm]
+
+  % ---------------------------- colonne gauche : RCNet ----------------------
+  \begin{scope}
+    \node[snarrow, seuclbox] (r1) {couche 1};
+    \node[snarrow, seuclbox, below=of r1] (r2) {couche 2};
+    \node[below=2mm of r2] (rd) {$\vdots$};
+    \node[snarrow, seuclbox, below=2mm of rd] (rl) {couche $\ilayer$};
+    \node[snarrow, splainbox, below=6mm of rl] (rt)
+      {$\Tstack\in\R^{\Nfilter\times h_\ilayer w_\ilayer}$};
+    \node[snarrow, smeanbox, below=of rt] (rc) {$\CovPooled\in\SPD{\Nfilter}$};
+
+    \foreach \a/\b in {r1/r2, r2/rd, rd/rl} \draw[sarrow] (\a) -- (\b);
+    \draw[sarrow] (rl) -- node[stiny, right] {$\Nfilter$ filtres} (rt);
+    \draw[sarrow] (rt) -- (rc);
+
+    \node[slabel, sstiefel, above=3mm of r1] {\textbf{\layername{rcnet}}};
+    \node[stiny, slayer, below=3mm of rc, align=center, text width=34mm]
+      {seule la dernière couche est utilisée};
+  \end{scope}
+
+  % ---------------------------- colonne droite : SRCNet ---------------------
+  \begin{scope}[xshift=46mm]
+    \node[snarrow, seuclbox] (s1) {couche 1};
+    \node[snarrow, seuclbox, below=of s1] (s2) {couche 2};
+    \node[below=2mm of s2] (sd) {$\vdots$};
+    \node[snarrow, seuclbox, below=2mm of sd] (sl) {couche $\ilayer$};
+    \node[snarrow, splainbox, below=6mm of sl] (st)
+      {$\Tstack\in\R^{\ilayer\bar{\Nfilter}\times M_h M_w}$};
+    \node[snarrow, smeanbox, below=of st] (sc) {$\CovPooled\in\SPD{\ilayer\bar{\Nfilter}}$};
+
+    \foreach \a/\b in {s1/s2, s2/sd, sd/sl} \draw[sarrow] (\a) -- (\b);
+    \draw[sarrow] (st) -- (sc);
+
+    % Les prises sur chaque couche, ramenees vers l'empilement.
+    \coordinate (tap) at ([xshift=8mm]s1.east);
+    \foreach \n in {s1,s2,sl}
+      \draw[sarrow, sback] (\n.east) -- ++(4mm,0) |- ([yshift=2mm]st.east);
+    \node[stiny, sback, anchor=west, align=left, text width=24mm]
+      at ([xshift=6mm,yshift=6mm]sl.east)
+      {$\bar{\Nfilter}$ sorties par couche, interpolées};
+
+    \node[slabel, sstiefel, above=3mm of s1] {\textbf{\layername{srcnet}}};
+    \node[stiny, slayer, below=3mm of sc, align=center, text width=34mm]
+      {les $\ilayer$ couches sont empilées};
+  \end{scope}
+
+\end{tikzpicture}

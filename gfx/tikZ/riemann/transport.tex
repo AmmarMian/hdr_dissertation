@@ -1,0 +1,40 @@
+% Transport parallele : deux vecteurs tangents deplaces le long d'une
+% geodesique, l'angle qu'ils forment etant conserve.
+% Utilise dans la \cref{sec:context-riemann-notion}.
+\input{gfx/tikZ/riemann/style.tex}
+\begin{tikzpicture}[riemann]
+  \coordinate (P) at (-1.85,1.05);
+  \coordinate (Q) at ( 1.65,1.50);
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85] at (2.75,0.75) {$\Manifold$};
+
+  % la geodesique support
+  \draw[rgeodesic, very thick]
+    (P) .. controls (-0.75,1.90) and (0.60,2.05) .. (Q);
+  \node[rgeodesic!85, anchor=north, inner sep=3pt] at (-0.15,1.55)
+    {$\transport_{\param_0\to\param_1}$};
+
+  % le couple de vecteurs en theta_0
+  \draw[rvector, very thick, ->] (P) -- ++(0.95,-0.20);
+  \node[rvector, anchor=north, inner sep=1pt] at ($(P)+(0.95,-0.22)$) {$\tvec$};
+  \draw[rvector, very thick, ->] (P) -- ++(0.42,0.52);
+  \node[rvector, anchor=east, inner sep=1pt] at ($(P)+(0.42,0.52)$) {$\tvecbis$};
+  \draw[rtangent!85] ($(P)+(0.52,-0.11)$) arc[start angle=-12, end angle=51, radius=0.53];
+  \node[rtangent!90, font=\scriptsize, anchor=west, inner sep=1pt] at ($(P)+(0.60,0.24)$) {$\phi$};
+
+  % le couple transporte en theta_1 : meme ecart angulaire
+  \draw[rvector, very thick, ->] (Q) -- ++(0.90,0.33);
+  \node[rvector, anchor=west, inner sep=1pt] at ($(Q)+(0.90,0.33)$)
+    {$\transport(\tvec)$};
+  \draw[rvector, very thick, ->] (Q) -- ++(0.05,0.66);
+  \node[rvector, anchor=south, inner sep=1pt] at ($(Q)+(0.05,0.66)$)
+    {$\transport(\tvecbis)$};
+  \draw[rtangent!85] ($(Q)+(0.51,0.19)$) arc[start angle=20, end angle=83, radius=0.54];
+  \node[rtangent!90, font=\scriptsize, anchor=west, inner sep=1pt] at ($(Q)+(0.46,0.52)$) {$\phi$};
+
+  \fill (P) circle (1.7pt);
+  \node[anchor=north east, inner sep=2pt] at (P) {$\param_0$};
+  \fill (Q) circle (1.7pt);
+  \node[anchor=north west, inner sep=2pt] at (Q) {$\param_1$};
+\end{tikzpicture}

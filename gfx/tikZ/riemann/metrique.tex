@@ -1,0 +1,34 @@
+% La metrique : produit scalaire sur l'espace tangent, donc norme et angle,
+% et par integration longueur d'une courbe.
+% Utilise dans la \cref{sec:context-riemann-notion}.
+\input{gfx/tikZ/riemann/style.tex}
+\begin{tikzpicture}[riemann]
+  \coordinate (P) at (-1.70,1.15);
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85] at (2.85,1.15) {$\Manifold$};
+
+  % plan tangent et deux vecteurs
+  \path (P) pic[scale=0.75] {rplane};
+  \draw[rvector, very thick, ->] (P) -- ($(P)+(1.10,-0.16)$);
+  \node[rvector, anchor=north west, inner sep=1pt] at ($(P)+(0.85,-0.14)$) {$\tvec$};
+  \draw[rvector, very thick, ->] (P) -- ($(P)+(0.40,0.46)$);
+  \node[rvector, anchor=south east, inner sep=1pt] at ($(P)+(0.42,0.44)$) {$\tvecbis$};
+  \draw[rtangent!80] ($(P)+(0.46,-0.07)$) arc[start angle=-8, end angle=48, radius=0.47];
+  \node[rtangent!90, font=\scriptsize, anchor=west] at ($(P)+(0.80,0.42)$)
+    {$\metric{\tvec}{\tvecbis}{\param}$};
+  \node[rtangent!90, anchor=north, inner sep=2pt] at ($(P)+(0.10,-0.50)$)
+    {$\Tangent{\param}{\Manifold}$};
+
+  % longueur d'une courbe : vitesses echantillonnees le long du chemin
+  \draw[rgeodesic, very thick]
+    (0.55,1.85) .. controls (1.45,1.95) and (2.05,1.55) .. (2.45,0.95);
+  \node[rgeodesic, anchor=south east, inner sep=1pt] at (0.60,1.88) {$\geod$};
+  \foreach \x/\y/\dx/\dy in {0.85/1.91/0.30/0.05, 1.60/1.89/0.28/-0.13, 2.22/1.42/0.18/-0.28}
+    \draw[rvector!85, thick, ->] (\x,\y) -- ++(\dx,\dy);
+  \node[rgeodesic!85, anchor=north, font=\scriptsize] at (1.35,1.32)
+    {$L(\geod)=\int\normriem{\dot{\geod}}{\geod}$};
+
+  \fill (P) circle (1.7pt);
+  \node[anchor=south east, inner sep=2pt] at (P) {$\param$};
+\end{tikzpicture}

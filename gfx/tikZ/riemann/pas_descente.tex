@@ -1,0 +1,59 @@
+% Un pas de descente de gradient riemannienne : la direction est determinee
+% dans l'espace tangent, la retraction la ramene sur la variete.
+% Utilise dans la \cref{sec:context-riemann-optimization}.
+\begin{tikzpicture}[
+    >={Stealth[length=5pt,width=4pt]},
+    line join=round,
+    font=\footnotesize,
+  ]
+  \definecolor{rmanifold}{RGB}{90,90,90}
+  \definecolor{rtangent}{RGB}{50,110,120}
+  \definecolor{rgeodesic}{RGB}{40,70,140}
+  \definecolor{rvector}{RGB}{175,95,45}
+
+  \coordinate (Sn)  at (-2.95,1.35);
+  \coordinate (Sn1) at ( 0.75,2.10);
+  \coordinate (Sst) at ( 3.55,1.70);
+
+  % ---------------------------------------------------------------- variete
+  \fill[rmanifold!7]
+    (-5.0,0.2) .. controls (-4.6,2.45) and (-2.2,3.3) .. (-0.2,3.3)
+    .. controls ( 2.1,3.3) and ( 4.4,2.35) .. ( 5.0,0.2)
+    .. controls ( 3.0,-0.9) and (-3.0,-0.95) .. (-5.0,0.2) -- cycle;
+  \draw[rmanifold!70, thick]
+    (-5.0,0.2) .. controls (-4.6,2.45) and (-2.2,3.3) .. (-0.2,3.3)
+    .. controls ( 2.1,3.3) and ( 4.4,2.35) .. ( 5.0,0.2);
+  \draw[rmanifold!70, thick]
+    (-5.0,0.2) .. controls (-3.0,-0.9) and (3.0,-0.95) .. (5.0,0.2);
+  \node[rmanifold!85, font=\normalsize] at (4.30,2.65) {$\SPD{\Nvar}$};
+
+  % ---------------------------------------------------- plan tangent en Sn
+  \fill[rtangent!10, draw=rtangent!65]
+    ($(Sn)+(-1.55,-0.45)$) -- ($(Sn)+(2.10,-1.05)$)
+    -- ($(Sn)+(2.75,0.25)$) -- ($(Sn)+(-0.90,0.85)$) -- cycle;
+  \node[rtangent!90, anchor=east] at ($(Sn)+(-1.65,0.55)$)
+    {$\Tangent{\MCov_{(\iiter)}}{\SPD{\Nvar}}$};
+
+  % -------------------------------------------------- direction de descente
+  \draw[rvector, very thick, ->] (Sn) -- ($(Sn)+(2.30,-0.28)$);
+  \node[rvector, anchor=north] at ($(Sn)+(1.15,-0.42)$)
+    {$-\gamma_\iiter\,\Rgrad f(\MCov_{(\iiter)})$};
+
+  % ---------------------------------------------------------- retraction
+  \draw[rvector!60, dotted, very thick]
+    ($(Sn)+(2.33,-0.26)$) .. controls (-0.30,1.05) and (0.20,1.55) .. (Sn1);
+  \node[rvector!85, anchor=north west] at (-0.35,1.20)
+    {$\Retr_{\MCov_{(\iiter)}}$};
+
+  % ------------------------------------------------ suite des iteres et opt.
+  \draw[rgeodesic!50, thick, dashed]
+    (Sn1) .. controls (2.05,2.45) .. (Sst);
+  \node[rgeodesic!70, anchor=south] at (2.15,2.44) {itérations suivantes};
+
+  \fill (Sn) circle (1.8pt);
+  \node[anchor=south east, inner sep=3pt] at (Sn) {$\MCov_{(\iiter)}$};
+  \fill (Sn1) circle (1.8pt);
+  \node[anchor=east, inner sep=4pt] at (Sn1) {$\MCov_{(\iiter+1)}$};
+  \fill[rgeodesic] (Sst) circle (2.1pt);
+  \node[anchor=west, inner sep=4pt] at (Sst) {$\MCov^{\opt}$};
+\end{tikzpicture}

@@ -1,0 +1,896 @@
+\chapter{Distribution de probabilités à paramètre de covariance}
+\label{ch:context-distributions}
+
+Considérons maintenant un apriori supplémentaire sur nos variables aléatoires: la connaissance de la d.d.p $\p{\Variable}$ qui régit leur comportement et essayons de préciser la notion de covariance comme un paramètre de la distribution puis intéressons nous à l'estimation de celle-ci à l'aide de la connaissance supplémentaire que l'on introduit. Nous verrons alors que la scm donnée en \cref{eq:context-estimation-covariance}, obtenue jusqu'ici sans aucun modèle, réapparait naturellement comme l'estimateur au sens du mle sous hypothèse gaussienne. Mais nous verrons également que ce résultat est fragile: dès que l'on s'écarte de ce modèle, notamment vers des distributions à queues lourdes, il faut lui substituer toute une famille d'estimateurs dits robustes. Ces résultats sont d'abord établis dans le cas réel, puis repris dans le cas complexe, où les objets d'ordre deux mis en place en \cref{sec:context-definition-complex} suffisent à en organiser la transposition.
+
+\section{Le cas réel}
+\label{sec:context-distributions-reel}
+
+\subsection{Distribution gaussienne}
+\label{subsec:context-distributions-gaussian}
+
+La première distribution que l'on considère, de par sa simplicité et son omniprésence, est la gaussienne dont la d.d.p est donnée par:
+\begin{equation}
+  \ddp{\Variable}(\x; \param) = (2\pi)^{-\Nvar/2}\Det(\MCov_\Variable)^{-1/2}\exp\left\{ -\frac{1}{2}\quadratic{(\x-\Vmoy_\Variable)}{\MCov_\Variable} \right\},
+  \label{eq:context-definition-gaussian}
+\end{equation}
+
+où $\param = (\Vmoy_\Variable, \MCov_\Variable)$ sont les paramètres de la distribution. On notera que la matrice de covariance doit être définie positive pour que la d.d.p soit bien définie\footnote{Ce sera par ailleurs le cas pour toutes les distributions que l'on considérera par la suite. On notera $\SPD{\Nvar}$ l'ensemble des matrices symmétriques définies positives de taille $\Nvar\times\Nvar$, dont la structure de cône a été évoquée en \cref{fig:context-figure-spdcone}.}.
+
+\begin{definition}[{Vecteur aléatoire gaussien}]
+  On dit qu'une variable aléatoire $\Variable\in\R^\Nvar$ suit une distribution gaussienne multivariée de moyenne $\Vmoy_\Variable$ et de matrice de covariance $\MCov_\Variable$, et on note $\Variable\sim\gaussian(\Vmoy_\Variable, \MCov_\Variable)$ si sa d.d.p est donnée par \cref{eq:context-definition-gaussian}.
+\end{definition}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{gfx/generated/context_gaussian_isocontours/gaussisocontours/plot.tex}
+  \end{center}
+  \provGaussisocontoursQR[.5cm]
+  \caption{Isodensités de la d.d.p gaussienne définie en \cref{eq:context-definition-gaussian} pour $\Nvar=2$ et différentes matrices de covariance. À gauche: $\MCov_\Variable=\Id{2}$, les isodensités sont des cercles. Au milieu: une covariance corrélée, les isodensités deviennent des ellipses dont les axes sont donnés par les vecteurs propres de $\MCov_\Variable$ et les longueurs par les racines de ses valeurs propres. À droite: une matrice mal conditionnée au sens de l'\cref{eq:context-estimation-conditionspd}. \provGaussisocontours}
+  \label{fig:context-distributions-gaussisocontours}
+\end{figure}
+
+On remarque que la forme quadratique $\quadratic{(\x-\Vmoy_\Variable)}{\MCov_\Variable}$ est la seule dépendance de la d.d.p en $\x$: les surfaces d'égale densité sont donc les ellipsoïdes définis par cette forme quadratique, dont la géométrie est entièrement portée par $\MCov_\Variable$ en vertu de la \cref{prop:context-definition-diagonalisation}. Cette observation, anodine à ce stade, est en fait le point de départ de la généralisation qui sera faite en \cref{subsec:context-distributions-elliptical}. \\
+
+
+Une fois ce modèle posé, l'estimation des paramètres peut être menée au sens du maximum de vraisemblance (mle\footnote{Pour \emph{Maximum likelihood Estimation} en anglais}) :
+\begin{equation}
+  \hat{\param} = \arg \max_\param \likelihood_{\Variable}(\x_1,\dots,\x_\Nobs),
+\end{equation}
+où $\likelihood_\Variable$ est la log-vraisemblance des données étant donnée la d.d.p de $\Variable$ (gaussien dans ce cas) Résoudre ce problème d'optimisation donne un statut nouveau aux estimateurs empiriques de la \cref{sec:context-covariance-estimation}:
+
+\begin{proposition}[{mle sous modèle gaussien}]
+\label{prop:context-distributions-mlegaussian}
+  \'Etant donné un ensemble d'observations i.i.d $\X$ de la variable $\Variable\sim\gaussian(\Vmoy_\Variable,\MCov_\Variable)$, les estimateurs au sens du maximum de vraisemblance des paramètres $\param=(\Vmoy_\Variable,\MCov_\Variable)$ sont:
+  \begin{equation}
+    \hat{\Vmoy}_\Variable^{\mathrm{ML}} = \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\x_\iobs,
+    \qquad
+    \hat{\MCov}_\Variable^{\mathrm{ML}} = \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\left(\x_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)\left(\x_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)^\T.
+    \label{eq:context-distributions-mlegaussian}
+  \end{equation}
+\end{proposition}
+
+
+\begin{remark}
+  On retrouve ainsi, au facteur $\Nobs/(\Nobs-1)$ près, la scm donnée en \cref{eq:context-estimation-covariance}: l'estimateur du maximum de vraisemblance est donc légèrement biaisé, mais reste consistant. Autrement dit, l'estimateur que nous avions construit sans aucun apriori sur la distribution est \emph{optimal} au sens du mle dès lors que les données sont effectivement gaussiennes.
+\end{remark}
+
+Ce cadre permet en outre de caractériser la qualité de l'estimation, et non plus seulement de l'observer comme nous l'avions fait en \cref{fig:context-estimation-errorscm}. En effet, sous hypothèse gaussienne, la loi de l'estimateur lui-même est connue exactement, ce qui est une situation rare et confortable dont nous ne disposerons plus dès la \cref{subsec:context-distributions-elliptical}. Introduisons pour cela la distribution qui régit la scm :
+
+\begin{definition}[{Distribution de Wishart}]
+\label{def:context-distributions-wishart}
+  Soit $\Nobs\geq\Nvar$ et $\{\vector{z}_1,\dots,\vector{z}_\Nobs\}$ un ensemble de vecteurs i.i.d de loi $\gaussian(\vector{0},\MCov)$. On dit que la matrice aléatoire
+  \begin{equation}
+    \Smat = \sum_{\iobs=1}^{\Nobs}\vector{z}_\iobs\vector{z}_\iobs^\T
+    \label{eq:context-distributions-wishartdef}
+  \end{equation}
+  suit une \textbf{distribution de Wishart} à $\Nobs$ degrés de liberté et de matrice d'échelle $\MCov$, et on note $\Smat\sim\wishart(\Nobs,\MCov)$. Sa d.d.p, définie sur le cône $\SPD{\Nvar}$, est donnée par :
+\begin{equation}
+  \ddp{\Smat}(\mat{S}; \Nobs, \MCov)
+  =
+  \frac{
+    \Det(\mat{S})^{(\Nobs-\Nvar-1)/2}
+    \exp\left\{-\frac{1}{2}\trace{\inv{\MCov}\mat{S}}\right\}
+  }{
+    2^{\Nobs\Nvar/2}\Det(\MCov)^{\Nobs/2}\Gamma_\Nvar(\Nobs/2)
+  },
+  \label{eq:context-distributions-wishartpdf}
+\end{equation}
+où $\Gamma_\Nvar$ est la fonction gamma multivariée, $\Gamma_\Nvar(a) = \pi^{\Nvar(\Nvar-1)/4}\prod_{\ivar=1}^{\Nvar}\Gamma\left(a-(\ivar-1)/2\right)$ et $\Gamma$ la fonction gamma.
+\end{definition}
+
+\begin{remark}
+  On notera que cette d.d.p est définie \emph{sur} le cône $\SPD{\Nvar}$ et non sur $\R^\Nvar$ : la mesure sous-jacente n'est donc pas celle de Lebesgue sur $\R^{\Nvar\times\Nvar}$ mais celle induite sur les matrices symmétriques, dont les $\Nvar(\Nvar+1)/2$ coefficients libres sont les véritables variables d'intégration.
+\end{remark}
+
+Le résultat central, dû à \sidecite[-1cm]{anderson1958introduction}, précise alors complètement le comportement de nos deux estimateurs :
+
+\begin{proposition}[{Loi conjointe des estimateurs gaussiens}]
+\label{prop:context-distributions-wishartscm}
+  Sous les hypothèses de la \cref{prop:context-distributions-mlegaussian} et pour $\Nobs>\Nvar$, on a :
+  \begin{itemize}
+    \item $\hat{\Vmoy}_\Variable^{\mathrm{ML}} \sim \gaussian\left(\Vmoy_\Variable, \MCov_\Variable/\Nobs\right)$,
+    \item $\Nobs\,\hat{\MCov}_\Variable^{\mathrm{ML}} \sim \wishart\left(\Nobs-1, \MCov_\Variable\right)$,
+  \end{itemize}
+  et ces deux quantités sont \textbf{indépendantes}\footnote{Ce point peut surprendre puisque $\hat{\MCov}_\Variable^{\mathrm{ML}}$ est construit \emph{à partir} de $\hat{\Vmoy}_\Variable^{\mathrm{ML}}$. Il s'explique en remarquant que $\hat{\Vmoy}_\Variable^{\mathrm{ML}}$ et les résidus $\x_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}$ sont conjointement gaussiens et non corrélés, puisque $\E\left\{\left(\x_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)\left(\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)^\T\right\}=\MCov_\Variable/\Nobs - \MCov_\Variable/\Nobs = \mat{0}$, et que la non-corrélation entraîne l'indépendance dans le cas conjointement gaussien. Comme $\Smat$ ne dépend que des résidus, l'indépendance suit. Cette propriété est du reste caractéristique de la gaussienne : c'est la seule distribution pour laquelle moyenne et covariance empiriques sont indépendantes.}.
+\end{proposition}
+
+\begin{remark}
+  La perte d'un degré de liberté, $\Nobs-1$ et non $\Nobs$, est exactement celle que nous avions rencontrée en \cref{eq:context-estimation-covariance} : elle traduit la contrainte linéaire introduite par la soustraction de la moyenne estimée. On retrouve d'ailleurs immédiatement le biais annoncé, puisque $\E\{\Smat\}=\Nobs\MCov$ pour $\Smat\sim\wishart(\Nobs,\MCov)$ :
+  $$
+  \E\left\{\hat{\MCov}_\Variable^{\mathrm{ML}}\right\}
+  =
+  \frac{\Nobs-1}{\Nobs}\MCov_\Variable.
+  $$
+\end{remark}
+
+Cette loi ne fait pas que confirmer le biais : elle donne accès aux moments d'ordre deux, et donc à une expression exacte de l'erreur que nous n'avions su qu'estimer par simulation.
+
+\begin{proposition}[{Erreur quadratique de la scm}]
+\label{prop:context-distributions-msescm}
+  Pour l'estimateur non-biaisé $\hat{\MCov}_\Variable = \Smat/(\Nobs-1)$, on a la covariance des coefficients
+  \begin{equation}
+    \Cov\left(
+      (\hat{\MCov}_\Variable)_{\ivar\ivarbis},
+      (\hat{\MCov}_\Variable)_{k\ell}
+    \right)
+    =
+    \frac{
+      (\MCov_\Variable)_{\ivar k}(\MCov_\Variable)_{\ivarbis \ell}
+      + (\MCov_\Variable)_{\ivar \ell}(\MCov_\Variable)_{\ivarbis k}
+    }{\Nobs-1},
+    \label{eq:context-distributions-covscm}
+  \end{equation}
+  et par sommation sur tous les coefficients, l'erreur quadratique moyenne :
+  \begin{equation}
+    \E\left\{
+      \left\|\hat{\MCov}_\Variable - \MCov_\Variable\right\|_\frob^2
+    \right\}
+    =
+    \sum_{\ivar=1}^{\Nvar}\sum_{\ivarbis=1}^{\Nvar}
+    \Var\left((\hat{\MCov}_\Variable)_{\ivar\ivarbis}\right)
+    =
+    \frac{
+      \|\MCov_\Variable\|_\frob^2 + \left(\trace{\MCov_\Variable}\right)^2
+    }{\Nobs-1}.
+    \label{eq:context-distributions-msescm}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}[{Passage de la covariance des coefficients à l'eqm}]
+  La première égalité de l'\cref{eq:context-distributions-msescm} est celle qui utilise le caractère non-biaisé de l'estimateur. En effet, la norme de Frobenius étant la somme des carrés des coefficients, on a de manière générale la décomposition biais-variance
+  $$
+    \E\left\{\left\|\hat{\MCov}_\Variable - \MCov_\Variable\right\|_\frob^2\right\}
+    =
+    \underbrace{
+      \left\|\E\left\{\hat{\MCov}_\Variable\right\} - \MCov_\Variable\right\|_\frob^2
+    }_{\text{biais}}
+    +
+    \sum_{\ivar,\ivarbis}
+    \Var\left((\hat{\MCov}_\Variable)_{\ivar\ivarbis}\right),
+  $$
+  dont le premier terme s'annule précisément parce que $\E\{\hat{\MCov}_\Variable\}=\MCov_\Variable$\footnote{C'est aussi ce qui rend la comparaison avec l'estimateur de Ledoit-Wolf de l'\cref{eq:context-ledoit-wolf} instructive : celui-ci fait délibérément réapparaitre ce terme de biais pour réduire la somme des variances, et le coefficient $\coefledoitwolf$ n'est rien d'autre que le curseur entre les deux termes de cette décomposition.}. L'eqm se réduit donc à la somme des variances des coefficients.
+
+  La seconde égalité s'obtient alors en prenant $k=\ivar$ et $\ell=\ivarbis$ dans \cref{eq:context-distributions-covscm}, ce qui donne la variance de chaque coefficient :
+  $$
+    \Var\left((\hat{\MCov}_\Variable)_{\ivar\ivarbis}\right)
+    =
+    \frac{
+      (\MCov_\Variable)_{\ivar\ivar}(\MCov_\Variable)_{\ivarbis\ivarbis}
+      + (\MCov_\Variable)_{\ivar\ivarbis}^2
+    }{\Nobs-1},
+  $$
+  puis en sommant sur $\ivar$ et $\ivarbis$ : le premier terme se factorise en $\left(\sum_\ivar (\MCov_\Variable)_{\ivar\ivar}\right)^2 = \left(\trace{\MCov_\Variable}\right)^2$ et le second est par définition $\|\MCov_\Variable\|_\frob^2$.
+\end{remark}
+
+\begin{remark}
+  Cette expression mérite qu'on s'y arrête, car elle contient à elle seule les deux comportements que nous avions observés numériquement.
+
+  D'une part, la décroissance en $1/\Nobs$ confirme la consistance et explique la forme des courbes de la \cref{fig:context-estimation-errorscm} : l'erreur décroît en $\Nobs^{-1/2}$, et la dispersion autour de cette moyenne suit le même régime.
+
+  D'autre part, le numérateur dépend de la dimension. Dans le cas particulier $\MCov_\Variable=\Id{\Nvar}$ utilisé pour ces simulations, il vient
+  $$
+  \E\left\{\left\|\hat{\MCov}_\Variable - \Id{\Nvar}\right\|_\frob^2\right\}
+  =
+  \frac{\Nvar(\Nvar+1)}{\Nobs-1},
+  $$
+  c'est-à-dire une erreur qui croît comme le \emph{carré} du nombre de variables à nombre d'observations fixé. Ce n'est donc pas $\Nobs$ seul qui gouverne la qualité de l'estimation mais bien le rapport $\Nvar^2/\Nobs$, ce qui donne un contenu quantitatif précis aux difficultés de la \cref{sec:context-covariance-regularized-estimation}\footnote{Le nombre de paramètres libres d'une matrice de covariance étant $\Nvar(\Nvar+1)/2$, on peut aussi lire cette formule comme le fait, très intuitif, que chaque paramètre à estimer coûte le même prix en observations.}.
+\end{remark}
+
+Cette caractérisation nous permet en outre de revenir sur une question laissée ouverte en \cref{sec:context-covariance-regularized-estimation}. Nous y avions introduit l'estimateur régularisé de l'\cref{eq:context-ledoit-wolf} et posé le problème de la valeur optimale du coefficient $\coefledoitwolf$, sans pouvoir le résoudre: l'espérance qui définit le risque $\risk(\coefledoitwolf)$ suppose de connaitre la loi des données. C'est maintenant chose faite.
+
+\begin{proposition}[{Coefficient de contraction optimal}]
+\label{prop:context-distributions-alphaoptimal}
+  Pour une matrice cible $\targetledoitwolf$ déterministe et un estimateur $\hat{\MCov}_\Variable$ non-biaisé, le minimiseur de $\risk(\coefledoitwolf)$ vaut
+  \begin{equation}
+    \coefledoitwolf^\opt
+    =
+    \frac{
+      \E\left\{\left\|\hat{\MCov}_\Variable - \MCov_\Variable\right\|_\frob^2\right\}
+    }{
+      \E\left\{\left\|\hat{\MCov}_\Variable - \MCov_\Variable\right\|_\frob^2\right\}
+      + \left\|\MCov_\Variable - \targetledoitwolf\right\|_\frob^2
+    }.
+    \label{eq:context-distributions-alphaoptimal}
+  \end{equation}
+  Sous hypothèse gaussienne et pour la cible $\targetledoitwolf = \frac{\trace{\MCov_\Variable}}{\Nvar}\Id{\Nvar}$, l'\cref{eq:context-distributions-msescm} en donne l'expression explicite
+  \begin{equation}
+    \coefledoitwolf^\opt
+    =
+    \frac{
+      \|\MCov_\Variable\|_\frob^2 + \left(\trace{\MCov_\Variable}\right)^2
+    }{
+      \|\MCov_\Variable\|_\frob^2 + \left(\trace{\MCov_\Variable}\right)^2
+      + (\Nobs-1)\left(\|\MCov_\Variable\|_\frob^2 - \frac{\left(\trace{\MCov_\Variable}\right)^2}{\Nvar}\right)
+    }.
+    \label{eq:context-distributions-alphaoptimalgauss}
+  \end{equation}
+\end{proposition}
+
+L'\cref{eq:context-distributions-alphaoptimal} est la formalisation exacte du compromis biais-variance de la \cref{fig:context-estimation-lwfbiasvar}: au numérateur la variance de l'estimateur empirique, que la contraction fait décroitre, et au dénominateur cette même variance augmentée de la distance entre la vraie covariance et la cible, qui est précisément le biais que la contraction introduit. Les deux cas limites se lisent directement. Si $\MCov_\Variable$ est proportionnelle à l'identité, la cible est exacte, le biais est nul et $\coefledoitwolf^\opt=1$: il faut contracter totalement. À l'inverse, à $\Nvar$ fixé et $\Nobs\to\infty$, le numérateur décroit en $1/\Nobs$ tandis que le biais reste constant, et $\coefledoitwolf^\opt\to 0$: on retrouve la scm, ce qui est cohérent avec son optimalité au sens du mle. Entre les deux, le terme $\|\MCov_\Variable\|_\frob^2 - (\trace{\MCov_\Variable})^2/\Nvar$ mesure l'écart de la vraie covariance à une identité mise à l'échelle, i.e, sa \emph{sphéricité}: plus la structure de corrélation à estimer est marquée, moins il est rentable de la sacrifier au profit d'une cible isotrope.
+
+Il reste évidemment que $\coefledoitwolf^\opt$ dépend de la matrice $\MCov_\Variable$ que l'on cherche justement à estimer: il s'agit d'un coefficient \emph{oracle}. Tout l'apport de \sidecite[-1cm]{LedoitWolf2004} est de montrer qu'en remplaçant $\|\MCov_\Variable\|_\frob^2$ et $\trace{\MCov_\Variable}$ par des estimateurs consistants construits sur les données, on obtient un coefficient $\hat{\coefledoitwolf}$ calculable dont l'estimateur associé demeure asymptotiquement optimal, et cela sans même requérir l'hypothèse gaussienne. Lorsque celle-ci est en revanche pleinement assumée, on peut aller plus loin en résolvant de manière itérative le problème dans lequel les moments inconnus sont eux-mêmes remplacés par leur expression gaussienne, ce qui conduit à l'estimateur oas \sidecite[-1cm]{chen2010shrinkage}, sensiblement meilleur que \cref{eq:context-ledoit-wolf} dans le régime des très faibles $\Nobs$. \\
+
+Ce degré de précision est cependant un luxe propre au modèle gaussien : il repose entièrement sur le fait que la loi exacte de l'estimateur est connue. Dès que l'on s'écartera de ce modèle, nous perdrons à la fois cette loi exacte et l'optimalité de la scm, et il faudra reconstruire l'estimation sur d'autres bases. \\
+
+
+\subsection{Distributions elliptiques}
+\label{subsec:context-distributions-elliptical}
+
+Le modèle gaussien tire sa popularité d'un argument de nature asymptotique: lorsque la quantité mesurée résulte de la somme d'un grand nombre de contributions élémentaires indépendantes, le théorème central limite rend le modèle gaussien légitime. Cet argument s'effondre néanmoins dès que le nombre de contributions diminue, ou que quelques unes d'entre elles dominent les autres. On observe alors empiriquement des distributions à queues plus lourdes, dites impulsives, ainsi qu'une hétérogénéité de la puissance d'une observation à l'autre\footnote{C'est typiquement le cas des données radar à haute résolution, où le nombre de diffuseurs par cellule de résolution devient faible: on renvoie pour cela à \sidecite{greco2007statistical} ainsi qu'au \cref{ch:robust-detection} où ce point sera repris sur données réelles.}. Or, la scm est particulièrement sensible à ce type de comportement: une seule observation de forte amplitude suffit à déplacer arbitrairement l'estimation, puisque celle-ci est une moyenne de matrices de rang 1 pondérées par le carré de la norme des observations. \\
+
+Plutôt que de substituer au modèle gaussien une distribution particulière, il est plus fécond de conserver la seule propriété qui nous intéresse ici, à savoir que la d.d.p ne dépend de $\x$ qu'au travers de la forme quadratique portée par une matrice de dispersion, et de relâcher complètement la décroissance exponentielle. On obtient alors la famille des distributions elliptiques \sidecite[-7cm]{kelker1970distribution}, \sidecite[-4,5cm]{cambanis1981theory}, dont un survol très complet dans un contexte de traitement du signal est donné dans \sidecite[-2cm]{6263313}.
+
+\begin{definition}[{Distribution elliptique}]
+\label{def:context-distributions-elliptical}
+  Soit une fonction $\densgen:\R^+\to\R^+$, appelée \textbf{générateur de densité}, vérifiant la condition de moment fini
+  \begin{equation}
+    \densgenmoment{\Nvar}
+    \eqdef
+    \int_{\R^+}
+    t^{\Nvar/2-1}\densgen(t)\diff t
+    <
+    \infty,
+    \label{eq:context-distributions-momentfini}
+  \end{equation}
+  et une matrice $\MScatter\in\SPD{\Nvar}$ appelée \textbf{matrice de dispersion} (\textit{scatter matrix}). On dit que $\Variable$ suit une distribution elliptique de paramètres $\param=(\Vmoy_\Variable,\MScatter,\densgen)$, et on note $\Variable\sim\elliptical(\Vmoy_\Variable,\MScatter,\densgen)$, si sa d.d.p est donnée par:
+\begin{equation}
+  \ddp{\Variable}(\x; \param)
+  =
+  \densgenconst{\Nvar}
+  \Det(\MScatter)^{-1/2}
+  \densgen\left(
+    \quadratic{(\x-\Vmoy_\Variable)}{\MScatter}
+  \right),
+  \label{eq:context-distributions-ellipticalpdf}
+\end{equation}
+  où $\densgenconst{\Nvar}$ est la constante assurant que la d.d.p intègre à $1$:
+\begin{equation}
+  \densgenconst{\Nvar}
+  \eqdef
+  2\inv{\left(\spherearea{\Nvar}\densgenmoment{\Nvar}\right)},
+  \qquad
+  \spherearea{\Nvar} = \frac{2\pi^{\Nvar/2}}{\Gamma(\Nvar/2)},
+  \label{eq:context-distributions-normconst}
+\end{equation}
+  $\spherearea{\Nvar}$ étant l'aire de la sphère unité $\sphere{\Nvar-1}=\{\vector{s}\in\R^\Nvar;\,\norm{\vector{s}}_2=1\}$.
+\end{definition}
+
+\begin{remark}
+  La constante \cref{eq:context-distributions-normconst} s'obtient par un simple passage en coordonnées polaires après le changement de variable $\vector{y}=\MScatter^{-1/2}(\x-\Vmoy_\Variable)$, qui est précisément ce qui rend les isodensités elliptiques. On vérifie au passage que la gaussienne est le cas particulier $\densgen(t)=\exp(-t/2)$: on a alors $\densgenmoment{\Nvar}=2^{\Nvar/2}\Gamma(\Nvar/2)$ et donc $\densgenconst{\Nvar}=(2\pi)^{-\Nvar/2}$, ce qui redonne bien \cref{eq:context-definition-gaussian}.
+\end{remark}
+
+La matrice $\MScatter$ n'est pas la matrice de covariance mais lui est proportionnelle, ce qui justifie l'intérêt que nous lui portons:
+
+
+\begin{property}[{Lien dispersion-covariance}]
+\label{prop:context-distributions-scattercov}
+  Si $\Variable\sim\elliptical(\Vmoy_\Variable,\MScatter,\densgen)$ admet des moments d'ordre deux finis, alors:
+  \begin{equation}
+    \MCov_\Variable
+    =
+    \frac{\E\{\quadvar\}}{\Nvar}\MScatter,
+    \qquad
+    \E\{\quadvar\} = \frac{\densgenmoment{\Nvar+2}}{\densgenmoment{\Nvar}},
+    \label{eq:context-distributions-scattercov}
+  \end{equation}
+  où $\quadvar$ est la variable aléatoire associée à la forme quadratique $\quadratic{(\Variable-\Vmoy_\Variable)}{\MScatter}$.
+\end{property}
+
+\begin{remark}
+  Les deux matrices ne diffèrent donc que par un facteur d'échelle qui ne dépend que de la dimension et du générateur de densité. En particulier, tout ce qui relève de la \emph{structure} de corrélation entre les variables est identique dans les deux objets: c'est pourquoi nous nous permettrons, dans la suite de cette dissertation, de parler de matrice de covariance là où nous manipulerons en réalité une matrice de dispersion\footnote{Cette identification a une conséquence pratique importante: un test statistique portant sur l'égalité de matrices de dispersion est équivalent à un test portant sur l'égalité de matrices de covariance dès lors que les observations partagent le même générateur de densité. Ce point sera exploité au \cref{ch:robust-detection}.}. On notera cependant que $\MScatter$ reste défini même lorsque $\E\{\quadvar\}$ est infini, i.e, lorsque la distribution n'admet pas de moment d'ordre deux.
+\end{remark}
+
+Il est alors usuel de séparer explicitement dans la matrice de dispersion ce qui relève de la puissance et ce qui relève de la structure:
+
+\begin{definition}[{Paramétrisation échelle-forme}]
+\label{def:context-distributions-scaleshape}
+  On appelle \textbf{paramétrisation échelle-forme} de la matrice de dispersion l'écriture:
+\begin{equation}
+  \MScatter = \texture\,\MShape,
+  \label{eq:context-distributions-scaleshape}
+\end{equation}
+  où:
+  \begin{itemize}
+    \item $\texture\in\R^+$ est le \textbf{paramètre d'échelle}\footnote{Aussi appelé \textit{texture} dans la littérature radar. Nous emploierons indifféremment les deux termes.}, équivariant par multiplication par une constante positive;
+    \item $\MShape\in\SPD{\Nvar}$ est la \textbf{matrice de forme} (\textit{shape matrix}), invariante par multiplication par une constante positive. Elle rend compte de la structure entre les variables sans considération sur la norme de la matrice.
+  \end{itemize}
+\end{definition}
+
+\begin{remark}[{Choix de la normalisation}]
+  Telle quelle, la décomposition donnée en \cref{eq:context-distributions-scaleshape} n'est pas identifiable: il faut fixer une normalisation de $\MShape$. Trois choix cohabitent dans la littérature: le premier élément diagonal \sidecite[-6.25cm]{10.2307/2669766} avec $\MShape = \MScatter/(\MScatter)_{11}$, la trace \sidecite[-4.5cm]{Pascal08a} avec $\MShape = \Nvar\MScatter/\trace{\MScatter}$, ou le déterminant \sidecite[0.5cm]{tatsuoka2000} avec $\MShape = \MScatter/\Det(\MScatter)^{1/\Nvar}$. Sous des conditions de régularité faibles, ces choix sont essentiellement équivalents vis-à-vis des problèmes d'inférence sur la forme \sidecite[2cm]{Hallin2007}. Nous retiendrons la normalisation par la trace au \cref{ch:robust-detection} afin de rester cohérent avec \cite{6263313}, mais nous utiliserons la normalisation par le déterminant à partir de la \cref{ch:context-riemann}: nous verrons en effet que cette dernière est celle qui se marie naturellement avec la géométrie riemannienne du cône, la contrainte $\Det(\MShape)=1$ y définissant une sous-variété totalement géodésique.
+\end{remark}
+
+Une autre façon, plus constructive, d'aborder ces distributions consiste à les décrire par la manière dont on les simule:
+
+\begin{property}[{Représentation stochastique}]
+\label{prop:context-distributions-stochastic}
+  Si $\Variable\sim\elliptical(\Vmoy_\Variable,\MScatter,\densgen)$, alors on peut écrire:
+  \begin{equation}
+    \Variable
+    \overset{d}{=}
+    \Vmoy_\Variable + \modvar\,\MScatter^{1/2}\vector{u},
+    \label{eq:context-distributions-stochastic}
+  \end{equation}
+  où $\modvar\eqdef\sqrt{\quadvar}$ est une variable aléatoire réelle positive appelée \textbf{variable modulaire}, indépendante du vecteur $\vector{u}$ uniformément distribué sur la sphère unité, $\vector{u}\sim\uniform(\sphere{\Nvar-1})$. La d.d.p de $\quadvar$ est donnée par:
+  \begin{equation}
+    \p{\quadvar}(q) = \inv{\densgenmoment{\Nvar}}\,q^{\Nvar/2-1}\densgen(q).
+    \label{eq:context-distributions-modularpdf}
+  \end{equation}
+\end{property}
+
+\begin{remark}
+  Cette représentation dit exactement que le modèle elliptique découple la direction, qui est uniforme après blanchiment par $\MScatter^{-1/2}$, de l'amplitude, qui est portée par $\modvar$ seule. Le générateur de densité ne contrôle donc rien d'autre que la loi de l'amplitude, et c'est bien là que se joue le caractère à queues lourdes ou non de la distribution.
+\end{remark}
+
+Lorsque l'on choisit de rendre l'amplitude aléatoire au moyen d'un paramètre d'échelle lui-même aléatoire, on obtient une sous-famille particulièrement commode:
+
+\begin{definition}[{Gaussienne composée}]
+\label{def:context-distributions-compoundgaussian}
+  On appelle distribution gaussienne-composée, ou \textit{sirv} \sidecite[2cm]{Yao73}, toute distribution de la forme:
+\begin{equation}
+  \Variable
+  \overset{d}{=}
+  \Vmoy_\Variable + \sqrt{\texture}\,\Variablebis,
+  \qquad
+  \Variablebis\sim\gaussian(\vector{0},\MShape),
+  \label{eq:context-distributions-compoundgaussian}
+\end{equation}
+  où la texture $\texture$ est une variable aléatoire positive indépendante de $\Variablebis$, et on note $\Variable\sim\compoundgaussian(\Vmoy_\Variable,\MShape,\p{\texture})$.
+\end{definition}
+
+\begin{remark}
+  Selon le modèle assigné à la texture, une distribution elliptique différente en découle. Cette famille est donc un moyen commode de construire des générateurs de densité, et surtout de les simuler: il suffit de tirer une texture puis une gaussienne.
+\end{remark}
+
+Donnons à présent quelques exemples, qui seront ceux que nous utiliserons dans la suite de la dissertation:
+
+\begin{itemize}
+  \item la \textbf{distribution $t$ de Student} à $\dof>0$ degrés de liberté, de générateur
+  $$
+  \densgen(t) = \left(1+\frac{t}{\dof}\right)^{-(\Nvar+\dof)/2},
+  $$
+  obtenue pour une texture $\texture\overset{d}{=}\dof/z$ avec $z\sim\chisquared_\dof$. Le cas $\dof=1$ donne la distribution de Cauchy, pour laquelle le moment d'ordre deux n'existe pas, et le cas limite $\dof\to\infty$ redonne la gaussienne;
+
+  \item la \textbf{distribution K} de paramètre de forme $\dof>0$, de générateur
+  $$
+  \densgen(t) = t^{(\dof-\Nvar/2)/2}\,K_{\dof-\Nvar/2}\left(\sqrt{2\dof t}\right),
+  $$
+  où $K_\ell$ désigne la fonction de Bessel modifiée de deuxième espèce d'ordre $\ell$. Elle est obtenue pour une texture suivant une loi $\gammadist$ de paramètre de forme $\dof$ et d'échelle $1/\dof$, et redonne également la gaussienne lorsque $\dof\to\infty$;
+
+  \item la \textbf{gaussienne généralisée} de paramètres $s>0$ et $b>0$, de générateur
+  $$
+  \densgen(t) = \exp\left(-\frac{t^s}{2b}\right),
+  $$
+  qui redonne la gaussienne pour $s=1,\,b=1$ et la distribution de Laplace pour $s=1/2$. Le paramètre $s$ contrôle directement l'épaisseur des queues: $s<1$ donne des queues plus lourdes que la gaussienne, $s>1$ des queues plus légères\footnote{On peut montrer qu'elle admet une représentation gaussienne-composée précisément lorsque $s\leq 1$, i.e, dans le régime à queues lourdes.}.
+\end{itemize}
+
+\begin{figure}[h]
+  \begin{center}
+    \input{gfx/generated/context_elliptical_examples/ellipticaltails/plot.tex}
+  \end{center}
+  \provEllipticaltailsQR[.5cm]
+  \caption{Nuages de points et isodensités pour $\Nvar=2$ et une même matrice de dispersion $\MScatter$, pour les quatre générateurs de densité considérés: gaussienne, $t$ de Student ($\dof=3$), K ($\dof=2$) et gaussienne généralisée ($s=0.5$). La symétrie elliptique est commune aux quatre modèles: seule la loi de l'amplitude, portée par la variable modulaire \cref{eq:context-distributions-modularpdf}, les distingue. \provEllipticaltails}
+  \label{fig:context-distributions-ellipticaltails}
+\end{figure}
+
+% TODO: à décommenter une fois l'expérience qanat context_elliptical_examples lancée
+% \begin{figure}[h]
+%   \begin{center}
+%     \input{gfx/generated/context_elliptical_examples/ellipticalmarginal/plot.tex}
+%   \end{center}
+%   \provEllipticalmarginalQR[.5cm]
+%   \caption{Histogramme d'une marginale simulée sous distribution $t$ de Student ($\dof=3$) et ajustements au sens du mle par un modèle gaussien et par un modèle de gaussienne généralisée. Le modèle gaussien échoue à rendre compte du comportement impulsif observé. \provEllipticalmarginal}
+%   \label{fig:context-distributions-ellipticalmarginal}
+% \end{figure}
+
+Enfin, la représentation donnée en \cref{eq:context-distributions-compoundgaussian} suggère une variante que nous exploiterons abondamment: plutôt que d'assigner une loi à la texture, on peut la considérer comme un paramètre déterministe qui varie d'une observation à l'autre.
+
+\begin{definition}[{Gaussienne composée déterministe}]
+\label{def:context-distributions-detcompoundgaussian}
+  \'Etant donné un ensemble d'observations $\X=[\x_1,\dots,\x_\Nobs]$, on appelle modèle de gaussienne-composée déterministe le modèle:
+\begin{equation}
+  \x_\iobs \sim \gaussian(\vector{0}, \texture_\iobs\MShape),
+  \qquad
+  \forall \iobs\in\intrange{1}{\Nobs},
+  \label{eq:context-distributions-detcompoundgaussian}
+\end{equation}
+  dont les paramètres sont les échelles déterministes $\vector{\texture}=[\texture_1,\dots,\texture_\Nobs]^\T\in(\R^+)^\Nobs$ et la matrice de forme $\MShape$, normalisée par $\trace{\MShape}=\Nvar$.
+\end{definition}
+
+\begin{remark}
+  Ce modèle ne suit pas strictement la paramétrisation donnée en \cref{eq:context-distributions-scaleshape}, puisqu'ici chaque observation possède son propre paramètre d'échelle alors que la paramétrisation n'en définit qu'un seul pour l'ensemble. Il postule donc une homogénéité de la structure et une hétérogénéité de la puissance au sein des observations. Son intérêt est de généraliser le modèle gaussien sans ajouter le moindre apriori sur la loi de la texture, au prix d'un nombre de paramètres qui croît avec $\Nobs$. Nous le retrouverons au \cref{ch:robust-detection} ainsi qu'en \cref{sec:context-geometry-compound-gaussian}.
+\end{remark}
+
+
+\subsection{Estimation robuste: M-estimation}
+\label{subsec:context-robust-m-estimation}
+
+Une fois le modèle elliptique posé, reprenons le problème d'estimation de la \cref{sec:context-covariance-estimation}, mais cette fois au sens du maximum de vraisemblance. Pour alléger, nous supposerons dans toute cette partie que la moyenne est connue et nulle\footnote{L'estimation conjointe de la position et de la dispersion est possible et traitée dès \cite{Maronna76}, mais elle alourdit les expressions sans rien changer aux mécanismes que nous voulons illustrer.}, de sorte que le seul paramètre à estimer est la matrice de dispersion $\MScatter$.
+
+En annulant la dérivée de la log-vraisemblance associée à l'\cref{eq:context-distributions-ellipticalpdf} par rapport à $\MScatter$, on obtient non pas une expression explicite comme dans le cas gaussien, mais une équation implicite:
+
+\begin{proposition}[{\'Equation du mle sous modèle elliptique}]
+\label{prop:context-robust-mlelliptical}
+  \'Etant donné un ensemble d'observations i.i.d $\X$ de la variable $\Variable\sim\elliptical(\vector{0},\MScatter,\densgen)$, l'estimateur au sens du maximum de vraisemblance de $\MScatter$ vérifie l'équation de point fixe:
+\begin{equation}
+  \hat{\MScatter}
+  =
+  \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \weight\left(\quadratic{\x_\iobs}{\hat{\MScatter}}\right)
+  \x_\iobs\x_\iobs^\T,
+  \qquad
+  \weight(t) \eqdef -2\frac{\densgen'(t)}{\densgen(t)}.
+  \label{eq:context-robust-fixedpoint}
+\end{equation}
+\end{proposition}
+
+\begin{remark}
+  On vérifie immédiatement que le cas gaussien $\densgen(t)=\exp(-t/2)$ donne $\weight(t)=1$ et donc $\hat{\MScatter}=\hat{\MCov}_\Variable^{\mathrm{ML}}$: on retombe sur la scm de l'\cref{eq:context-distributions-mlegaussian}. Pour la distribution $t$ de Student en revanche, on obtient
+  $$
+  \weight(t) = \frac{\Nvar+\dof}{\dof+t},
+  $$
+  qui est une fonction \emph{décroissante}. C'est là tout le mécanisme: la scm pondère toutes les observations de la même façon, tandis que l'estimateur du maximum de vraisemblance sous un modèle à queues lourdes attribue un poids d'autant plus faible que l'observation est éloignée, au sens de la distance de Mahalanobis induite par $\hat{\MScatter}$ elle-même.
+\end{remark}
+
+Cette lecture suggère naturellement de s'affranchir du générateur de densité et de considérer la fonction de poids comme un objet à part entière que l'on choisit, ce qui est la définition même d'un M-estimateur \sidecite[-3cm]{Maronna76,huber1964robust}:
+
+\begin{definition}[{M-estimateur de dispersion}]
+\label{def:context-robust-mestimator}
+  Soit $\weight:\R^+\to\R^+$ une fonction de poids. On appelle M-estimateur de la matrice de dispersion toute solution $\Mestim\in\SPD{\Nvar}$ de l'équation:
+\begin{equation}
+  \Mestim
+  =
+  \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \weight\left(\quadratic{\x_\iobs}{\Mestim}\right)
+  \x_\iobs\x_\iobs^\T.
+  \label{eq:context-robust-mestimator}
+\end{equation}
+\end{definition}
+
+Rien ne garantit à priori qu'une telle équation admette une solution, ni qu'elle soit unique. Les conditions classiques, dues à (\cite{Maronna76}), portent sur la fonction de poids:
+
+\begin{proposition}[{Existence et unicité}]
+\label{prop:context-robust-existence}
+  Si $\weight$ est continue, positive et non croissante sur $\R^+$, si $t\mapsto t\weight(t)$ est non décroissante, bornée et de borne supérieure $a>\Nvar$, et si les observations sont en position générale avec $\Nobs>\Nvar$, alors \cref{eq:context-robust-mestimator} admet une unique solution, obtenue comme limite de la suite d'itérations de point fixe:
+\begin{equation}
+  \Mestim_{\iiter+1}
+  =
+  \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \weight\left(\quadratic{\x_\iobs}{\Mestim_\iiter}\right)
+  \x_\iobs\x_\iobs^\T.
+  \label{eq:context-robust-iterations}
+\end{equation}
+\end{proposition}
+
+\begin{remark}
+  La condition $a>\Nvar$ est à rapprocher du régime dimensionnel discuté en \cref{sec:context-covariance-regularized-estimation}: comme pour la scm, il faut suffisamment d'observations relativement à la dimension pour que le problème soit bien posé. Nous verrons par ailleurs en \cref{sec:context-riemann-optimization} que ces conditions d'unicité s'expliquent élégamment par la notion de convexité géodésique sur le cône $\SPD{\Nvar}$ \sidecite[0cm]{6298979,Ollila2014}: la fonction de coût, qui n'est pas convexe au sens euclidien, l'est le long des géodésiques de la métrique affine invariante.
+\end{remark}
+
+Un cas particulier mérite une attention spécifique, à la fois parce qu'il échappe aux conditions précédentes et parce qu'il est celui que nous emploierons le plus:
+
+\begin{definition}[{Estimateur de Tyler}]
+\label{def:context-robust-tyler}
+  L'estimateur de Tyler \sidecite[1.5cm]{Tyler1987} est le M-estimateur associé au choix $\weight(t)=\Nvar/t$, i.e, la solution de:
+\begin{equation}
+  \Tyler
+  =
+  \frac{\Nvar}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \frac{\x_\iobs\x_\iobs^\T}{\quadratic{\x_\iobs}{\Tyler}},
+  \label{eq:context-robust-tyler}
+\end{equation}
+  assortie de la normalisation $\trace{\Tyler}=\Nvar$.
+\end{definition}
+
+\begin{remark}
+  Le choix $\weight(t)=\Nvar/t$ donne $t\weight(t)=\Nvar$, qui est constante: les conditions de la \cref{prop:context-robust-existence} ne sont donc pas vérifiées, et l'unicité doit être établie séparément (\cite{Pascal08a}). La conséquence directe de cette constance est que \cref{eq:context-robust-tyler} est invariante par changement d'échelle de $\Tyler$: la solution n'est définie qu'à un facteur positif près, ce qui explique la normalisation imposée. Autrement dit, l'estimateur de Tyler n'estime pas une matrice de dispersion mais une matrice de \emph{forme} au sens de la \cref{def:context-distributions-scaleshape}.
+\end{remark}
+
+\begin{property}[{Caractère distribution-free}]
+\label{prop:context-robust-distributionfree}
+  La distribution de $\Tyler$ ne dépend pas du générateur de densité $\densgen$ des observations. Il s'agit donc du mle de la matrice de forme sous le modèle de gaussienne-composée déterministe \cref{eq:context-distributions-detcompoundgaussian}, quelles que soient les valeurs des textures $\{\texture_\iobs\}$.
+\end{property}
+
+\begin{remark}
+  C'est cette propriété qui donne à l'estimateur de Tyler son statut particulier et qui définit la notion de robustesse que nous retiendrons dans cette dissertation: une méthode sera dite \textbf{robuste} lorsque ses propriétés statistiques ne dépendent pas du générateur de densité \sidecite[0cm]{maronna2006robust,zoubir_koivunen_ollila_muma_2018}. En effet, \cref{eq:context-robust-tyler} ne fait intervenir les observations que par leur direction $\x_\iobs/\norm{\x_\iobs}_2$, l'amplitude étant exactement annulée par le dénominateur. Or, d'après la représentation stochastique \cref{eq:context-distributions-stochastic}, c'est précisément l'amplitude qui porte toute la dépendance en $\densgen$\footnote{On peut formaliser cela en remarquant que le vecteur normalisé $\x_\iobs/\norm{\x_\iobs}_2$ suit une distribution elliptique angulaire, dont la d.d.p sur la sphère $\sphere{\Nvar-1}$ ne fait plus apparaître que la matrice de forme.}.
+\end{remark}
+
+Plutôt que de raisonner sur des courbes d'erreur, il est éclairant de regarder une \emph{unique} estimation dans le plan. Nous simulons pour cela $\Nobs=50$ observations centrées de matrice de forme $\MShape$ connue, pour $\Nvar=2$ et selon les quatre modèles introduits en \cref{subsec:context-distributions-elliptical}, et nous représentons en \cref{fig:context-robust-scmvstyler} les ellipses de concentration des trois estimateurs: la scm, le M-estimateur du maximum de vraisemblance du modèle considéré, et l'estimateur de Tyler.
+
+\begin{figure}[h]
+  \begin{center}
+    \input{gfx/generated/context_robust_mestimation/scmvstyler/plot.tex}
+  \end{center}
+  \provScmvstylerQR[.5cm]
+  \caption{Ellipses de concentration estimées à partir d'une unique réalisation de $\Nobs=50$ observations, pour $\Nvar=2$ et une même matrice de forme $\MShape$, sous les quatre modèles de la \cref{subsec:context-distributions-elliptical}. En pointillés: la vraie forme. En traits pleins: la scm, le mle du modèle considéré et l'estimateur de Tyler \cref{eq:context-robust-tyler}. Toutes les matrices sont normalisées par la trace, seule la forme étant comparable. Dans le panneau gaussien, le mle est exactement la scm et les deux courbes se confondent. \provScmvstyler}
+  \label{fig:context-robust-scmvstyler}
+\end{figure}
+
+
+Le panneau gaussien sert de témoin: le mle y coïncide exactement avec la scm, puisque $\weight(t)=1$, et les deux ellipses se superposent. Dès que l'on passe aux modèles à queues lourdes en revanche, quelques observations de forte amplitude suffisent à faire basculer l'ellipse de la scm, tandis que celles du mle et de Tyler restent proches de la vérité. On mesure au passage le prix de la robustesse: dans le cas gaussien, Tyler est légèrement moins bon que la scm, puisqu'il renonce délibérément à l'information portée par l'amplitude\footnote{Sur un grand nombre de tirages, l'erreur médiane de Tyler est par ailleurs rigoureusement la même sous les quatre modèles, ce qui est la traduction numérique directe de la \cref{prop:context-robust-distributionfree}, là où celle de la scm varie du simple au double.}.
+
+
+
+Quant à la question du calcul effectif de ces estimateurs, contrairement à la scm, aucun d'entre eux ne possède de forme explicite: on procède par les itérations de point fixe \cref{eq:context-robust-iterations}, initialisées en général à la matrice identité ou à la scm elle-même. La convergence est en pratique très rapide et l'itération préserve le caractère spd à chaque étape. \\
+
+
+Il reste à répondre à la question que nous avions laissée en suspens en \cref{subsec:context-distributions-gaussian}: nous y avions souligné que la connaissance exacte de la loi de l'estimateur était un luxe propre au modèle gaussien. Cela demeure vrai, aucun de ces estimateurs n'ayant de loi connue à $\Nobs$ fini, mais le comportement \emph{asymptotique}, lui, est complètement caractérisé.
+
+\begin{proposition}[{Normalité asymptotique des M-estimateurs}]
+\label{prop:context-robust-asymptotic}
+  Posons $\scorefun(t)\eqdef t\,\weight(t)$ et notons $\quadvar$ la forme quadratique $\quadratic{\Variable}{\MScatter}$ introduite en \cref{prop:context-distributions-scattercov}. Sous les hypothèses de la \cref{prop:context-robust-existence} et sous la normalisation $\E\{\scorefun(\quadvar)\}=\Nvar$, le M-estimateur $\Mestim$ est fortement consistant et vérifie, à $\Nvar$ fixé lorsque $\Nobs\to\infty$:
+  \begin{equation}
+    \label{eq:context-robust-asymptotic}
+    \sqrt{\Nobs}\,\vecop\left(\Mestim-\MScatter\right)
+    \xrightarrow{d}
+    \gaussian\left(\vector{0},\,
+    \sigma_1\left(\Id{\Nvar^2}+\Kmat\right)\left(\MScatter\otimes\MScatter\right)
+    + \sigma_2\,\vecop(\MScatter)\vecop(\MScatter)^\T\right),
+  \end{equation}
+  où $\Kmat$ est la matrice de commutation et où les deux scalaires valent, en posant $\beta\eqdef\E\{\quadvar\,\scorefun'(\quadvar)\}/\Nvar$:
+  \begin{equation}
+    \label{eq:context-robust-sigmas}
+    \sigma_1 = \frac{(\Nvar+2)\,\E\{\scorefun^2(\quadvar)\}}{\Nvar\left(\Nvar+2\beta\right)^{2}},
+    \qquad
+    \sigma_2 = \frac{1}{\beta^{2}}\left(\frac{\E\{\scorefun^2(\quadvar)\}}{\Nvar^{2}}-1\right) - \frac{2\sigma_1}{\Nvar}.
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  Le point remarquable n'est pas tant la gaussianité que la \emph{structure} de la covariance limite: elle est exactement celle que nous avions obtenue sous modèle gaussien en \cref{eq:context-distributions-covscm}, aux deux scalaires $\sigma_1$ et $\sigma_2$ près. Toute la dépendance au générateur de densité $\densgen$ et au choix de la fonction de poids $\weight$ se concentre dans ces deux nombres. On vérifie d'ailleurs que le choix gaussien $\weight(t)=1$ donne $\scorefun(t)=t$, $\beta=1$ et $\E\{\scorefun^2(\quadvar)\}=\E\{\quadvar^2\}=\Nvar(\Nvar+2)$, d'où $\sigma_1=1$ et $\sigma_2=0$: on retombe sur la scm. En particulier, la lecture en $\Nvar^2/\Nobs$ de l'\cref{eq:context-distributions-msescm} reste valable pour tout M-estimateur, seule la constante multiplicative changeant.
+\end{remark}
+
+La normalisation $\E\{\scorefun(\quadvar)\}=\Nvar$ n'est pas anodine: sans elle, $\Mestim$ converge non pas vers $\MScatter$ mais vers $\sigma\MScatter$, où $\sigma$ est solution de $\E\{\scorefun(\quadvar/\sigma)\}=\Nvar$. Autrement dit, un M-estimateur estime toujours consistamment la matrice de \emph{forme} au sens de la \cref{def:context-distributions-scaleshape}, mais l'échelle n'est restituée qu'au prix d'un facteur correctif qui, lui, dépend de $\densgen$. C'est la version asymptotique de ce que nous avons déjà constaté sur l'estimateur de Tyler, pour lequel cette indétermination est totale. \\
+
+Appliquée précisément à ce dernier, la proposition prend une forme particulièrement parlante. Le choix $\weight(t)=\Nvar/t$ donne $\scorefun\equiv\Nvar$ et donc $\scorefun'\equiv 0$, soit $\beta=0$: l'expression de $\sigma_2$ dégénère, ce qui n'est que la traduction de l'indétermination d'échelle. En imposant la contrainte $\Tr(\Tyler)=\Nvar$, on obtient en revanche
+\begin{equation}
+  \label{eq:context-robust-tylerasymptotic}
+  \sigma_1 = \frac{\Nvar+2}{\Nvar},
+  \qquad
+  \sigma_2 = -\frac{2(\Nvar+2)}{\Nvar^{2}},
+\end{equation}
+qui ne dépendent, conformément à la \cref{prop:context-robust-distributionfree}, ni de $\densgen$ ni d'aucun paramètre de nuisance. La comparaison avec le cas gaussien $\sigma_1=1$ fournit alors la mesure exacte du prix de la robustesse que la \cref{fig:context-robust-scmvstyler} ne montrait que qualitativement: l'efficacité relative asymptotique de Tyler par rapport à la scm, lorsque les données sont effectivement gaussiennes, vaut $\Nvar/(\Nvar+2)$. Ce prix est d'autant plus faible que la dimension est grande et devient négligeable dès quelques dizaines de variables, alors que la dégradation subie par la scm sous un modèle à queues lourdes, elle, n'est pas bornée. \sidecite[-6cm]{Tyler1987} montre par ailleurs que cet estimateur est \emph{minimax} au sein de la famille elliptique, au sens où il minimise la variance asymptotique maximale. Il n'est pas pour autant efficace au sens semiparamétrique, c'est-à-dire qu'il n'atteint pas la borne de Cramér-Rao associée au modèle où $\densgen$ est traité comme un paramètre de nuisance infini-dimensionnel; y parvenir demande de recourir à des estimateurs de rang \sidecite[-5cm]{HallinOja2006,Fortunati2020}, que nous n'utiliserons pas dans cette dissertation.
+
+Ces résultats sont asymptotiques en $\Nobs$ à dimension fixée, ce qui, au vu des difficultés soulevées en \cref{sec:context-covariance-regularized-estimation}, n'est pas toujours le régime pertinent. Une seconde ligne de travaux se place précisément dans le régime où $\Nobs$ et $\Nvar$ tendent conjointement vers l'infini à rapport $\Nvar/\Nobs$ constant: on y montre que $\norm{\Mestim - \hat{\Smat}_\Nobs}\to 0$ presque sûrement en norme spectrale, où $\hat{\Smat}_\Nobs$ est une scm dont les observations sont pondérées par des coefficients \emph{déterministes} \sidecite[-1cm]{couillet2015RMT}. Le M-estimateur, objet implicite défini par un point fixe, admet donc en grande dimension un équivalent explicite dont on sait décrire la distribution spectrale limite. \\
+
+Signalons enfin que les difficultés dimensionnelles rencontrées en \cref{sec:context-covariance-regularized-estimation} ne disparaissent évidemment pas ici: la \cref{prop:context-robust-existence} exige $\Nobs>\Nvar$, et l'estimateur de Tyler est même indéfini dès que $\Nobs\leq\Nvar$. Les mêmes remèdes s'appliquent alors, en contractant l'itération vers une matrice cible à la manière de l'\cref{eq:context-ledoit-wolf}, ce qui donne les M-estimateurs régularisés \sidecite[-1cm]{chen2011robust,pascal2014generalized,Ollila2014}. Nous ferons appel à ces variantes dès lors que l'estimation devra être menée sur des fenêtres de petite taille.
+
+\section{Le cas complexe}
+\label{sec:context-distributions-complex}
+
+Les objets d'ordre deux du cas complexe --- forme réelle, couple covariance--pseudo-covariance, circularité --- ont été mis en place en \cref{sec:context-definition-complex}, et nous les supposons acquis. Reste le versant probabiliste, qui ne se transpose pas davantage de façon mécanique. Cette section reprend donc les résultats des \cref{subsec:context-distributions-gaussian,subsec:context-distributions-elliptical,subsec:context-robust-m-estimation} dans le cas complexe, en indiquant à chaque étape ce qui change et pourquoi.
+
+\subsection{La distribution gaussienne complexe}
+
+Un vecteur complexe est dit gaussien lorsque ses parties réelle et imaginaire sont conjointement gaussiennes. Sa d.d.p est donc entièrement déterminée par la gaussienne réelle en dimension $2\Nvar$, et il ne reste qu'à la réécrire en fonction de $\MCov_\Variable$ et $\MPCov_\Variable$.
+
+\begin{proposition}[{d.d.p gaussienne complexe générale}]
+\label{prop:context-complex-gaussianpdf}
+  Soit $\Variable\in\C^\Nvar$ un vecteur gaussien complexe centré, de covariance $\MCov_\Variable\in\HPD{\Nvar}$ et de pseudo-covariance $\MPCov_\Variable$, et soient $\MWl=\MPCov_\Variable^\herm\inv{\MCov_\Variable}$ et $\MErr$ définies comme en \cref{eq:context-complex-picinbono}. Sa d.d.p, vue comme densité sur $\R^{2\Nvar}$, s'écrit
+\begin{equation}
+  \ddp{\Variable}(\vector{z})
+  =
+  \pi^{-\Nvar}
+  \left[\Det(\MCov_\Variable)\Det(\MErr)\right]^{-1/2}
+  \exp\left\{
+    -\vector{z}^\herm\conj{\inv{\MErr}}\vector{z}
+    + \Realp\left(\vector{z}^\T\MWl^\T\conj{\inv{\MErr}}\vector{z}\right)
+  \right\}.
+  \label{eq:context-complex-gaussiangeneral}
+\end{equation}
+\end{proposition}
+
+\begin{remark}
+  On peut mettre \cref{eq:context-complex-gaussiangeneral} sous une forme plus parlante en appliquant le lemme d'inversion matricielle à $\conj{\inv{\MErr}} = \inv{\MCov_\Variable} + \inv{\MCov_\Variable}\MPCov_\Variable\inv{\MErr}\MPCov_\Variable^\herm\inv{\MCov_\Variable}$: la d.d.p se factorise alors en le produit de la d.d.p du cas circulaire, donnée ci-dessous, et d'un facteur correctif ne dépendant que du couple $(\MWl,\MErr)$, dont le déterminant se réduit à $\Det(\inv{\MCov_\Variable}\MErr) = \Det(\Id{\Nvar}-\MWl^\herm\MWl^\T)$. Toute la non-circularité est ainsi concentrée dans ce facteur, qui vaut $1$ lorsque $\MPCov_\Variable=\mat{0}$.
+\end{remark}
+
+Dans le cas circulaire qui nosu intéresse, nous aovsn alors :
+
+\begin{definition}[{Vecteur aléatoire gaussien complexe circulaire}]
+\label{def:context-complex-cgaussian}
+  On dit que $\Variable\in\C^\Nvar$ suit une distribution gaussienne complexe circulaire de moyenne $\Vmoy_\Variable$ et de covariance $\MCov_\Variable\in\HPD{\Nvar}$, et on note $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, si sa d.d.p est
+\begin{equation}
+  \ddp{\Variable}(\vector{z};\param)
+  =
+  \pi^{-\Nvar}\Det(\MCov_\Variable)^{-1}
+  \exp\left\{-\quadraticH{(\vector{z}-\Vmoy_\Variable)}{\MCov_\Variable}\right\}.
+  \label{eq:context-complex-cgaussianpdf}
+\end{equation}
+\end{definition}
+
+% \begin{remark}[{Origine des constantes}]
+%   L'\cref{eq:context-complex-cgaussianpdf} s'obtient en posant $\MPCov_\Variable=\mat{0}$ dans \cref{eq:context-complex-gaussiangeneral}, ce qui donne $\MWl=\mat{0}$, $\MErr=\conj{\MCov_\Variable}$, et donc $\Det(\MCov_\Variable)\Det(\MErr) = \Det(\MCov_\Variable)^2$ puisque le déterminant d'une matrice hermitienne définie positive est réel positif.
+%
+%   La comparaison avec \cref{eq:context-definition-gaussian} fait apparaître trois différences: la constante est $\pi^{-\Nvar}$ et non $(2\pi)^{-\Nvar/2}$, le déterminant est à la puissance $-1$ et non $-1/2$, et le facteur $1/2$ a disparu de la forme quadratique. Ces trois écarts ont une seule et même origine, qui est la \cref{def:context-complex-circularity}: la d.d.p n'est autre que celle d'une gaussienne réelle en dimension $2\Nvar$ dont la covariance vaut $\frac12\complexform{\MCov_\Variable}$. Le facteur $1/2$ de cette covariance absorbe celui de l'exposant, et \cref{prop:context-complex-transport} donne
+%   $$
+%   \Det\left(\tfrac12\complexform{\MCov_\Variable}\right)^{-1/2}
+%   = \left(2^{-2\Nvar}\abs{\Det(\MCov_\Variable)}^2\right)^{-1/2}
+%   = 2^{\Nvar}\Det(\MCov_\Variable)^{-1},
+%   $$
+%   le facteur $2^\Nvar$ transformant $(2\pi)^{-\Nvar}$ en $\pi^{-\Nvar}$. Il n'y a donc aucune convention arbitraire dans \cref{eq:context-complex-cgaussianpdf}: c'est la gaussienne réelle, lue dans les bonnes coordonnées.
+% \end{remark}
+%
+
+On retrouve à partir de celle-ci, la loi de la forme quadratique :
+
+\begin{property}[{Loi de la forme quadratique}]
+\label{prop:context-complex-quadform}
+  Si $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, alors
+  \begin{equation}
+    \quadraticH{(\Variable-\Vmoy_\Variable)}{\MCov_\Variable}
+    \sim
+    \tfrac12\chisquared_{2\Nvar}
+    % =
+    % \gammadist(\Nvar,1).
+    \label{eq:context-complex-quadform}
+  \end{equation}
+\end{property}
+
+\begin{remark}
+  Là où le cas réel faisait apparaître un $\chisquared_\Nvar$, le cas complexe fait apparaître un $\chisquared$ à $2\Nvar$ degrés de liberté, réduit de moitié: une observation complexe vaut bien deux observations réelles. On notera au passage que la circularité au second ordre entraîne ici la circularité stricte, puisque la d.d.p \cref{eq:context-complex-cgaussianpdf} centrée ne dépend de $\vector{z}$ qu'au travers d'une forme quadratique hermitienne, invariante par déphasage.
+\end{remark}
+
+L'estimation se transpose alors sans surprise, à ceci près que les lois exactes changent de constantes :
+
+\begin{proposition}[{mle et loi de la scm sous modèle gaussien complexe}]
+\label{prop:context-complex-mle}
+  \'Etant donné un ensemble d'observations i.i.d $\X$ de $\Variable\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable)$, les estimateurs au sens du maximum de vraisemblance sont
+  \begin{equation}
+    \hat{\Vmoy}_\Variable^{\mathrm{ML}} = \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\vector{z}_\iobs,
+    \qquad
+    \hat{\MCov}_\Variable^{\mathrm{ML}}
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \left(\vector{z}_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)
+    \left(\vector{z}_\iobs-\hat{\Vmoy}_\Variable^{\mathrm{ML}}\right)^\herm.
+    \label{eq:context-complex-mle}
+  \end{equation}
+  De plus, pour $\Nobs>\Nvar$, la matrice $\Smat=\Nobs\hat{\MCov}_\Variable^{\mathrm{ML}}$ suit une \textbf{distribution de Wishart complexe} à $\Nobs-1$ degrés de liberté \sidecite[1.2cm]{Goodman1963}, notée $\Smat\sim\cwishart(\Nobs-1,\MCov_\Variable)$, de d.d.p sur le cône $\HPD{\Nvar}$
+  \begin{equation}
+    \ddp{\Smat}(\mat{S};\Nobs,\MCov)
+    =
+    \frac{
+      \Det(\mat{S})^{\Nobs-\Nvar}
+      \exp\left\{-\trace{\inv{\MCov}\mat{S}}\right\}
+    }{
+      \tilde{\Gamma}_\Nvar(\Nobs)\Det(\MCov)^{\Nobs}
+    },
+    \label{eq:context-complex-cwishart}
+  \end{equation}
+  où $\tilde{\Gamma}_\Nvar(a) $ est la fonction gamma multivariée complexe. 
+
+  Enfin, $\hat{\Vmoy}_\Variable^{\mathrm{ML}}\sim\cgaussian(\Vmoy_\Variable,\MCov_\Variable/\Nobs)$ lui est indépendante.
+\end{proposition}
+
+Et on peut retrouver les résutlats sur l'eqm :
+
+\begin{proposition}[{Erreur quadratique de la scm complexe}]
+\label{prop:context-complex-msescm}
+  Pour l'estimateur non-biaisé $\hat{\MCov}_\Variable = \Smat/(\Nobs-1)$, on a
+  \begin{equation}
+    \Cov\left(
+      (\hat{\MCov}_\Variable)_{\ivar\ivarbis},
+      (\hat{\MCov}_\Variable)_{k\ell}
+    \right)
+    =
+    \frac{(\MCov_\Variable)_{\ivar k}\conj{(\MCov_\Variable)_{\ivarbis \ell}}}{\Nobs-1},
+    \label{eq:context-complex-covscm}
+  \end{equation}
+  et, par sommation sur tous les coefficients,
+  \begin{equation}
+    \E\left\{\left\|\hat{\MCov}_\Variable-\MCov_\Variable\right\|_\frob^2\right\}
+    =
+    \frac{\left(\trace{\MCov_\Variable}\right)^2}{\Nobs-1}.
+    \label{eq:context-complex-msescm}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  % La comparaison avec l'\cref{eq:context-distributions-msescm} est instructive. Le moment d'ordre quatre d'un vecteur gaussien complexe circulaire vaut $\E\{\variable_a\conj{\variable_b}\variable_c\conj{\variable_d}\} = \MCov_{ab}\MCov_{cd} + \MCov_{ad}\MCov_{cb}$, soit deux termes comme dans le cas réel; mais l'un des deux ne survit pas au centrage, alors que dans le cas réel les deux subsistent. C'est cette disparition du terme $\|\MCov_\Variable\|_\frob^2$ qui distingue \cref{eq:context-complex-msescm} de son homologue réelle.
+  Pour $\MCov_\Variable=\Id{\Nvar}$, l'erreur vaut $\Nvar^2/(\Nobs-1)$, contre $\Nvar(\Nvar+1)/(\Nobs-1)$ dans le cas réel. Le rapport n'est pas $2$ mais $2\Nvar/(\Nvar+1)$, et la lecture correcte n'est pas que le cas complexe serait plus coûteux: en notant $p$ le nombre de paramètres réels libres, l'erreur vaut $2p/(\Nobs-1)$ dans le cas réel et $p/(\Nobs-1)$ dans le cas complexe. Rapportée au nombre de scalaires \emph{réels} effectivement observés — $\Nobs\Nvar$ d'un côté, $2\Nobs\Nvar$ de l'autre — la précision est donc exactement la même. Le doublement du nombre de paramètres constaté en \cref{sec:context-definition-complex} est intégralement compensé par le doublement de l'information apportée par chaque observation, et la lecture en $\Nvar^2/\Nobs$ de la \cref{sec:context-covariance-regularized-estimation} demeure inchangée.
+\end{remark}
+
+\subsection{Distributions elliptiques complexes}
+
+Le passage aux distributions elliptiques complexes (ces\footnote{Pour \emph{Complex Elliptically Symmetric} en anglais.}) suit la même logique: on conserve la dépendance en la seule forme quadratique hermitienne, et l'on relâche le générateur\footnote{Pour un état des lieux détaillé, on peut se référer à \sidecite{6263313}}.
+
+\begin{definition}[{Distribution elliptique complexe}]
+\label{def:context-complex-ces}
+  Soit $\densgen:\R^+\to\R^+$ vérifiant la condition de moment fini
+  \begin{equation}
+    \densgenmomentC{\Nvar}
+    \eqdef
+    \int_{\R^+} t^{\Nvar-1}\densgen(t)\diff t < \infty,
+    \label{eq:context-complex-momentfini}
+  \end{equation}
+  et $\MScatter\in\HPD{\Nvar}$. On dit que $\Variable$ suit une distribution elliptique complexe de paramètres $\param=(\Vmoy_\Variable,\MScatter,\densgen)$, et on note $\Variable\sim\celliptical(\Vmoy_\Variable,\MScatter,\densgen)$, si sa d.d.p est
+  \begin{equation}
+    \ddp{\Variable}(\vector{z};\param)
+    =
+    \densgenconstC{\Nvar}\Det(\MScatter)^{-1}
+    \densgen\left(\quadraticH{(\vector{z}-\Vmoy_\Variable)}{\MScatter}\right),
+    \qquad
+    \densgenconstC{\Nvar}
+    \eqdef
+    \frac{\Gamma(\Nvar)}{\pi^\Nvar\densgenmomentC{\Nvar}}.
+    \label{eq:context-complex-cespdf}
+  \end{equation}
+\end{definition}
+
+\begin{remark}
+  La comparaison avec la \cref{def:context-distributions-elliptical} tient en trois substitutions: l'exposant $\Nvar/2-1$ du moment devient $\Nvar-1$, le déterminant passe de la puissance $-1/2$ à $-1$, et l'aire de la sphère unité $\spherearea{\Nvar}$ est remplacée par celle de la sphère unité de $\C^\Nvar\simeq\R^{2\Nvar}$, soit $\spherearea{2\Nvar}=2\pi^\Nvar/\Gamma(\Nvar)$. La constante s'obtient d'ailleurs par le même calcul: le changement de variable $\vector{y}=\MScatter^{-1/2}(\vector{z}-\Vmoy_\Variable)$ suivi d'un passage en coordonnées polaires dans $\R^{2\Nvar}$ donne $\densgenconstC{\Nvar} = 2\inv{\left(\spherearea{2\Nvar}\densgenmomentC{\Nvar}\right)}$, ce qui est bien l'expression annoncée. On vérifie que le cas gaussien $\densgen(t)=\exp(-t)$ — et non plus $\exp(-t/2)$ — donne $\densgenmomentC{\Nvar}=\Gamma(\Nvar)$ et donc $\densgenconstC{\Nvar}=\pi^{-\Nvar}$, en accord avec \cref{eq:context-complex-cgaussianpdf}.
+\end{remark}
+
+\begin{property}[{Représentation stochastique et lien dispersion--covariance}]
+\label{prop:context-complex-stochastic}
+  Si $\Variable\sim\celliptical(\Vmoy_\Variable,\MScatter,\densgen)$, alors
+  \begin{equation}
+    \Variable \overset{d}{=} \Vmoy_\Variable + \modvar\,\MScatter^{1/2}\vector{u},
+    \qquad
+    \vector{u}\sim\uniform\left(\csphere{\Nvar-1}\right),
+    \qquad
+    \p{\quadvar}(q) = \inv{\densgenmomentC{\Nvar}}\,q^{\Nvar-1}\densgen(q),
+    \label{eq:context-complex-stochastic}
+  \end{equation}
+  où $\modvar=\sqrt{\quadvar}$ est indépendante de $\vector{u}$, uniforme sur la sphère unité complexe $\csphere{\Nvar-1}=\{\vector{s}\in\C^\Nvar;\,\norm{\vector{s}}_2=1\}$. Si de plus les moments d'ordre deux existent,
+  \begin{equation}
+    \MCov_\Variable = \frac{\E\{\quadvar\}}{\Nvar}\MScatter,
+    \qquad
+    \E\{\quadvar\} = \frac{\densgenmomentC{\Nvar+1}}{\densgenmomentC{\Nvar}},
+    \qquad
+    \MPCov_\Variable = \mat{0}.
+    \label{eq:context-complex-scattercov}
+  \end{equation}
+\end{property}
+
+  Le lien entre dispersion et covariance est donc formellement \emph{identique} à celui de la \cref{prop:context-distributions-scattercov}, seule la définition du moment $\densgenmomentC{\cdot}$ ayant changé; la \cref{def:context-distributions-scaleshape} de la paramétrisation échelle-forme et tout ce qui en découle s'appliquent inchangées, sur $\HPD{\Nvar}$ plutôt que sur $\SPD{\Nvar}$. On notera en revanche le troisième point de \cref{eq:context-complex-scattercov}: une distribution elliptique complexe au sens de la \cref{def:context-complex-ces} est automatiquement circulaire, puisque sa d.d.p ne dépend de $\vector{z}$ qu'au travers d'une forme quadratique hermitienne. La famille ces telle qu'elle est usuellement définie \cite{6263313} est donc, par construction, une famille de lois circulaires\footnote{Il existe des extensions non circulaires, construites sur le vecteur augmenté $[\vector{z}^\T,\vector{z}^\herm]^\T$, que nous n'emploierons pas.}.
+
+  La sous-famille des gaussiennes composées se définit de même par $\Variable \overset{d}{=} \Vmoy_\Variable + \sqrt{\texture}\,\Variablebis$ avec $\Variablebis\sim\cgaussian(\vector{0},\MShape)$ et $\texture$ une texture réelle positive indépendante, ce que nous noterons $\Variable\sim\ccompoundgaussian(\Vmoy_\Variable,\MShape,\p{\texture})$. Les modèles de la \cref{subsec:context-distributions-elliptical} — $t$ de Student, K, gaussienne généralisée — en admettent tous une version complexe, obtenue en assignant à la texture la même loi et en substituant le speckle complexe au speckle réel. Le modèle de gaussienne composée déterministe \cref{eq:context-distributions-detcompoundgaussian} se transpose de la même manière, en $\vector{z}_\iobs\sim\cgaussian(\vector{0},\texture_\iobs\MShape)$; c'est sous cette forme que nous l'emploierons au \cref{ch:robust-detection}. 
+
+% ============================ TODO decision ========================================
+% Le modele de gaussienne composee *deterministe complexe* n'est enonce ici
+% qu'en passant, dans le fil du texte, alors que tout le
+% \cref{ch:robust-detection} repose dessus (modele msg, estimateur de Tyler
+% complexe, detecteurs anmf). Deux options:
+%  (a) le promouvoir en \begin{definition} numerotee, sur le modele de la
+%      \cref{def:context-distributions-detcompoundgaussian} du cas reel, ce qui
+%      donnerait a la partie 3 une cible de \cref propre --- et eviterait d'y
+%      redonner l'equation;
+%  (b) le laisser tel quel, la partie 3 rappelant le modele sur place
+%      (\cref{def:detection-msg}) puisqu'elle doit pouvoir se lire seule.
+% Mon avis: (a), c'est le seul modele du chapitre qui n'a pas son enonce propre
+% alors qu'il est le plus utilise en aval.
+% ====================================================================================
+
+\subsection{M-estimation complexe}
+\label{subsec:context-complex-mestimation}
+
+Reprenons enfin l'estimation robuste. En annulant, au sens du calcul différentiel complexe précisé plus bas, la dérivée de la log-vraisemblance associée à \cref{eq:context-complex-cespdf}, on obtient là encore une équation de point fixe.
+
+\begin{proposition}[{\'Equation du mle sous modèle ces}]
+\label{prop:context-complex-mlefixedpoint}
+  \'Etant donné des observations i.i.d $\X$ de $\Variable\sim\celliptical(\vector{0},\MScatter,\densgen)$, le mle de $\MScatter$ vérifie
+  \begin{equation}
+    \hat{\MScatter}
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \weight\left(\quadraticH{\vector{z}_\iobs}{\hat{\MScatter}}\right)
+    \vector{z}_\iobs\vector{z}_\iobs^\herm,
+    \qquad
+    \weight(t) \eqdef -\frac{\densgen'(t)}{\densgen(t)}.
+    \label{eq:context-complex-fixedpoint}
+  \end{equation}
+\end{proposition}
+
+\begin{remark}
+  Le facteur $2$ de la fonction de poids de l'\cref{eq:context-robust-fixedpoint} a disparu: c'est la contrepartie exacte de la disparition du $1/2$ dans l'exposant de la d.d.p gaussienne, et confondre les deux conventions est l'erreur la plus fréquente lors du passage au complexe. On vérifie la cohérence sur le cas gaussien: $\densgen(t)=\exp(-t)$ donne $\weight(t)=1$, donc la scm de \cref{eq:context-complex-mle}. Pour le $t$ de Student complexe à $\dof$ degrés de liberté, de générateur $\densgen(t)=(1+2t/\dof)^{-(2\Nvar+\dof)/2}$, on obtient
+  $$
+  \weight(t) = \frac{2\Nvar+\dof}{\dof+2t},
+  $$
+  décroissante comme dans le cas réel, et l'on retrouve bien $\Nvar\mapsto2\Nvar$, $t\mapsto2t$: le poids complexe en dimension $\Nvar$ est le poids réel en dimension $2\Nvar$.
+\end{remark}
+
+La définition d'un M-estimateur complexe est alors identique à la \cref{def:context-robust-mestimator}, la transposée étant remplacée par la transposée conjuguée et le cône $\SPD{\Nvar}$ par $\HPD{\Nvar}$. C'est ici que la \cref{prop:context-complex-transport} paye:
+
+\begin{proposition}[{Existence et unicité, cas complexe}]
+\label{prop:context-complex-existence}
+  Sous les conditions de la \cref{prop:context-robust-existence} appliquées en dimension $2\Nvar$, l'équation \cref{eq:context-complex-fixedpoint} admet une unique solution dans $\HPD{\Nvar}$, limite des itérations de point fixe correspondantes.
+\end{proposition}
+
+\begin{remark}
+  La démonstration \sidecite[1.7cm]{6263313} consiste précisément à observer que $\hat{\MScatter}$ résout \cref{eq:context-complex-fixedpoint} si et seulement si $\complexform{\hat{\MScatter}}$ résout l'équation de M-estimation réelle associée aux $2\Nobs$ vecteurs $\{\vector{v}_\iobs, \complexform{j\Id{\Nvar}}\vector{v}_\iobs\}$, où $\vector{v}_\iobs$ est la forme réelle de $\vector{z}_\iobs$. Les résultats de \cite{Maronna76,Kent1991} s'appliquent alors tels quels. On notera que la condition dimensionnelle porte sur $2\Nvar$ et que le doublement du nombre de vecteurs réels la compense: la condition effective demeure $\Nobs>\Nvar$ en nombre d'observations \emph{complexes}.
+\end{remark}
+
+Notamment l'estimateur de Tyler se retrouve naturellement :
+
+\begin{definition}[{Estimateur de Tyler complexe}]
+\label{def:context-complex-tyler}
+  L'estimateur de Tyler complexe est le M-estimateur associé à $\weight(t)=\Nvar/t$, i.e, la solution de
+  \begin{equation}
+    \Tyler
+    =
+    \frac{\Nvar}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \frac{\vector{z}_\iobs\vector{z}_\iobs^\herm}{\quadraticH{\vector{z}_\iobs}{\Tyler}},
+    \label{eq:context-complex-tyler}
+  \end{equation}
+  assortie de la normalisation $\trace{\Tyler}=\Nvar$.
+\end{definition}
+
+Et on a toujours l'idée suivante de vraie :
+
+\begin{property}[{Caractère distribution-free}]
+\label{prop:context-complex-tylerdf}
+  L'estimateur \cref{eq:context-complex-tyler} est le mle de la matrice de forme sous le modèle de gaussienne composée déterministe complexe, quelles que soient les textures. C'est également le mle de la matrice de forme de la distribution \textbf{angulaire centrale gaussienne complexe}, notée $\vector{u}\sim\cangular(\MShape)$, de d.d.p sur la sphère $\csphere{\Nvar-1}$
+  \begin{equation}
+    \ddp{\vector{u}}(\vector{u};\MShape)
+    =
+    \frac{\Gamma(\Nvar)}{2\pi^\Nvar}\Det(\MShape)^{-1}
+    \left(\quadraticH{\vector{u}}{\MShape}\right)^{-\Nvar},
+    \label{eq:context-complex-acg}
+  \end{equation}
+  qui est la loi de $\Variable/\norm{\Variable}_2$ pour tout $\Variable\sim\celliptical(\vector{0},\MShape,\densgen)$, indépendamment de $\densgen$.
+\end{property}
+
+\begin{remark}
+  La \cref{eq:context-complex-acg} donne un contenu très concret à la notion de robustesse retenue en \cref{prop:context-robust-distributionfree}: le vecteur normalisé perd toute mémoire du générateur de densité, et Tyler n'est rien d'autre que le mle de la loi qu'il suit alors. On notera que cette d.d.p, quoique de la forme \cref{eq:context-complex-cespdf}, n'est pas celle d'une distribution ces: elle est définie par rapport à la mesure uniforme sur $\csphere{\Nvar-1}$ et non par rapport à la mesure de Lebesgue sur $\C^\Nvar$.
+\end{remark}
+
+Quant au comportement asymptotique, la \cref{prop:context-robust-asymptotic} se transpose avec la même structure — une combinaison de $(\Id{\Nvar^2}+\Kmat)(\MScatter\otimes\conj{\MScatter})$ et de $\vecop(\MScatter)\vecop(\MScatter)^\herm$ — au prix d'une subtilité: le vecteur limite étant complexe, sa loi n'est pleinement caractérisée que par la donnée de sa covariance \emph{et} de sa pseudo-covariance, conformément à la \cref{def:context-complex-pseudocov}. Le point qui nous intéresse est le suivant: pour la matrice de forme issue de l'estimateur de Tyler complexe, le scalaire correspondant à celui de \cref{eq:context-robust-tylerasymptotic} vaut
+\begin{equation}
+  \sigma_1 = \frac{\Nvar+1}{\Nvar},
+  \label{eq:context-complex-tylerasymptotic}
+\end{equation}
+au lieu de $(\Nvar+2)/\Nvar$ dans le cas réel. L'efficacité relative asymptotique de Tyler par rapport à la scm, lorsque les données sont effectivement gaussiennes complexes, vaut donc $\Nvar/(\Nvar+1)$: elle est de $66,7\%$ à $\Nvar=2$, de $90\%$ à $\Nvar=9$, et tend vers $1$ avec la dimension. Le prix de la robustesse est ainsi \emph{plus faible} dans le cas complexe que dans le cas réel, ce qui n'est que la traduction asymptotique de ce que nous avons déjà constaté sur l'erreur quadratique: à dimension égale, une observation complexe est deux fois plus informative.
+
+\subsection{Dérivation: le calcul de Wirtinger}
+
+Il reste à justifier ce que signifie « annuler la dérivée » d'une log-vraisemblance dans \cref{prop:context-complex-mlefixedpoint}. La difficulté est réelle: une log-vraisemblance est une fonction \emph{à valeurs réelles} d'une variable complexe, et une telle fonction, si elle n'est pas constante, ne vérifie jamais les conditions de Cauchy-Riemann. Elle n'est donc pas holomorphe, et la dérivée complexe usuelle n'existe en aucun point.
+
+\begin{definition}[{Dérivées de Wirtinger}]
+\label{def:context-complex-wirtinger}
+  Soit $f:\C\to\R$ une fonction $\R$-différentiable, vue comme fonction de $(x,y)$ avec $z=x+jy$. On appelle \textbf{dérivées de Wirtinger} \sidecite[1.8cm]{Brandwood1983} les opérateurs
+  \begin{equation}
+    \frac{\partial}{\partial z}
+    \eqdef
+    \frac{1}{2}\left(\frac{\partial}{\partial x} - j\frac{\partial}{\partial y}\right),
+    \qquad
+    \frac{\partial}{\partial \conj{z}}
+    \eqdef
+    \frac{1}{2}\left(\frac{\partial}{\partial x} + j\frac{\partial}{\partial y}\right).
+    \label{eq:context-complex-wirtinger}
+  \end{equation}
+\end{definition}
+
+\begin{remark}
+  Ces opérateurs se manipulent comme des dérivées partielles ordinaires, en traitant formellement $z$ et $\conj{z}$ comme deux variables indépendantes, ce qui est légitime puisque le passage de $(x,y)$ à $(z,\conj{z})$ est un changement de variables linéaire inversible. La condition d'holomorphie s'y lit $\partial f/\partial\conj{z} = 0$, ce qui montre bien qu'aucune fonction à valeurs réelles non constante ne l'est.
+
+  Deux conséquences nous importent. D'abord, un point stationnaire de $f$ est caractérisé par $\partial f/\partial\conj{z} = 0$, et c'est cette équation, appliquée à la log-vraisemblance dérivée par rapport à $\conj{\MScatter}$, qui produit \cref{eq:context-complex-fixedpoint}. Ensuite, la direction de plus forte pente de $f$ est donnée par $2\,\partial f/\partial\conj{z}$ et non par $\partial f/\partial z$ \sidecite[0.5cm]{vandenBos1994,KreutzDelgado2009,Hjorungnes2011}: une descente de gradient sur une fonction de coût complexe s'écrit donc $\vector{z}\leftarrow\vector{z} - 2\gamma\,\partial f/\partial\conj{\vector{z}}$. Nous retrouverons ces opérateurs en \cref{sec:context-riemann-optimization}, lorsqu'il s'agira de définir un gradient sur le cône $\HPD{\Nvar}$; les règles de calcul matriciel associées sont rassemblées dans \cite{Hjorungnes2011}.
+\end{remark}
+
+\subsection{Bilan}
+
+Le \cref{tab:context-complex-summary} rassemble les correspondances établies ici et en \cref{sec:context-definition-complex}.
+
+\begin{table}[h]
+  \centering
+  \caption{Correspondances entre le cas réel et le cas complexe circulaire.}
+  \label{tab:context-complex-summary}
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+     & Réel & Complexe circulaire \\
+    \midrule
+    Transposition & $\mat{A}^\T$ & $\mat{A}^\herm$ \\
+    Cône & $\SPD{\Nvar}$ & $\HPD{\Nvar}$ \\
+    Paramètres libres & $\Nvar(\Nvar+1)/2$ & $\Nvar^2$ \\
+    Constante gaussienne & $(2\pi)^{-\Nvar/2}\Det(\MCov)^{-1/2}$ & $\pi^{-\Nvar}\Det(\MCov)^{-1}$ \\
+    Forme quadratique & $\chisquared_\Nvar$ & $\tfrac12\chisquared_{2\Nvar}$ \\
+    Moment de $\densgen$ & $\int t^{\Nvar/2-1}\densgen(t)\diff t$ & $\int t^{\Nvar-1}\densgen(t)\diff t$ \\
+    Fonction de poids & $-2\densgen'(t)/\densgen(t)$ & $-\densgen'(t)/\densgen(t)$ \\
+    eqm de la scm & $\frac{\|\MCov\|_\frob^2+(\trace{\MCov})^2}{\Nobs-1}$ & $\frac{(\trace{\MCov})^2}{\Nobs-1}$ \\[1.2ex]
+    Efficacité de Tyler & $\Nvar/(\Nvar+2)$ & $\Nvar/(\Nvar+1)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Dans la suite de cette dissertation, les deux cas coexisteront: les applications radar et sonar du \cref{ch:robust-detection} relèvent du complexe circulaire, tandis que d'autres jeux de données sont naturellement réels. Nous préciserons donc à chaque fois le cadre retenu, et nous emploierons alors la transposée conjuguée sans plus le signaler. En particulier, la \cref{ch:context-riemann} sera menée dans le cas réel, où les figures et les dimensions sont plus lisibles, et une section dédiée établira le dictionnaire vers le cas complexe; la \cref{ch:context-geometry} repassera ensuite au complexe, qui est celui des modèles exploités au \cref{ch:robust-detection}. Nous conserverons par ailleurs l'abus de langage acté en \cref{prop:context-distributions-scattercov}, consistant à parler de matrice de covariance là où nous manipulerons une matrice de dispersion ou de forme.

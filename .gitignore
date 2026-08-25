@@ -53,3 +53,10 @@ Thumbs.db
 .DS_Store
 Thumbs.db
 
+# Python cache
+__pycache__/
+*.pyc
+
+# Cover art render cache
+couverture/annecy/cache/
+

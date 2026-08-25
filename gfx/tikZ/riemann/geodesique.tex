@@ -1,0 +1,29 @@
+% Geodesique entre deux points et distance geodesique, comparees a une autre
+% courbe tracee sur la variete.
+% Utilise dans la \cref{sec:context-riemann-notion}.
+\input{gfx/tikZ/riemann/style.tex}
+\begin{tikzpicture}[riemann]
+  \coordinate (P) at (-1.95,1.05);
+  \coordinate (Q) at ( 1.85,1.35);
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85] at (2.65,0.55) {$\Manifold$};
+
+  % une courbe quelconque joignant les deux points
+  \draw[rmanifold!60, thick, dashed]
+    (P) .. controls (-1.20,-0.15) and (1.05,-0.05) .. (Q);
+  \node[rmanifold, anchor=north, font=\scriptsize] at (-0.15,0.05)
+    {$L(\geod')>\geodist(\param_0,\param_1)$};
+
+  % la geodesique
+  \draw[rgeodesic, very thick]
+    (P) .. controls (-0.85,2.05) and (0.75,2.15) .. (Q);
+  \node[rgeodesic, anchor=east, inner sep=3pt] at (-1.35,1.72) {$\geod$};
+  \node[rgeodesic!85, anchor=south, font=\scriptsize] at (0.05,2.06)
+    {$L(\geod)=\geodist(\param_0,\param_1)$};
+
+  \fill (P) circle (1.7pt);
+  \node[anchor=east, inner sep=3pt] at (P) {$\param_0$};
+  \fill (Q) circle (1.7pt);
+  \node[anchor=west, inner sep=3pt] at (Q) {$\param_1$};
+\end{tikzpicture}

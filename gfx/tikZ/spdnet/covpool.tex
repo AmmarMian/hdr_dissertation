@@ -1,0 +1,28 @@
+% De la vignette GPR a la matrice SPD, de haut en bas. La retropropagation
+% remonte a gauche: c'est elle qui fait de la covariance une couche apprise et
+% non une caracteristique calculee en amont.
+% Utilise dans la \cref{sec:spdnet-covpool-couche}.
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[spdnet]
+
+  \node[splainbox] (img) {vignette $\imagegpr\in\R^{h\times w}$};
+  \node[seuclbox, below=of img] (cnn) {$\ilayer$ premières couches d'un \layername{resnet}};
+  \node[splainbox, below=of cnn] (stack) {cartes de filtres $\Tstack\in\R^{\Nfilter\times\Npix}$};
+  \node[smeanbox, below=of stack] (cov) {\CovPool{} \ $\CovPooled=\Tstack\centermat\Tstack^\T$};
+  \node[sstiefelbox, below=of cov] (spd) {\SPDnet{} \ $\Wlayer_1,\dots,\Wlayer_\Nlayer$};
+  \node[seuclbox, below=of spd] (out) {\LogEig{} puis $\softmax$};
+
+  \foreach \a/\b in {img/cnn, cnn/stack, stack/cov, cov/spd, spd/out}
+    \draw[sarrow] (\a) -- (\b);
+
+  \node[stiny, sspd, anchor=west, align=left, text width=34mm] at ([xshift=5mm]cov.east)
+    {$\Nfilter$ variables pour $\Npix$ échantillons: le régime de la
+     \cref{sec:context-covariance-regularized-estimation}};
+
+  % Retropropagation: elle traverse la mise en covariance.
+  \coordinate (l) at ([xshift=-6mm]img.west);
+  \draw[sbackarrow] (out.west-|l) -- (cnn.west-|l);
+  \node[stiny, sback, rotate=90, anchor=south, align=center] at ([xshift=-1.5mm]cov.west-|l)
+    {la rétropropagation traverse\\la mise en covariance};
+
+\end{tikzpicture}

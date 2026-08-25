@@ -1,0 +1,40 @@
+% ProjAvg: la moyenne arithmetique des poids locaux quitte la variete, on l'y
+% ramene par le facteur orthogonal de la decomposition polaire.
+% Figure dessinee pour ce memoire: elle n'existe dans aucun des articles.
+% L'indice de couche est omis, il est le meme partout.
+% Utilise dans la \cref{sec:spdnet-federe-agregation}.
+\input{gfx/tikZ/riemann/style.tex}
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[riemann, scale=1.62, every node/.style={transform shape}]
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85, font=\scriptsize] at (2.25,1.95)
+    {$\Stiefel{\dlayer{\ilayer-1}}{\dlayer{\ilayer}}$};
+
+  \coordinate (W1) at (-1.80,1.30);
+  \coordinate (W2) at (-0.10,1.88);
+  \coordinate (W3) at ( 1.55,1.22);
+  \coordinate (Abar) at (-0.10,-1.30);
+  \coordinate (Wnext) at (-0.10,0.95);
+
+  \foreach \p in {W1,W2,W3} \draw[slayer!45, thin] (\p) -- (Abar);
+  \fill[slayer!85] (Abar) circle (1.7pt);
+  \node[slayer, font=\scriptsize, anchor=north, inner sep=3pt, align=center] at (Abar)
+    {$\bar{\Wlayer}=\tfrac{1}{\Nselected}\sum_{\iclient}\Wlayer^{(\iclient)}$\\
+     \textit{hors de la variété}};
+
+  \foreach \p/\l in {W1/1, W2/2, W3/{\Nselected}}{
+    \fill[sstiefel] (\p) circle (1.5pt);
+    \node[sstiefel, font=\scriptsize, anchor=south, inner sep=2pt]
+      at ([yshift=0.5pt]\p) {$\Wlayer^{(\l)}$};
+  }
+
+  \draw[sspd, very thick, ->] (Abar) -- (Wnext);
+  \node[sspd, font=\scriptsize, anchor=west, inner sep=3.5pt] at ($(Abar)!0.5!(Wnext)$)
+    {$\polarf$};
+
+  \fill[sspd] (Wnext) circle (1.8pt);
+  \node[sspd, font=\scriptsize, anchor=west, inner sep=3.5pt] at (Wnext)
+    {$\Wlayer_{\iround+1}$};
+
+\end{tikzpicture}

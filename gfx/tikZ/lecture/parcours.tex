@@ -1,0 +1,69 @@
+% Les quatre parcours de lecture, en regard de la section « Parcours de
+% lecture » de FrontBackmatter/CommentLire.tex. Meme palette que carte.tex:
+% chaque couloir est une suite de jalons, du point d'entree au chapitre vise.
+\definecolor{lctx}{RGB}{90,90,90}
+\definecolor{lcinq}{RGB}{40,70,140}
+\definecolor{lsix}{RGB}{50,110,120}
+\definecolor{lsept}{RGB}{125,125,125}
+\begin{tikzpicture}[
+    >={Stealth[length=4pt,width=3pt]},
+    line join=round,
+    font=\footnotesize,
+    lane/.style={anchor=east, align=right, text width=2.3cm,
+                 font=\scriptsize\bfseries, inner sep=0pt},
+    jalon/.style={draw, rounded corners=2pt, align=center, font=\scriptsize,
+                 text width=1.75cm, inner sep=4pt, minimum height=0.95cm},
+    goal/.style={jalon, very thick},
+    hop/.style={thin, ->, shorten >=1pt, shorten <=1pt},
+    note/.style={font=\tiny, text=lctx, align=center},
+  ]
+
+  % abscisses des quatre colonnes de jalons
+  \def\ca{3.45} \def\cb{6.05} \def\cc{8.65} \def\cd{11.25}
+
+  %--------------------------------------------------- 1. radar / sonar
+  \node[lane, text=lcinq] at (2.30,0) {Traitement du signal RADAR ou SONAR};
+  \node[jalon, draw=lcinq!55, text=lcinq] (a1) at (\ca,0) {bilans des ch.~\textsc{ii}.1 et \textsc{ii}.2};
+  \node[jalon, draw=lcinq!55, text=lcinq] (a2) at (\cb,0) {\S3.2\\cône SPD};
+  \node[jalon, draw=lcinq!55, text=lcinq] (a3) at (\cc,0) {\S3.3\\moyennes};
+  \node[goal, draw=lcinq, text=lcinq, fill=lcinq!7] (a4) at (\cd,0) {ch.~\textsc{iii}.1\\détection};
+  \draw[hop, lcinq] (a1) -- (a2);
+  \draw[hop, lcinq] (a2) -- (a3);
+  \draw[hop, lcinq] (a3) -- (a4);
+  \node[note, anchor=north] at ($(a3)!0.5!(a4)+(0,-0.50)$)
+    {\S4.1 en appoint\\(tests de Rao)};
+
+  %--------------------------------------------------- 2. geometres
+  \node[lane, text=lsix] at (2.30,-2.05) {Géométrie riemannienne, apprentissage sur variétés};
+  \node[jalon, draw=lsix!55, text=lsix] (b1) at (\ca,-2.05) {\S2.1.2\\elliptiques};
+  \node[jalon, draw=lsix!55, text=lsix] (b2) at (\cb,-2.05) {\S2.1.3\\M-estimation};
+  \node[jalon, draw=lsix!55, text=lsix] (b3) at (\cc,-2.05) {ch.~\textsc{ii}.4\\Fisher};
+  \node[goal, draw=lsix, text=lsix, fill=lsix!7] (b4) at (\cd,-2.05) {ch.~\textsc{iii}.2 et \textsc{iii}.3};
+  \draw[hop, lsix] (b1) -- (b2);
+  \draw[hop, lsix] (b2) -- (b3);
+  \draw[hop, lsix] (b3) -- (b4);
+
+  %--------------------------------------------------- 3. lecture rapide
+  \node[lane, text=lsept] at (2.30,-4.10) {Lecture rapide};
+  \node[jalon, draw=lsept!60, text=lsept] (c1) at (\ca,-4.10) {curriculum vitae};
+  \node[jalon, draw=lsept!60, text=lsept] (c2) at (\cb,-4.10) {bilans des ch.~\textsc{ii}.1 à \textsc{ii}.4};
+  \node[goal, draw=lsept, text=lsept, fill=lsept!7] (c3) at (\cc,-4.10)
+    {intro.\ et bilans de la partie \textsc{iii}};
+  \draw[hop, lsept] (c1) -- (c2);
+  \draw[hop, lsept] (c2) -- (c3);
+  \node[note, anchor=west] at ($(c3.east)+(0.35,0)$)
+    {les blocs \emph{Contributions}\\donnent les publications};
+
+  %--------------------------------------------------- 4. lecture lineaire
+  \node[lane, text=lctx] at (2.30,-5.85) {Lecture linéaire};
+  \node[jalon, draw=lctx!55, text=lctx, text width=8.65cm, minimum height=0.7cm,
+        anchor=west] (d1) at (\ca-0.95,-5.85)
+    {l'intégralité, dans l'ordre du mémoire: chaque chapitre de l'état des lieux
+     naît d'une insuffisance du précédent};
+
+  %--------------------------------------------------- reperes de colonne
+  \node[note, anchor=south] at (\ca,0.75) {point d'entrée};
+  \node[note, anchor=south] at (\cd,0.75) {chapitre visé};
+  \draw[lctx!30, dashed, thin] (\ca,0.65) -- (\ca,-5.35);
+  \draw[lctx!30, dashed, thin] (\cd,0.65) -- (\cd,-2.75);
+\end{tikzpicture}

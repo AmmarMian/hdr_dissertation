@@ -1,0 +1,38 @@
+% Feuille de route du chapitre: les trois endroits ou une moyenne euclidienne
+% doit ceder la place a une moyenne de Frechet, la variete concernee, et la
+% severite croissante de l'obstacle.
+% Utilise dans la \cref{sec:spdnet-feuille-route}.
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[spdnet, node distance=7mm]
+
+  \node[splainbox, minimum width=52mm] (amont)
+    {\textbf{la donnée} \ --- \ mise en covariance};
+  \node[smeanbox, minimum width=52mm, below=of amont] (dans)
+    {\textbf{un batch} \ --- \ normalisation};
+  \node[sstiefelbox, minimum width=52mm, below=of dans] (aval)
+    {\textbf{les paramètres} \ --- \ agrégation};
+
+  \draw[sarrow] (amont) -- (dans);
+  \draw[sarrow] (dans) -- (aval);
+
+  % Colonne de gauche: la moyenne concernee.
+  \node[stiny, slayer, anchor=east, align=right, text width=30mm] at ([xshift=-4mm]amont.west)
+    {$\CovPooled=\Tstack\centermat\Tstack^\T$\\sur $\SPD{\Nfilter}$};
+  \node[stiny, slayer, anchor=east, align=right, text width=30mm] at ([xshift=-4mm]dans.west)
+    {$\Fmean$ du batch\\sur $\SPD{\Nvar}$};
+  \node[stiny, slayer, anchor=east, align=right, text width=30mm] at ([xshift=-4mm]aval.west)
+    {moyenne des $\Wlayer_\ilayer$\\sur $\Stiefel{}{}$};
+
+  % Colonne de droite: la section, et la severite de l'obstacle.
+  \node[stiny, sspd, anchor=west, align=left, text width=27mm] at ([xshift=4mm]amont.east)
+    {\cref{sec:spdnet-covpool}};
+  \node[stiny, sspd, anchor=west, align=left, text width=27mm] at ([xshift=4mm]dans.east)
+    {\cref{sec:spdnet-batchnorm}\\pas de forme close};
+  \node[stiny, sspd, anchor=west, align=left, text width=27mm] at ([xshift=4mm]aval.east)
+    {\cref{sec:spdnet-federe}\\pas même de logarithme};
+
+  \node[stiny, slayer, below=5mm of aval, align=center, text width=95mm]
+    {dans les trois cas, une moyenne de Fréchet (\cref{def:context-riemann-frechet}):
+     il faut choisir une approximation, puis la différentier};
+
+\end{tikzpicture}

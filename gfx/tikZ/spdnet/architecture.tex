@@ -1,0 +1,45 @@
+% Architecture SPDnet, dessinee de haut en bas: c'est le seul sens qui laisse
+% aux boites une taille lisible dans les 355pt du texte.
+% Utilise dans la \cref{sec:spdnet-couches}.
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[spdnet]
+
+  \node[splainbox] (in) {entrée $\MCov_0\in\SPD{\dlayer{0}}$};
+
+  \node[sstiefelbox, below=of in] (bimap1) {\BiMap{} \ $\Wlayer_1\in\Stiefel{\dlayer{0}}{\dlayer{1}}$};
+  \node[splainbox, below=of bimap1] (reeig1) {\ReEig{} \ seuil $\reeigeps$};
+  \node[smeanbox, below=of reeig1] (bn1) {\BatchNorm{} \ $\Fmean,\ \Covbias_1$};
+
+  \node[below=6mm of bn1] (dots) {$\vdots$};
+
+  \node[sstiefelbox, below=6mm of dots] (bimapL) {\BiMap{} \ $\Wlayer_\Nlayer\in\Stiefel{\dlayer{\Nlayer-1}}{\dlayer{\Nlayer}}$};
+  \node[splainbox, below=of bimapL] (reeigL) {\ReEig{} \ seuil $\reeigeps$};
+
+  \node[splainbox, below=8mm of reeigL] (logeig) {\LogEig};
+  \node[seuclbox, below=of logeig] (fc) {$\softmax$ \ $\MSoftmax,\Vsoftmax$};
+  \node[splainbox, below=of fc] (out) {sortie $\hat{\classlabel}\in\R^{\Nclass}$};
+
+  \foreach \a/\b in {in/bimap1, bimap1/reeig1, reeig1/bn1, bn1/dots, dots/bimapL,
+                     bimapL/reeigL, reeigL/logeig, logeig/fc, fc/out}
+    \draw[sarrow] (\a) -- (\b);
+  \coordinate (mid) at ($(logeig.south)!0.5!(fc.north)$);
+  \node[stiny, slayer, anchor=west] at ([xshift=2mm]mid) {$\vech$};
+
+  % Regroupement des deux blocs BiRe.
+  \node[sblock, fit=(bimap1)(bn1)] (b1) {};
+  \node[stiny, slayer, rotate=90, anchor=south] at ($(b1.west)+(-1mm,0)$) {bloc \BiRe{} 1};
+  \node[sblock, fit=(bimapL)(reeigL)] (bL) {};
+  \node[stiny, slayer, rotate=90, anchor=south] at ($(bL.west)+(-1mm,0)$) {bloc \BiRe{} $\Nlayer$};
+
+  % Colonne de droite: ou vivent les objets.
+  \coordinate (x) at ([xshift=6mm]in.east);
+  \draw[sspd!75, thick] ([yshift=1mm]in.north-|x) -- ([yshift=-1mm]logeig.north-|x);
+  \node[stiny, sspd, anchor=west, align=left, text width=32mm]
+    at ($([yshift=1mm]in.north-|x)!0.5!([yshift=-1mm]logeig.north-|x)+(2mm,0)$)
+    {les représentations restent dans le cône $\SPD{\dlayer{\ilayer}}$};
+  \draw[seucl!75, thick] ([yshift=-1mm]logeig.north-|x) -- ([yshift=-1mm]out.south-|x);
+  \node[stiny, seucl, anchor=west, align=left, text width=32mm]
+    at ($([yshift=-1mm]logeig.north-|x)!0.5!([yshift=-1mm]out.south-|x)+(2mm,0)$)
+    {espace tangent en $\Id{\dlayer{\Nlayer}}$, puis $\R^{\Nclass}$};
+
+\end{tikzpicture}

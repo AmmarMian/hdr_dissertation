@@ -96,3 +96,119 @@ ext-tikz/dissertation-figure20.pdf:
 	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure20" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
 
 ext-tikz/dissertation-figure20.pdf: ext-tikz/dissertation-figure20.md5
+ext-tikz/dissertation-figure21.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure21" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure21.pdf: ext-tikz/dissertation-figure21.md5
+ext-tikz/dissertation-figure22.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure22" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure22.pdf: ext-tikz/dissertation-figure22.md5
+ext-tikz/dissertation-figure23.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure23" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure23.pdf: ext-tikz/dissertation-figure23.md5
+ext-tikz/dissertation-figure24.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure24" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure24.pdf: ext-tikz/dissertation-figure24.md5
+ext-tikz/dissertation-figure25.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure25" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure25.pdf: ext-tikz/dissertation-figure25.md5
+ext-tikz/dissertation-figure26.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure26" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure26.pdf: ext-tikz/dissertation-figure26.md5
+ext-tikz/dissertation-figure27.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure27" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure27.pdf: ext-tikz/dissertation-figure27.md5
+ext-tikz/dissertation-figure28.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure28" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure28.pdf: ext-tikz/dissertation-figure28.md5
+ext-tikz/dissertation-figure29.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure29" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure29.pdf: ext-tikz/dissertation-figure29.md5
+ext-tikz/dissertation-figure30.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure30" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure30.pdf: ext-tikz/dissertation-figure30.md5
+ext-tikz/dissertation-figure31.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure31" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure31.pdf: ext-tikz/dissertation-figure31.md5
+ext-tikz/dissertation-figure32.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure32" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure32.pdf: ext-tikz/dissertation-figure32.md5
+ext-tikz/dissertation-figure33.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure33" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure33.pdf: ext-tikz/dissertation-figure33.md5
+ext-tikz/dissertation-figure34.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure34" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure34.pdf: ext-tikz/dissertation-figure34.md5
+ext-tikz/dissertation-figure35.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure35" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure35.pdf: ext-tikz/dissertation-figure35.md5
+ext-tikz/dissertation-figure36.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure36" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure36.pdf: ext-tikz/dissertation-figure36.md5
+ext-tikz/dissertation-figure37.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure37" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure37.pdf: ext-tikz/dissertation-figure37.md5
+ext-tikz/dissertation-figure38.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure38" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure38.pdf: ext-tikz/dissertation-figure38.md5
+ext-tikz/dissertation-figure39.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure39" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure39.pdf: ext-tikz/dissertation-figure39.md5
+ext-tikz/dissertation-figure40.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure40" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure40.pdf: ext-tikz/dissertation-figure40.md5
+ext-tikz/dissertation-figure41.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure41" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure41.pdf: ext-tikz/dissertation-figure41.md5
+ext-tikz/dissertation-figure42.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure42" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure42.pdf: ext-tikz/dissertation-figure42.md5
+ext-tikz/dissertation-figure43.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure43" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure43.pdf: ext-tikz/dissertation-figure43.md5
+ext-tikz/dissertation-figure44.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure44" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure44.pdf: ext-tikz/dissertation-figure44.md5
+ext-tikz/dissertation-figure45.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure45" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure45.pdf: ext-tikz/dissertation-figure45.md5
+ext-tikz/dissertation-figure46.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure46" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure46.pdf: ext-tikz/dissertation-figure46.md5
+ext-tikz/dissertation-figure47.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure47" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure47.pdf: ext-tikz/dissertation-figure47.md5
+ext-tikz/dissertation-figure48.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure48" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure48.pdf: ext-tikz/dissertation-figure48.md5
+ext-tikz/dissertation-figure49.pdf: 
+	pdflatex -halt-on-error -interaction=batchmode -jobname "ext-tikz/dissertation-figure49" "\def\tikzexternalrealjob{dissertation}\input{dissertation}"
+
+ext-tikz/dissertation-figure49.pdf: ext-tikz/dissertation-figure49.md5

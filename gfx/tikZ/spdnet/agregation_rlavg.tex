@@ -1,0 +1,57 @@
+% RLAvg: on releve les poids locaux dans l'espace tangent en l'iteree globale
+% precedente, on y prend la moyenne --- qui a un sens, l'espace tangent etant
+% vectoriel --- et l'on retourne sur la variete par retraction.
+% Figure dessinee pour ce memoire: elle n'existe dans aucun des articles.
+% Meme cadrage et meme echelle que agregation_projavg.tex, pour que les deux
+% figures se comparent d'un coup d'oeil. L'indice de couche est omis.
+% Utilise dans la \cref{sec:spdnet-federe-agregation}.
+\input{gfx/tikZ/riemann/style.tex}
+\input{gfx/tikZ/spdnet/style.tex}
+\begin{tikzpicture}[riemann, scale=1.62, every node/.style={transform shape}]
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85, font=\scriptsize] at (2.25,1.95)
+    {$\Stiefel{\dlayer{\ilayer-1}}{\dlayer{\ilayer}}$};
+
+  \coordinate (W1) at (-1.80,1.30);
+  \coordinate (W2) at (-0.10,1.88);
+  \coordinate (W3) at ( 1.55,1.22);
+  \coordinate (Wt) at (-0.30,0.15);
+  \coordinate (Wnext) at ( 0.62,0.95);
+
+  \path (Wt) pic[scale=0.98] {rplane};
+  \node[rtangent!90, font=\scriptsize, anchor=east, inner sep=1pt]
+    at ($(Wt)+(-1.42,0.44)$) {$\Tangent{\Wlayer_{\iround}}{\Stiefel{}{}}$};
+
+  \coordinate (T1) at ($(Wt)+(-0.78,0.20)$);
+  \coordinate (T2) at ($(Wt)+( 0.16,0.32)$);
+  \coordinate (T3) at ($(Wt)+( 0.94,0.18)$);
+  \coordinate (Tbar) at ($(Wt)+(0.11,0.24)$);
+  \foreach \a/\b in {W1/T1, W2/T2, W3/T3}
+    \draw[rtangent!75, thin, ->] (\a) -- (\b);
+  \node[rtangent, font=\scriptsize, anchor=south east, inner sep=2pt] at ($(W1)!0.55!(T1)$)
+    {$\Lift_{\Wlayer_\iround}$};
+
+  \foreach \p/\l in {W1/1, W2/2, W3/{\Nselected}}{
+    \fill[sstiefel] (\p) circle (1.5pt);
+    \node[sstiefel, font=\scriptsize, anchor=south, inner sep=2pt]
+      at ([yshift=0.5pt]\p) {$\Wlayer^{(\l)}$};
+  }
+
+  \fill (Wt) circle (1.5pt);
+  \node[font=\scriptsize, anchor=north, inner sep=2.5pt] at (Wt) {$\Wlayer_{\iround}$};
+
+  \fill[rtangent] (Tbar) circle (1.3pt);
+  \node[rtangent, font=\scriptsize, anchor=north, inner sep=2.5pt, align=center]
+    at ($(Tbar)+(0,-0.30)$)
+    {$\tfrac{1}{\Nselected}\sum_{\iclient}\Lift_{\Wlayer_\iround}(\Wlayer^{(\iclient)})$};
+
+  \draw[sspd, very thick, ->] (Tbar) .. controls ($(Tbar)+(0.42,0.28)$) .. (Wnext);
+  \node[sspd, font=\scriptsize, anchor=west, inner sep=2.5pt] at ($(Tbar)+(0.30,0.42)$)
+    {$\Retr_{\Wlayer_\iround}$};
+
+  \fill[sspd] (Wnext) circle (1.8pt);
+  \node[sspd, font=\scriptsize, anchor=west, inner sep=3pt] at (Wnext)
+    {$\Wlayer_{\iround+1}$};
+
+\end{tikzpicture}

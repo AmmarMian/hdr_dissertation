@@ -1,0 +1,1439 @@
+\chapter{Apprentissage profond sur la variété des matrices SPD}
+\label{ch:spdnet}
+
+\section{Introduction}
+\label{sec:spdnet-introduction}
+
+\begin{contributions}
+  Ce chapitre rend compte des travaux suivants, dont les versions publiées sont
+  reproduites en fin de chapitre:
+  \begin{itemize}
+    \item \fullcite{JSTARS25};
+    \item \fullcite{IGARSS24};
+    \item \fullcite{PREP26b};
+    \item \fullcite{EUSIPCO26b}.
+  \end{itemize}
+\end{contributions}
+
+% ============================ TODO texte (~4 paragraphes) ===========================
+% Introduction du chapitre. Ordre suggere:
+%  1. Les trois collaborations, avec les statuts exacts --- c'est le seul endroit
+%     du chapitre ou ils apparaissent, et ils different:
+%       - Douba Jafuno: these CIFRE Geolithe 2022--2025, encadrement 45 %, avec
+%         Guillaume Ginolhac et Nickolas Stelzenmuller (cf. le CV,
+%         \cref{sec:cv-annexe-encadrements}). Soutenue le 4 novembre 2025;
+%       - Matthieu Gallet: ancien stagiaire de master 2 (2020) puis doctorant,
+%         aujourd'hui MCF --- la collaboration sur la batch normalization est
+%         donc *posterieure* a l'encadrement, entre collegues. Ne pas la
+%         presenter comme un encadrement;
+%       - Thibault Pautrel: stage de master 2 en 2025 (encadrement 33 %, avec
+%         Florent Bouchard et Guillaume Ginolhac), devenu post-doctorant sur le
+%         meme sujet. C'est le travail le plus recent du memoire.
+%  2. Le fil du chapitre, a annoncer sans detour: un reseau operant sur des
+%     matrices SPD est une chaine d'applications sur une variete; a trois
+%     endroits --- la donnee en amont, l'interieur du reseau, les parametres en
+%     aval --- une operation standard repose sur une *moyenne euclidienne*, et
+%     chacune doit ceder la place a une moyenne de Frechet
+%     (\cref{def:context-riemann-frechet}).
+%  3. Les deux enseignements transversaux, qui sont la these du chapitre:
+%       (a) choisir la moyenne, c'est choisir une geometrie, donc un modele
+%           statistique --- point developpe en
+%           \cref{sec:spdnet-batchnorm-moyennes}, et qui transforme un resultat
+%           experimental (« GAH bat la moyenne geometrique ») en un enonce de
+%           modelisation;
+%       (b) l'objet geometriquement juste est toujours iteratif, donc trop cher;
+%           le travail consiste a choisir l'approximation en forme close *et a
+%           en deriver le gradient a la main* --- gain d'un facteur 2 en memoire
+%           en \cref{sec:spdnet-batchnorm-resultats}, et echec pur et simple de
+%           la differentiation automatique sur deux des trois jeux de donnees.
+%  4. Annoncer que \cref{sec:spdnet-covpool} est la seule des trois sections a
+%     *mesurer* la robustesse que l'invariance geometrique promet (donnees
+%     rares, etiquettes erronees, changement de conditions d'acquisition), et
+%     que c'est a ce titre qu'elle ouvre le chapitre plutot qu'elle ne le clot.
+% ====================================================================================
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Paragraphe de renvoi vers la partie de contexte, apres l'introduction. Meme
+% principe qu'au \cref{ch:robust-detection}: le chapitre doit pouvoir se lire
+% sans y revenir pour un lecteur familier. Points d'appui a mentionner:
+%   - le cone et sa metrique affine invariante
+%     (\cref{sec:context-riemann-spd,def:context-riemann-metriquenaturelle});
+%   - la moyenne de Frechet (\cref{def:context-riemann-frechet}) et l'absence de
+%     forme close pour la metrique affine invariante
+%     (\cref{eq:context-riemann-frechetopt});
+%   - la metrique log-euclidienne (\cref{def:context-riemann-logeuclidienne});
+%   - la variete de Stiefel et la projection sur son espace tangent
+%     (\cref{def:context-riemann-stiefel,eq:context-riemann-projstiefel}), et la
+%     remarque sur la compacite et les retractions
+%     (\cref{rem:context-riemann-stiefelvscone});
+%   - le gradient riemannien et la descente
+%     (\cref{sec:context-riemann-optimization});
+%   - la metrique affine invariante comme geometrie de Fisher du modele gaussien
+%     (\cref{sec:context-geometry-gaussian}) et les divergences
+%     (\cref{sec:context-geometry-divergences}) --- ce dernier renvoi est celui
+%     qui porte le plus de poids, cf. \cref{prop:spdnet-moyennes-frechet};
+%   - le regime dimensionnel et le retrecissement
+%     (\cref{sec:context-covariance-regularized-estimation}), qui eclairent a la
+%     fois le seuil de \ReEig{} et le conditionnement des donnees.
+% ====================================================================================
+
+% ================================ TODO decision =====================================
+% Ajouts a la partie contexte identifies en construisant ce chapitre, et
+% volontairement non faits pour l'instant. Chacun rendrait une partie de ce
+% chapitre plus courte et mieux ancree:
+%  1. \cref{sec:context-geometry-divergences}: sous-section « moyennes associees
+%     aux divergences » (KL a gauche -> arithmetique, KL a droite -> harmonique,
+%     KL symetrisee -> GAH), avec la lecture Wishart / Wishart inverse. Sans
+%     elle, \cref{prop:spdnet-moyennes-frechet} doit tout poser sur place.
+%     C'est l'ajout le plus rentable des cinq.
+%  2. \cref{sec:context-riemann-orthogonal}: retraction polaire sur Stiefel et
+%     notion de releve (lifting) comme logarithme approche. Actuellement seule
+%     la retraction QR est mentionnee, en passant, dans
+%     \cref{rem:context-riemann-stiefelvscone}.
+%  3. \cref{sec:context-riemann-moyennes}: remarque sur la moyenne de Frechet
+%     sur Stiefel et sur son inaccessibilite. C'est le pivot de
+%     \cref{sec:spdnet-federe-obstacle}.
+%  4. \cref{sec:context-riemann-notion}: proposition donnant les derivees
+%     directionnelles de \expm{} et \logm{} (formule de Daleckii-Krein). Elles
+%     servent dans toutes les propositions de \cref{sec:spdnet-batchnorm}, et
+%     elles expliquent l'instabilite en $1/(\eig_\ivar-\eig_\ivarbis)$ de
+%     \cref{prop:spdnet-gradevd}. Elles sont posees ici en
+%     \cref{prop:spdnet-diffm} faute de mieux.
+%  5. Figure: etendre l'experience qanat context_riemann_moyennes (aujourd'hui
+%     arithmetique, log-euclidienne, Frechet) aux moyennes harmonique et GAH.
+%     Elle servirait a la fois l'ajout 1 et
+%     \cref{sec:spdnet-batchnorm-moyennes}, pour le cout d'un seul run.
+% ====================================================================================
+
+
+\section{Cadre commun: un réseau sous contrainte géométrique}
+\label{sec:spdnet-cadre}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% Ouvrir la section. Ce qu'il faut dire, dans cet ordre:
+%  1. cette section n'est dans aucun des trois articles: elle est ecrite pour ce
+%     memoire, et c'est elle qui fait du chapitre autre chose qu'une
+%     juxtaposition de travaux --- meme role que
+%     \cref{sec:detection-cadre} au chapitre precedent;
+%  2. l'idee directrice: un reseau convolutif classique est une chaine
+%     d'applications sur des espaces vectoriels; \SPDnet{} est la meme chaine
+%     ou chaque espace est remplace par un cone
+%     (\cref{sec:context-riemann-spd}) et chaque parametre par un point d'une
+%     variete de Stiefel (\cref{def:context-riemann-stiefel}). Tout le reste du
+%     chapitre consiste a payer le prix de cette substitution.
+% ====================================================================================
+
+\subsection{Les couches de \SPDnet}
+\label{sec:spdnet-couches}
+
+\begin{definition}[{Couche \BiMap}]
+\label{def:spdnet-bimap}
+  La couche \BiMap{} est la contrepartie de la convolution: à la transformation
+  linéaire $\x\mapsto\Wlayer^\T\x$ d'un vecteur elle substitue la congruence
+  \begin{equation}
+    \MCov_\ilayer
+    =
+    \Wlayer_\ilayer^\T\,\MCov_{\ilayer-1}\,\Wlayer_\ilayer,
+    \qquad
+    \Wlayer_\ilayer\in\Stiefel{\dlayer{\ilayer-1}}{\dlayer{\ilayer}},
+    \label{eq:spdnet-bimap}
+  \end{equation}
+  avec $\dlayer{\ilayer}\leq\dlayer{\ilayer-1}$ \sidecite[-0.5cm]{huang2017riemannian}.
+  L'orthonormalité des colonnes de $\Wlayer_\ilayer$ garantit
+  $\MCov_\ilayer\in\SPD{\dlayer{\ilayer}}$ dès que $\MCov_{\ilayer-1}\in\SPD{\dlayer{\ilayer-1}}$.
+\end{definition}
+
+\begin{definition}[{Couche \ReEig}]
+\label{def:spdnet-reeig}
+  La couche \ReEig{} est la contrepartie de la fonction d'activation \textsc{relu}:
+  celle-ci s'appliquant terme à terme détruirait la structure SPD, elle est
+  appliquée aux valeurs propres. Pour $\MCov_{\ilayer-1}=\Unit\eigset\Unit^\T$,
+  \begin{equation}
+    \MCov_\ilayer
+    =
+    \Unit\,\max\!\left(\reeigeps\Id{\dlayer{\ilayer}},\eigset\right)\Unit^\T,
+    \label{eq:spdnet-reeig}
+  \end{equation}
+  où le seuil $\reeigeps>0$ n'est pas appris et est fixé avant l'entraînement.
+\end{definition}
+
+\begin{definition}[{Couche \LogEig}]
+\label{def:spdnet-logeig}
+  La couche \LogEig{} envoie la représentation dans un espace euclidien en la
+  projetant sur l'espace tangent en l'identité
+  (\cref{eq:context-riemann-explogspd}), puis en la vectorisant:
+  \begin{equation}
+    \MCov_{\Nlayer}
+    =
+    \logm\!\left(\MCov_{\Nlayer-1}\right),
+    \qquad
+    \hat{\classlabel}
+    =
+    \softmax\!\left(\MSoftmax\,\vech(\MCov_{\Nlayer})+\Vsoftmax\right),
+    \label{eq:spdnet-logeig}
+  \end{equation}
+  avec $\MSoftmax\in\R^{\Nclass\times\dlayer{\Nlayer}(\dlayer{\Nlayer}+1)/2}$ et
+  $\Vsoftmax\in\R^{\Nclass}$.
+\end{definition}
+
+\begin{definition}[{Architecture \SPDnet}]
+\label{def:spdnet-architecture}
+  Un réseau \SPDnet{} est la composition de $\Nlayer$ blocs \BiRe{}
+  --- une couche \BiMap{} suivie d'une couche \ReEig{}, éventuellement d'une
+  couche de normalisation par batch (\cref{def:spdnet-batchnorm}) ---, d'une
+  couche \LogEig{} et d'une tête euclidienne. Ses paramètres sont
+  \begin{equation}
+    \netparam
+    =
+    \left(\Wlayer_1,\dots,\Wlayer_{\Nlayer},\MSoftmax,\Vsoftmax\right)
+    \in
+    \Stiefel{\dlayer{0}}{\dlayer{1}}\times\cdots\times
+    \Stiefel{\dlayer{\Nlayer-1}}{\dlayer{\Nlayer}}\times\R^{\Nclass\times\frac{\dlayer{\Nlayer}(\dlayer{\Nlayer}+1)}{2}}\times\R^{\Nclass},
+    \label{eq:spdnet-parametres}
+  \end{equation}
+  et l'application qu'il réalise est notée $\netfun_{\netparam}$.
+\end{definition}
+
+\begin{figure}[htb]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/architecture.tex}}
+  \end{center}
+  \caption{Architecture \SPDnet{} \sidecite[0cm]{huang2017riemannian}: une chaîne
+    de $\Nlayer$ blocs \BiRe, suivie du passage au plan tangent par \LogEig{} et
+    d'une tête euclidienne. % TODO texte: completer la legende.
+  }
+  \label{fig:spdnet-architecture}
+\end{figure}
+
+% ======================= TODO texte (remarque, ~10 lignes) ==========================
+% Poser le label rem:spdnet-reeig-retrecissement. Deux lectures de \ReEig{} qui
+% ne sont dans aucun des articles et qui rattachent le chapitre a la partie 2:
+%  1. seuiller les valeurs propres par le bas est une *regularisation du
+%     spectre*, de la meme famille que le retrecissement de
+%     \cref{sec:context-covariance-regularized-estimation}: on paye un biais
+%     pour garantir l'inversibilite et le conditionnement. La difference est
+%     qu'ici la matrice a regulariser est produite par le reseau lui-meme;
+%  2. donner les ordres de grandeur mesures dans \fullcite{PREP26b}: nombre de
+%     conditionnement moyen de $9{,}1\times10^{5}$ (HDM05), $6{,}0\times10^{6}$
+%     (HyperLeaf), $1{,}2\times10^{7}$ (Rices90). C'est ce qui rend le choix de
+%     $\reeigeps$ critique et ce qui explique, en
+%     \cref{sec:spdnet-batchnorm-resultats}, l'echec de la differentiation
+%     automatique: les termes en $1/(\eig_\ivar-\eig_\ivarbis)$ de
+%     \cref{prop:spdnet-gradevd} explosent exactement dans ce regime.
+% Enchainer sur: \LogEig{} n'est pas une operation anodine non plus --- c'est le
+% choix d'une geometrie, celle du plan tangent en $\Id{}$, donc une
+% linearisation dont la validite depend de la dispersion des donnees.
+% ====================================================================================
+
+\subsection{Apprendre sous contrainte de Stiefel}
+\label{sec:spdnet-apprentissage}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Le strict minimum de vocabulaire, en une demi-page et pas davantage: on ne
+% refait pas un cours d'apprentissage profond. Dire: perte d'entropie croisee,
+% risque empirique, entrainement par batchs, et le fait que la seule
+% specificite ici est que \cref{eq:spdnet-descente} est un pas riemannien au
+% sens de \cref{eq:context-riemann-descente} pour les $\Wlayer_\ilayer$, et un
+% pas euclidien ordinaire pour $\MSoftmax$ et $\Vsoftmax$. Preciser que, en
+% pratique, les articles utilisent soit une retraction explicite, soit une
+% parametrisation (trivialisation locale \sidecite{ablin2024infeasible},
+% decomposition de Householder) qui ramene le probleme a une optimisation
+% euclidienne --- et que ce choix est orthogonal a tout ce que dit le chapitre.
+% ====================================================================================
+
+Pour un jeu d'apprentissage $\{(\MCov_\iobs,\classlabel_\iobs)\}$ de
+$\SPD{\dlayer{0}}\times\intrange{1}{\Nclass}$, le risque empirique associé à
+l'entropie croisée s'écrit
+\begin{equation}
+  \loss(\netparam)
+  =
+  -\frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\sum_{\iclass=1}^{\Nclass}
+  \mathbf{1}_{\{\classlabel_\iobs=\iclass\}}
+  \log\left[\netfun_{\netparam}(\MCov_\iobs)\right]_\iclass,
+  \label{eq:spdnet-risque}
+\end{equation}
+et le pas de descente s'écrit, pour les poids contraints,
+\begin{equation}
+  \Wlayer_\ilayer
+  \gets
+  \Retr_{\Wlayer_\ilayer}\!\left(-\lrate\,\Rgrad\loss(\Wlayer_\ilayer)\right),
+  \qquad
+  \Rgrad\loss(\Wlayer_\ilayer)
+  =
+  \projman_{\Wlayer_\ilayer}\!\left(\err{\loss}{\Wlayer_\ilayer}\right),
+  \label{eq:spdnet-descente}
+\end{equation}
+avec $\projman$ la projection de \cref{eq:context-riemann-projstiefel}.
+
+\subsection{Rétropropagation matricielle}
+\label{sec:spdnet-backprop}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% C'est le coeur technique de la section, et le denominateur commun aux trois
+% travaux. A dire:
+%  1. dans un reseau ordinaire, la retropropagation est une suite de produits
+%     matrice-vecteur; ici les variables sont des matrices et les couches font
+%     intervenir des decompositions spectrales, si bien que la regle de chaine
+%     doit etre ecrite au niveau des differentielles, avec le produit scalaire
+%     de Frobenius comme appariement \sidecite{ionescu2015matrix};
+%  2. pourquoi ne pas se contenter de la differentiation automatique: elle
+%     stocke le graphe complet, donc toutes les iterees d'un algorithme de point
+%     fixe (\cref{eq:spdnet-geometrique-iteration}), d'ou une occupation memoire
+%     qui croit avec le nombre d'iterations; et elle differentie une
+%     decomposition spectrale terme a terme, avec les instabilites de
+%     \cref{prop:spdnet-gradevd}. Les deux points sont mesures en
+%     \cref{sec:spdnet-batchnorm-resultats}.
+% ====================================================================================
+
+\begin{proposition}[{Règle de chaîne matricielle}]
+\label{prop:spdnet-chainrule}
+  Soit une couche $\netfun_\ilayer$ transformant $\mat{X}_{\ilayer-1}$ en
+  $\mat{X}_\ilayer=\netfun_\ilayer(\mat{X}_{\ilayer-1})$, et $\loss^{\ilayer}$ la
+  perte vue depuis cette couche. L'erreur rétropropagée
+  $\err{\loss^{\ilayer}}{\mat{X}_{\ilayer-1}}$ est l'unique matrice vérifiant,
+  pour toute direction admissible $\diff\mat{X}_{\ilayer-1}$,
+  \begin{equation}
+    \trace{\err{\loss^{\ilayer}}{\mat{X}_{\ilayer-1}}^\T\diff\mat{X}_{\ilayer-1}}
+    =
+    \trace{\err{\loss^{\ilayer+1}}{\mat{X}_{\ilayer}}^\T\diff\mat{X}_{\ilayer}},
+    \qquad
+    \diff\mat{X}_\ilayer=\dirderiv\netfun_\ilayer(\mat{X}_{\ilayer-1})[\diff\mat{X}_{\ilayer-1}].
+    \label{eq:spdnet-chainrule}
+  \end{equation}
+\end{proposition}
+
+\begin{proposition}[{Dérivées directionnelles de $\expm$ et $\logm$}]
+\label{prop:spdnet-diffm}
+  Soit $\mat{X}=\Unit\eigset\Unit^\T$ la décomposition spectrale d'une matrice
+  symétrique, $\eigset=\Diag(\eig_1,\dots,\eig_\Nvar)$, et $h$ une fonction
+  scalaire appliquée au spectre. Pour toute direction symétrique $\tvec$,
+  \begin{equation}
+    \dirderiv h(\mat{X})[\tvec]
+    =
+    \Unit\left(\mat{G}\had\left(\Unit^\T\tvec\,\Unit\right)\right)\Unit^\T,
+    \qquad
+    \mat{G}_{\ivar\ivarbis}
+    =
+    \left\{
+    \begin{array}{ll}
+      \dfrac{h(\eig_\ivar)-h(\eig_\ivarbis)}{\eig_\ivar-\eig_\ivarbis}
+        & \text{si } \eig_\ivar\neq\eig_\ivarbis,\\[8pt]
+      h'(\eig_\ivar) & \text{sinon,}
+    \end{array}
+    \right.
+    \label{eq:spdnet-daleckii}
+  \end{equation}
+  où $\had$ est le produit de Hadamard. Les cas $h=\exp$ et $h=\log$ donnent
+  $\dirderiv\expm$ et $\dirderiv\logm$.
+\end{proposition}
+
+% ============================ TODO texte (~5 lignes) ================================
+% Une phrase pour dire que \cref{prop:spdnet-diffm} est la formule de
+% Daleckii-Krein, admise ici, et qu'elle aurait sa place au
+% \cref{ch:context-riemann} (cf. le bloc TODO decision de l'introduction). Une
+% phrase pour dire qu'elle est le seul ingredient manquant pour differentier
+% toutes les couches spectrales du chapitre.
+% ====================================================================================
+
+\begin{proposition}[{Gradients des couches spectrales}]
+\label{prop:spdnet-gradevd}
+  Soit une couche s'écrivant $\mat{X}_\ilayer=\Unit\,h(\eigset)\,\Unit^\T$ à
+  partir de $\mat{X}_{\ilayer-1}=\Unit\eigset\Unit^\T$. L'erreur rétropropagée est
+  \begin{equation}
+    \err{\loss^{\ilayer}}{\mat{X}_{\ilayer-1}}
+    =
+    2\,\Unit\left(\mat{P}^\T\had\symop\!\left(\Unit^\T\err{\loss^{\ilayer+1}\circ h}{\Unit}\right)\right)\Unit^\T
+    +
+    \Unit\,\Diag\!\left(\err{\loss^{\ilayer+1}\circ h}{\eigset}\right)\Unit^\T,
+    \label{eq:spdnet-gradevd}
+  \end{equation}
+  où $\mat{P}_{\ivar\ivarbis}=(\eig_\ivar-\eig_\ivarbis)^{-1}$ pour
+  $\ivar\neq\ivarbis$ et $\mat{P}_{\ivar\ivar}=0$
+  \sidecite[-0.5cm]{ionescu2015matrix,brooks2019riemannian}. Pour la couche
+  \ReEig{} de \cref{eq:spdnet-reeig},
+  \begin{equation}
+    \err{\loss^{\ilayer+1}\circ h}{\Unit}
+    =
+    2\,\symop\!\left(\err{\loss^{\ilayer+1}}{\mat{X}_{\ilayer}}\right)\Unit\max(\reeigeps\Id{},\eigset),
+    \qquad
+    \err{\loss^{\ilayer+1}\circ h}{\eigset}
+    =
+    \mat{Q}\,\Unit^\T\symop\!\left(\err{\loss^{\ilayer+1}}{\mat{X}_{\ilayer}}\right)\Unit,
+    \label{eq:spdnet-gradreeig}
+  \end{equation}
+  avec $\mat{Q}=\Diag(\mathbf{1}_{\{\eig_1>\reeigeps\}},\dots)$; pour la couche
+  \LogEig{} de \cref{eq:spdnet-logeig}, les mêmes expressions avec
+  $\max(\reeigeps\Id{},\eigset)$ remplacé par $\log(\eigset)$ et $\mat{Q}$ par
+  $\inv{\eigset}$.
+\end{proposition}
+
+% ======================= TODO texte (remarque, ~8 lignes) ===========================
+% Poser le label rem:spdnet-sylvester. Deux points:
+%  1. les equations de Sylvester du type $\mat{Z}\mat{S}+\mat{S}\mat{Z}=\mat{R}$
+%     avec $\mat{S}\in\SPD{\Nvar}$ reviennent quatre fois dans ce chapitre
+%     (\cref{prop:spdnet-batchnorm-backprop,prop:spdnet-grad-geo,prop:spdnet-grad-gah}).
+%     Elles se resolvent en une decomposition spectrale de $\mat{S}$: dans la
+%     base propre, $\mat{Z}_{\ivar\ivarbis}=\mat{R}_{\ivar\ivarbis}/(\std_\ivar+\std_\ivarbis)$,
+%     ou les $\std$ sont les valeurs propres de $\mat{S}$. Le cout est celui
+%     d'une decomposition spectrale, et la solution symetrique est unique
+%     puisque $\std_\ivar+\std_\ivarbis>0$;
+%  2. noter le contraste avec \cref{eq:spdnet-gradevd}: ici le denominateur est
+%     une *somme* de valeurs propres, la ou la retropropagation spectrale fait
+%     apparaitre une *difference*. C'est pourquoi les formules manuelles de ce
+%     chapitre sont numeriquement plus sages que leur equivalent automatique.
+% ====================================================================================
+
+\subsection{Où se cachent les moyennes}
+\label{sec:spdnet-feuille-route}
+
+\begin{figure}[htb]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/trois_moyennes.tex}}
+  \end{center}
+  \caption{Feuille de route du chapitre. % TODO texte: completer la legende.
+  }
+  \label{fig:spdnet-feuille-route}
+\end{figure}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% Section charniere, une page au plus. Ce qu'il faut poser:
+%  1. les trois sections qui suivent traitent trois problemes qui n'ont, en
+%     apparence, rien a voir: former la matrice d'entree, normaliser un batch,
+%     agreger des poids entre clients. Enoncer qu'ils ont la meme forme: une
+%     quantite qui, dans le cas euclidien, est une moyenne;
+%  2. et que la reponse geometrique est chaque fois la meme --- la moyenne de
+%     Frechet de \cref{def:context-riemann-frechet} --- avec le meme obstacle:
+%     pas de forme close, donc un algorithme iteratif, donc un cout
+%     inacceptable a chaque batch ou a chaque tour. Le degre de severite croit
+%     d'ailleurs d'une section a l'autre: sur le cone, la moyenne de Frechet est
+%     calculable mais chere (\cref{eq:context-riemann-frechetopt}); sur Stiefel,
+%     le logarithme lui-meme n'a pas de forme close
+%     (\cref{sec:spdnet-federe-obstacle});
+%  3. annoncer les deux facons d'en sortir, qui structurent le reste du
+%     chapitre: changer de geometrie pour une dont la moyenne est en forme close
+%     (\cref{sec:spdnet-batchnorm-moyennes}), ou approcher les operateurs de la
+%     bonne geometrie (\cref{sec:spdnet-federe-agregation}).
+% ====================================================================================
+
+
+\section{Former la matrice: la covariance comme couche apprise}
+\label{sec:spdnet-covpool}
+
+\begin{contributions}
+  Cette section reprend \fullcite{JSTARS25}, ainsi que ses versions préliminaires
+  \fullcite{IGARSS24} et \fullcite{GRETSI23b}.
+\end{contributions}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% Ouvrir la section. Elle doit rester courte --- environ le quart de
+% \cref{sec:spdnet-batchnorm}. Ce qu'il faut dire:
+%  1. le probleme applicatif en trois phrases: classifier des objets enfouis a
+%     partir de vignettes d'hyperboles issues d'un radar geologique (\textsc{gpr}).
+%     La difficulte n'est pas la forme de l'hyperbole en soi, c'est qu'elle
+%     depend autant de l'objet que des conditions d'acquisition (frequence,
+%     elevation du radar, nature et humidite du sol);
+%  2. la these de la section: la representation du second ordre est un choix
+%     *d'invariance*, et c'est ce qui la rend robuste au changement de
+%     conditions. C'est la seule des trois sections du chapitre a mesurer cette
+%     promesse, d'ou sa place en ouverture;
+%  3. annoncer que la contribution methodologique tient en une proposition
+%     (\cref{prop:spdnet-covpool-grad}) --- la covariance cesse d'etre une
+%     caracteristique calculee en amont pour devenir une couche apprise --- et
+%     que c'est cette prémisse dont \cref{sec:spdnet-batchnorm,sec:spdnet-federe}
+%     ont besoin.
+% ====================================================================================
+
+\subsection{La couche de mise en covariance}
+\label{sec:spdnet-covpool-couche}
+
+\begin{definition}[{Couche \CovPool}]
+\label{def:spdnet-covpool}
+  Soit $\Tstack\in\R^{\Nfilter\times\Npix}$ la matrice regroupant les $\Nfilter$
+  cartes de filtres d'un réseau convolutif, chacune aplatie en $\Npix$ pixels.
+  La couche de mise en covariance produit
+  \begin{equation}
+    \CovPooled
+    =
+    \Tstack\,\centermat\,\Tstack^\T
+    \in\SPD{\Nfilter},
+    \qquad
+    \centermat
+    =
+    \frac{1}{\Npix}\left(\Id{\Npix}-\frac{1}{\Npix}\vector{1}_{\Npix}\vector{1}_{\Npix}^\T\right),
+    \label{eq:spdnet-covpool}
+  \end{equation}
+  c'est-à-dire la matrice de covariance empirique des $\Nfilter$ canaux, estimée
+  sur les $\Npix$ positions spatiales.
+\end{definition}
+
+\begin{figure}[htb]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/covpool.tex}}
+  \end{center}
+  \caption{% TODO texte: legende.
+  }
+  \label{fig:spdnet-covpool}
+\end{figure}
+
+% ======================= TODO texte (remarque, ~10 lignes) ==========================
+% Poser le label rem:spdnet-covpool-regime. Point important et absent de
+% l'article: \cref{eq:spdnet-covpool} est une matrice de covariance empirique
+% estimee a partir de $\Npix$ echantillons pour $\Nfilter$ variables, c'est-a-dire
+% exactement le regime dimensionnel discute en
+% \cref{sec:context-covariance-regularized-estimation}. Donner les chiffres du
+% papier: $\Nfilter=8\times32=256$ pour SRCNet, contre $\Npix=M_h\times M_w$
+% de l'ordre de $38\times20=760$; le rapport $\Npix/\Nfilter$ est de l'ordre de 3,
+% ce qui est faible. Conclure: c'est *pour cette raison* que la reduction de
+% dimension par \BiMap{} et le seuil de \ReEig{} ne sont pas des raffinements
+% mais des necessites --- sans eux, la matrice est trop mal conditionnee pour que
+% \LogEig{} ait un sens. Rattacher a rem:spdnet-reeig-retrecissement.
+% ====================================================================================
+
+\subsection{Deux architectures: \layername{rcnet} et \layername{srcnet}}
+\label{sec:spdnet-covpool-archi}
+
+\begin{definition}[{\layername{rcnet} et \layername{srcnet}}]
+\label{def:spdnet-rcnet}
+  Les deux architectures diffèrent par la façon de former $\Tstack$ à partir des
+  $\ilayer$ premières couches d'un réseau résiduel:
+  \begin{itemize}
+    \item \layername{rcnet}: seules les sorties de la dernière couche retenue
+      sont utilisées, $\Tstack\in\R^{\Nfilter\times\Npix}$ avec
+      $\Npix=h_\ilayer w_\ilayer$;
+    \item \layername{srcnet}: les sorties des $\ilayer$ couches sont empilées
+      après interpolation à une taille commune, ce qui donne
+      $\Nfilter=\ilayer\cdot\bar{\Nfilter}$ cartes.
+  \end{itemize}
+  Dans les deux cas, $\CovPooled$ de \cref{eq:spdnet-covpool} alimente un réseau
+  \SPDnet{} au sens de \cref{def:spdnet-architecture}.
+\end{definition}
+
+\begin{figure}[htb]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/rcnet_srcnet.tex}}
+  \end{center}
+  \caption{Les deux façons de former $\Tstack$ à partir des $\ilayer$ premières
+    couches d'un réseau résiduel. % TODO texte: completer la legende --- dire ce
+    % que chaque variante privilegie (profondeur des caracteristiques contre
+    % richesse multi-echelle) et rappeler la contrainte memoire qui motive de ne
+    % retenir que $\bar{\Nfilter}$ sorties par couche dans \layername{srcnet}.
+  }
+  \label{fig:spdnet-rcnet-srcnet}
+\end{figure}
+
+% ============================ TODO decision =========================================
+% Voir \cref{fig:spdnet-rcnet-srcnet}. Les valeurs de reglage ($\ilayer=8$, $\bar{\Nfilter}=32$, $h=112$, $w=60$,
+% interpolation a $38\times20$) sont dans l'article. Proposition: ne pas les
+% reprendre ici, elles appartiennent au pdf joint, sauf celles qui servent
+% l'argument du regime dimensionnel de rem:spdnet-covpool-regime. A confirmer.
+% ====================================================================================
+
+\subsection{Rétropropager jusqu'aux convolutions}
+\label{sec:spdnet-covpool-backprop}
+
+\begin{proposition}[{Gradient de la couche \CovPool}]
+\label{prop:spdnet-covpool-grad}
+  La couche \CovPool{} de \cref{eq:spdnet-covpool} n'a pas de paramètre à
+  apprendre. L'erreur rétropropagée vers les cartes de filtres est
+  \begin{equation}
+    \err{\loss^{\ilayer}}{\Tstack}
+    =
+    2\,\centermat\,\Tstack^\T\,\err{\loss^{\ilayer+1}}{\CovPooled}.
+    \label{eq:spdnet-covpool-grad}
+  \end{equation}
+\end{proposition}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Ce que \cref{prop:spdnet-covpool-grad} change, et c'est le seul point
+% methodologique de la section: la chaine de gradients est complete depuis la
+% couche softmax jusqu'aux convolutions du reseau residuel. La matrice de
+% covariance n'est donc plus une caracteristique calculee en amont, comme dans
+% les approches par covariance pooling a poids figes \sidecite{li2017second,akodad2020ensemble},
+% mais une couche dont l'amont est appris pour la tache. Enoncer que c'est la
+% prémisse dont vivent les deux sections suivantes: sans elle, normaliser ou
+% agreger a l'interieur du reseau n'aurait pas d'objet.
+% ====================================================================================
+
+\subsection{Classification d'objets enfouis en \textsc{gpr}}
+\label{sec:spdnet-covpool-resultats}
+
+% ==================== TODO texte + experiences (~2 pages) ===========================
+% Trois experiences, toutes reprises de \fullcite{JSTARS25}, sur la base
+% Geolithe (4 types d'objets enfouis, plusieurs configurations de frequence et
+% d'elevation, sols secs et humides, sable et gravier). Convention du memoire:
+% figures reprises d'un article -> citation, pas de macro \prov, les donnees
+% n'etant pas distribuables. Protocole commun a rappeler une fois: 100 tirages
+% de partition apprentissage/test, quantiles 5 / 50 / 95.
+%
+% FIGURE 1/3 --- precision de test en fonction de la fraction de donnees
+%   d'apprentissage, pour CNN1, ResNet (pre-entraine et depuis zero), RCNet et
+%   SRCNet. C'est la figure qui porte l'argument « peu de donnees ».
+%
+% FIGURE 2/3 --- precision de test en fonction du taux d'etiquettes erronees
+%   dans l'ensemble d'apprentissage. Argument « robustesse au bruit
+%   d'annotation ».
+%
+% FIGURE 3/3 --- les quatre scenarios de decalage entre apprentissage et test
+%   (A: elevation du radar; B: frequence; C et D: nature du sol, gravier et
+%   sable). C'est la figure la plus importante de la section: c'est elle qui
+%   mesure ce que l'invariance geometrique promet. Decision a prendre: les
+%   quatre scenarios en une figure a quatre panneaux, ou seulement A et C, les
+%   deux autres renvoyant au pdf joint.
+%
+% Texte a ecrire autour: ne pas commenter scenario par scenario, mais degager la
+% regularite --- l'ecart entre les modeles du second ordre et les autres *croit*
+% avec la severite du decalage, alors qu'il est faible en conditions
+% homogenes. C'est l'enonce a retenir pour le \cref{sec:spdnet-bilan}.
+% ====================================================================================
+
+
+\section{Normaliser un batch: quelle moyenne sur le cône?}
+\label{sec:spdnet-batchnorm}
+
+\begin{contributions}
+  Cette section reprend \fullcite{PREP26b}.
+\end{contributions}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% Ouvrir la section. Ordre suggere:
+%  1. rappeler ce que fait la normalisation par batch dans le cas euclidien
+%     \sidecite{ioffe2015batch}: centrer et reduire chaque batch, puis
+%     apprendre un biais qui rend a la couche la liberte de choisir la
+%     distribution de sortie. C'est une des raisons pour lesquelles les reseaux
+%     profonds s'entrainent;
+%  2. sa transposition au cone \sidecite{brooks2019riemannian,kobler2022spd}
+%     remplace la moyenne empirique par la moyenne geometrique. Enoncer les deux
+%     limites qui motivent le travail: (i) la moyenne geometrique est iterative
+%     et chere, (ii) la retropropagation a travers la couche n'avait pas ete
+%     derivee et reposait sur la differentiation automatique;
+%  3. annoncer le renversement de perspective de la section, qui est le point de
+%     synthese du chapitre: le choix de la moyenne n'est pas un reglage, c'est le
+%     choix d'une geometrie donc d'un modele statistique
+%     (\cref{prop:spdnet-moyennes-frechet}). Le fait experimental que la moyenne
+%     geometrique ne soit pas la meilleure devient alors un enonce sur les
+%     donnees, pas une curiosite.
+% Preciser aussi ce qui a ete volontairement laisse de cote: la normalisation de
+% la dispersion \sidecite{kobler2022spd,9746629}, plus couteuse et instable pour
+% des matrices mal conditionnees.
+% ====================================================================================
+
+\subsection{La couche de normalisation}
+\label{sec:spdnet-batchnorm-couche}
+
+\begin{definition}[{Normalisation par batch sur $\SPD{\Nvar}$}]
+\label{def:spdnet-batchnorm}
+  Soit $\{\MCov_\iobs\}_{\iobs=1}^{\Nobs}$ un batch de $\SPD{\Nvar}$ et $\Fmean$
+  une moyenne de ce batch. La couche recentre le batch en l'identité puis lui
+  applique un biais $\Covbias\in\SPD{\Nvar}$ appris:
+  \begin{equation}
+    \bnnorm_\iobs
+    =
+    \Fmean^{-1/2}\,\MCov_\iobs\,\Fmean^{-1/2},
+    \qquad
+    \bnout_\iobs
+    =
+    \Covbias\,\bnnorm_\iobs\,\Covbias,
+    \label{eq:spdnet-batchnorm}
+  \end{equation}
+  de sorte que la moyenne du batch de sortie est $\Covbias^2$. En inférence, la
+  moyenne du batch est remplacée par une moyenne globale $\Fmeanglob$ accumulée
+  pendant l'apprentissage.
+\end{definition}
+
+% ======================= TODO texte (remarque, ~8 lignes) ===========================
+% Poser le label rem:spdnet-biais-carre. Deux remarques de mise en place:
+%  1. dans \sidecite{brooks2019riemannian,kobler2022spd} le biais est tel que la
+%     moyenne du batch devienne $\Covbias$ et non $\Covbias^2$; le choix retenu
+%     ici evite d'avoir a manipuler $\Covbias^{1/2}$ et allege toutes les
+%     derivations qui suivent, sans rien changer a l'expressivite de la couche;
+%  2. \cref{eq:spdnet-batchnorm} n'est autre que la congruence sous laquelle la
+%     metrique affine invariante est invariante
+%     (\cref{eq:context-riemann-invcongruence}). Autrement dit, *pour la
+%     geometrie du cone, cette couche est une isometrie*: elle deplace les
+%     donnees sans deformer leurs distances relatives. C'est une lecture qui
+%     n'est dans aucun des articles et qui merite d'etre faite ici.
+% ====================================================================================
+
+\begin{property}[{Mise à jour de la moyenne globale}]
+\label{prop:spdnet-momentum}
+  La moyenne globale est mise à jour à chaque batch le long de la géodésique de
+  la géométrie associée à la moyenne retenue. Pour la moyenne géométrique,
+  \begin{equation}
+    \Fmeanglob
+    \gets
+    \Fmeanglob\,\geodmean_{\momentum}\,\Fmean
+    =
+    (\Fmeanglob)^{1/2}\left((\Fmeanglob)^{-1/2}\Fmean(\Fmeanglob)^{-1/2}\right)^{\momentum}(\Fmeanglob)^{1/2},
+    \label{eq:spdnet-momentum-geo}
+  \end{equation}
+  où $\momentum$ est le momentum et $\geodmean$ la géodésique de
+  \cref{eq:context-riemann-geodspd}; les formules correspondantes pour les
+  autres moyennes sont données en
+  \cref{eq:spdnet-momentum-le,eq:spdnet-momentum-ari,eq:spdnet-momentum-harm,eq:spdnet-momentum-gah}.
+\end{property}
+
+% ======================= TODO texte (remarque, ~6 lignes) ===========================
+% Poser le label rem:spdnet-momentum-geodesique. Le point a faire ressortir, qui
+% n'est pas explicite dans l'article: la moyenne glissante par momentum, qui est
+% une astuce d'implementation dans le cas euclidien, est ici *un point de la
+% geodesique* entre l'ancienne moyenne globale et la moyenne du batch courant.
+% Le momentum devient donc un objet geometrique, et chaque geometrie du chapitre
+% fournit sa propre regle de mise a jour --- ce qui est le premier indice que le
+% choix de la moyenne engage bien plus qu'un cout de calcul.
+% ====================================================================================
+
+\begin{figure}[p]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/batchnorm.tex}}
+  \end{center}
+  \caption{% TODO texte: legende. Insister sur les deux chemins de retour.
+  }
+  \label{fig:spdnet-batchnorm}
+\end{figure}
+
+\begin{algorithm}[htb]
+  \caption{Normalisation par batch pour \SPDnet}
+  \label{algo:spdnet-batchnorm}
+  \begin{algorithmic}[1]
+    \Statex\hspace*{-\algorithmicindent}\textbf{Apprentissage}
+    \Require $\Nbatch$ batchs $\{\MCov_{\iobs,\ibatch}\}_{\iobs=1}^{\Nobs}$ de $\SPD{\Nvar}$, momentum $\momentum$
+    \State Initialiser la moyenne globale $\Fmeanglob=\Id{\Nvar}$
+    \For{$\ibatch\in\intrange{1}{\Nbatch}$}
+      \State Calculer la moyenne du batch $\Fmean_\ibatch$
+      \State Normaliser et biaiser selon \cref{eq:spdnet-batchnorm}
+      \State Mettre à jour $\Fmeanglob$ selon \cref{eq:spdnet-momentum-geo}
+    \EndFor
+    \Ensure batchs transformés; paramètre appris $\Covbias$; moyenne estimée $\Fmeanglob$
+    \Statex\hspace*{-\algorithmicindent}\textbf{Inférence}
+    \Require $\MCov\in\SPD{\Nvar}$
+    \Ensure $\Covbias\,(\Fmeanglob)^{-1/2}\,\MCov\,(\Fmeanglob)^{-1/2}\,\Covbias$
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Rétropropagation de la couche}
+\label{sec:spdnet-batchnorm-backprop}
+
+\begin{proposition}[{Rétropropagation de la normalisation par batch}]
+\label{prop:spdnet-batchnorm-backprop}
+  Soit $\{\err{\loss}{\bnout_\iobs}\}_{\iobs=1}^{\Nobs}$ les erreurs en
+  sortie de la couche de \cref{def:spdnet-batchnorm}. L'erreur servant à mettre
+  à jour le biais est
+  \begin{equation}
+    \err{\loss_{\bnout}}{\Covbias}
+    =
+    \sum_{\iobs=1}^{\Nobs}
+    \left(
+      \err{\loss}{\bnout_\iobs}\Covbias\,\bnnorm_\iobs
+      +
+      \bnnorm_\iobs\,\Covbias\err{\loss}{\bnout_\iobs}
+    \right),
+    \label{eq:spdnet-backprop-biais}
+  \end{equation}
+  et les erreurs de l'entrée se décomposent en deux contributions, l'une par la
+  normalisation et l'autre par le calcul de la moyenne,
+  \begin{equation}
+    \err{\loss}{\MCov_\iobs}
+    =
+    \err{\loss_{\bnnorm}}{\MCov_\iobs}
+    +
+    \err{\loss_{\Fmean}}{\MCov_\iobs},
+    \qquad
+    \err{\loss_{\bnnorm}}{\MCov_\iobs}
+    =
+    \Fmean^{-1/2}\Covbias\err{\loss}{\bnout_\iobs}\Covbias\Fmean^{-1/2}.
+    \label{eq:spdnet-backprop-entree}
+  \end{equation}
+  La seconde contribution s'obtient de $\err{\loss_{\bnnorm}}{\Fmean}$ par
+  \begin{equation}
+    \sum_{\iobs=1}^{\Nobs}\trace{\err{\loss_{\Fmean}}{\MCov_\iobs}\diff\MCov_\iobs}
+    =
+    \trace{\err{\loss_{\bnnorm}}{\Fmean}\diff\Fmean},
+    \label{eq:spdnet-backprop-moyenne}
+  \end{equation}
+  où $\err{\loss_{\bnnorm}}{\Fmean}$ est l'unique solution symétrique de
+  l'équation de Sylvester
+  \begin{equation}
+    \err{\loss_{\bnnorm}}{\Fmean}\Fmean^{1/2}
+    +
+    \Fmean^{1/2}\err{\loss_{\bnnorm}}{\Fmean}
+    =
+    \sum_{\iobs=1}^{\Nobs}
+    \left(
+      \err{\loss_{\bnnorm}}{\MCov_\iobs}\MCov_\iobs\Fmean^{-1/2}
+      +
+      \Fmean^{-1/2}\MCov_\iobs\err{\loss_{\bnnorm}}{\MCov_\iobs}
+    \right).
+    \label{eq:spdnet-backprop-sylvester}
+  \end{equation}
+\end{proposition}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Commenter \cref{prop:spdnet-batchnorm-backprop}: la structure de la couche est
+% telle que l'entree influence la sortie par deux chemins (directement par la
+% normalisation, indirectement par la moyenne), d'ou les deux termes de
+% \cref{eq:spdnet-backprop-entree} et la figure \ref{fig:spdnet-batchnorm}.
+% Insister sur le fait que tout est explicite *sauf* le passage de
+% \cref{eq:spdnet-backprop-moyenne}, qui depend de la moyenne choisie: c'est
+% exactement le point ou la geometrie entre dans le calcul, et c'est l'objet de
+% \cref{sec:spdnet-batchnorm-gradmoyennes}.
+% ====================================================================================
+
+\subsection{Cinq moyennes, cinq géométries}
+\label{sec:spdnet-batchnorm-moyennes}
+
+\begin{proposition}[{Les moyennes considérées sont des moyennes de Fréchet}]
+\label{prop:spdnet-moyennes-frechet}
+  Chacune des moyennes utilisées dans la couche de \cref{def:spdnet-batchnorm}
+  est la moyenne de Fréchet (\cref{def:context-riemann-frechet}) du batch
+  $\{\MCov_\iobs\}_{\iobs=1}^{\Nobs}$ pour une géométrie ou une divergence
+  identifiée en \cref{pt:context}:
+  \begin{equation}
+    \begin{array}{rcl}
+      \Fmean_{\meanlabel{G}}
+        &=& \displaystyle\argmin_{\Fmean\in\SPD{\Nvar}}\ \sum_{\iobs}\geodist^2_{\meanlabel{AI}}(\Fmean,\MCov_\iobs),
+        \\[10pt]
+      \Fmean_{\meanlabel{LE}}
+        &=& \displaystyle\argmin_{\Fmean\in\SPD{\Nvar}}\ \sum_{\iobs}\geodist^2_{\meanlabel{LE}}(\Fmean,\MCov_\iobs)
+        \;=\; \expm\left(\frac{1}{\Nobs}\sum_{\iobs}\logm\MCov_\iobs\right),
+        \\[10pt]
+      \meanari
+        &=& \displaystyle\argmin_{\Fmean\in\SPD{\Nvar}}\ \sum_{\iobs}\KL(\Fmean\,\|\,\MCov_\iobs)
+        \;=\; \frac{1}{\Nobs}\sum_{\iobs}\MCov_\iobs,
+        \\[10pt]
+      \meanharm
+        &=& \displaystyle\argmin_{\Fmean\in\SPD{\Nvar}}\ \sum_{\iobs}\KL(\MCov_\iobs\,\|\,\Fmean)
+        \;=\; \left(\frac{1}{\Nobs}\sum_{\iobs}\inv{\MCov_\iobs}\right)^{-1},
+        \\[10pt]
+      \Fmean_{\meanlabel{GAH}}
+        &=& \displaystyle\argmin_{\Fmean\in\SPD{\Nvar}}\ \sum_{\iobs}\left[\KL(\Fmean\,\|\,\MCov_\iobs)+\KL(\MCov_\iobs\,\|\,\Fmean)\right]
+        \;=\; \meanari\,\geodmean_{1/2}\,\meanharm,
+    \end{array}
+    \label{eq:spdnet-moyennes-frechet}
+  \end{equation}
+  où $\geodist_{\meanlabel{AI}}$ et $\geodist_{\meanlabel{LE}}$ sont les distances
+  affine invariante \cref{eq:context-riemann-distspd} et log-euclidienne, et où
+  $\KL$ est la divergence de Kullback-Leibler entre lois normales centrées
+  \cref{eq:context-geometry-kldivergence}
+  \sidecite[-1cm]{moakher2012divergence,congedo2015approximate}.
+\end{proposition}
+
+% ==================== TODO texte (~3 paragraphes) --- LE POINT CENTRAL ==============
+% C'est le passage le plus important du chapitre; le reste peut etre lu comme sa
+% mise en oeuvre. Ce qu'il faut ecrire:
+%  1. lire \cref{eq:spdnet-moyennes-frechet} comme un *prolongement de la
+%     \cref{tab:context-riemann-metriques}*: la liste des moyennes n'est pas un
+%     catalogue d'heuristiques numeriques, c'est une famille indexee par la
+%     geometrie que l'on met sur le cone. Chaque ligne est une hypothese;
+%  2. la lecture statistique, qui est ce qui transforme le resultat
+%     experimental en enonce: la moyenne arithmetique est l'estimateur du
+%     maximum de vraisemblance sous modele de Wishart, la moyenne harmonique son
+%     equivalent sous modele de Wishart inverse, la moyenne geometrique
+%     correspond a la distance de Rao du modele gaussien
+%     (\cref{sec:context-geometry-gaussian}), et GAH est le compromis
+%     symetrique entre les deux premieres. Dire alors ce qui est vraiment
+%     mesure en \cref{sec:spdnet-batchnorm-resultats}: si GAH bat la moyenne
+%     geometrique sur les trois jeux de donnees, ce n'est pas une curiosite
+%     numerique, c'est que l'hypothese implicite de la moyenne geometrique n'est
+%     pas la bonne pour ces donnees;
+%  3. la remarque de cout, qui prepare \cref{sec:spdnet-batchnorm-cout}: la
+%     ligne la mieux fondee du tableau est aussi la seule sans forme close.
+%     C'est le meme obstacle qu'en \cref{sec:spdnet-feuille-route}, et la
+%     reponse retenue ici est de *changer de geometrie*, la ou
+%     \cref{sec:spdnet-federe} choisira d'approcher les operateurs.
+% Ajouter une phrase sur la relation entre les deux premieres lignes: la moyenne
+% log-euclidienne est exactement la premiere iteree de
+% \cref{eq:spdnet-geometrique-iteration} initialisee en $\Id{\Nvar}$.
+% ====================================================================================
+
+La moyenne géométrique est obtenue par le point fixe \sidecite[0cm]{jeuris2012survey}
+\begin{equation}
+  \Fmean_{\iiter+1}
+  =
+  \Fmean_{\iiter}^{1/2}
+  \expm\!\left(\frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \logm\!\left(\Fmean_{\iiter}^{-1/2}\MCov_\iobs\Fmean_{\iiter}^{-1/2}\right)\right)
+  \Fmean_{\iiter}^{1/2},
+  \qquad \Fmean_0=\Id{\Nvar},
+  \label{eq:spdnet-geometrique-iteration}
+\end{equation}
+arrêté après un nombre fixé $\Niterm$ d'itérations. Les mises à jour de la
+moyenne globale correspondant aux quatre autres moyennes s'écrivent
+\begin{align}
+  \Fmeanglob &\gets \expm\!\left((1-\momentum)\logm\Fmeanglob+\momentum\logm\Fmean_{\meanlabel{LE}}\right),
+  \label{eq:spdnet-momentum-le}\\
+  \Fmeanglob &\gets (1-\momentum)\,\Fmeanglob+\momentum\,\meanari,
+  \label{eq:spdnet-momentum-ari}\\
+  \Fmeanglob &\gets \left((1-\momentum)\inv{\Fmeanglob}+\momentum\inv{\meanharm}\right)^{-1},
+  \label{eq:spdnet-momentum-harm}\\
+  \Fmeanglob &\gets \left((1-\momentum)\Fmeanglob_{\meanari}+\momentum\,\meanari\right)
+    \geodmean_{1/2}
+    \left((1-\momentum)\inv{\Fmeanglob_{\meanharm}}+\momentum\inv{\meanharm}\right)^{-1}.
+  \label{eq:spdnet-momentum-gah}
+\end{align}
+
+% ============================ TODO texte (~5 lignes) ================================
+% Une phrase pour dire que \cref{eq:spdnet-momentum-gah} impose de maintenir
+% separement les deux moyennes globales arithmetique et harmonique, ce qui est
+% le seul surcout de memoire de GAH par rapport aux autres.
+% ====================================================================================
+
+\subsection{Rétropropagation des moyennes}
+\label{sec:spdnet-batchnorm-gradmoyennes}
+
+\begin{proposition}[{Rétropropagation de la moyenne géométrique}]
+\label{prop:spdnet-grad-geo}
+  Soit $\Fmean=\Fmean_{\Niterm}$ la sortie du point fixe
+  \cref{eq:spdnet-geometrique-iteration} et $\err{\loss}{\Fmean}$ son erreur. En
+  notant $\mat{\Gamma}_{\iobs,\iiter}=\Fmean_\iiter^{-1/2}\MCov_\iobs\Fmean_\iiter^{-1/2}$
+  et
+  \begin{equation}
+    \mat{E}_\iiter
+    =
+    \dirderiv\expm\!\left(\tfrac{1}{\Nobs}\textstyle\sum_{\iobs}\logm\mat{\Gamma}_{\iobs,\iiter}\right)
+    \left[\Fmean_\iiter^{1/2}\err{\loss^{(\Niterm-\iiter-1)}}{\Fmean_{\iiter+1}}\Fmean_\iiter^{1/2}\right],
+    \label{eq:spdnet-grad-geo-E}
+  \end{equation}
+  les erreurs de l'entrée s'obtiennent en accumulant les contributions de toutes
+  les itérations,
+  \begin{equation}
+    \err{\loss}{\MCov_\iobs}
+    =
+    \sum_{\iiter=0}^{\Niterm-1}
+    \frac{1}{\Nobs}\,
+    \Fmean_\iiter^{-1/2}\,
+    \dirderiv\logm(\mat{\Gamma}_{\iobs,\iiter})\!\left[\mat{E}_\iiter\right]\,
+    \Fmean_\iiter^{-1/2},
+    \label{eq:spdnet-grad-geo}
+  \end{equation}
+  l'erreur sur l'itérée courante étant obtenue récursivement par
+  $\err{\loss^{(\Niterm-\iiter)}}{\Fmean_\iiter}=\mat{M}_\iiter-\inv{\Fmean_\iiter}\mat{N}_\iiter\inv{\Fmean_\iiter}$,
+  où $\mat{M}_\iiter$ et $\mat{N}_\iiter$ sont les uniques solutions symétriques des
+  équations de Sylvester
+  \begin{equation}
+    \mat{M}_\iiter\Fmean_\iiter^{1/2}+\Fmean_\iiter^{1/2}\mat{M}_\iiter
+    =
+    \Fmean_\iiter^{-1/2}\Fmean_{\iiter+1}\err{\loss^{(\Niterm-\iiter-1)}}{\Fmean_{\iiter+1}}
+    +
+    \err{\loss^{(\Niterm-\iiter-1)}}{\Fmean_{\iiter+1}}\Fmean_{\iiter+1}\Fmean_\iiter^{-1/2},
+    \label{eq:spdnet-grad-geo-M}
+  \end{equation}
+  \begin{equation}
+    \mat{N}_\iiter\Fmean_\iiter^{-1/2}+\Fmean_\iiter^{-1/2}\mat{N}_\iiter
+    =
+    \frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+    \left(
+      \MCov_\iobs\Fmean_\iiter^{-1/2}\dirderiv\logm(\mat{\Gamma}_{\iobs,\iiter})[\mat{E}_\iiter]
+      +
+      \dirderiv\logm(\mat{\Gamma}_{\iobs,\iiter})[\mat{E}_\iiter]\Fmean_\iiter^{-1/2}\MCov_\iobs
+    \right).
+    \label{eq:spdnet-grad-geo-N}
+  \end{equation}
+\end{proposition}
+
+\begin{proposition}[{Rétropropagation de la moyenne log-euclidienne}]
+\label{prop:spdnet-grad-le}
+  Pour la moyenne log-euclidienne de \cref{eq:spdnet-moyennes-frechet},
+  \begin{equation}
+    \err{\loss}{\MCov_\iobs}
+    =
+    \frac{1}{\Nobs}\,\dirderiv\logm(\MCov_\iobs)\!\left[\mat{E}\right],
+    \qquad
+    \mat{E}
+    =
+    \dirderiv\expm\!\left(\tfrac{1}{\Nobs}\textstyle\sum_{\iobs}\logm\MCov_\iobs\right)\!\left[\err{\loss}{\Fmean}\right].
+    \label{eq:spdnet-grad-le}
+  \end{equation}
+  C'est le cas $\Niterm=1$ de \cref{prop:spdnet-grad-geo}.
+\end{proposition}
+
+\begin{proposition}[{Rétropropagation des moyennes arithmétique et harmonique}]
+\label{prop:spdnet-grad-arith-harm}
+  Pour les moyennes $\meanari$ et $\meanharm$ de
+  \cref{eq:spdnet-moyennes-frechet},
+  \begin{equation}
+    \err{\loss}{\MCov_\iobs}
+    =
+    \frac{1}{\Nobs}\err{\loss}{\meanari}
+    \qquad\text{et}\qquad
+    \err{\loss}{\MCov_\iobs}
+    =
+    \frac{1}{\Nobs}\,\inv{\MCov_\iobs}\,\meanharm\,\err{\loss}{\meanharm}\,\meanharm\,\inv{\MCov_\iobs}.
+    \label{eq:spdnet-grad-arith-harm}
+  \end{equation}
+\end{proposition}
+
+\begin{proposition}[{Rétropropagation de la moyenne GAH}]
+\label{prop:spdnet-grad-gah}
+  Pour $\Fmean_{\meanlabel{GAH}}=\meanari\geodmean_{1/2}\meanharm$,
+  \begin{equation}
+    \err{\loss}{\MCov_\iobs}
+    =
+    \frac{1}{\Nobs}\err{\loss}{\meanari}
+    +
+    \frac{1}{\Nobs}\inv{\MCov_\iobs}\meanharm\err{\loss}{\meanharm}\meanharm\inv{\MCov_\iobs},
+    \label{eq:spdnet-grad-gah}
+  \end{equation}
+  où
+  $\err{\loss}{\meanari}=\meanharm^{-1/2}\mat{M}\meanharm^{-1/2}$ et
+  $\err{\loss}{\meanharm}=\meanari^{-1/2}\mat{N}\meanari^{-1/2}$, avec $\mat{M}$
+  et $\mat{N}$ les uniques solutions symétriques des équations de Sylvester
+  \begin{equation}
+    \mat{M}\left(\meanharm^{-1/2}\meanari\meanharm^{-1/2}\right)^{1/2}
+    +
+    \left(\meanharm^{-1/2}\meanari\meanharm^{-1/2}\right)^{1/2}\mat{M}
+    =
+    \meanharm^{1/2}\err{\loss}{\Fmean}\meanharm^{1/2},
+    \label{eq:spdnet-grad-gah-M}
+  \end{equation}
+  \begin{equation}
+    \mat{N}\left(\meanari^{-1/2}\meanharm\meanari^{-1/2}\right)^{1/2}
+    +
+    \left(\meanari^{-1/2}\meanharm\meanari^{-1/2}\right)^{1/2}\mat{N}
+    =
+    \meanari^{1/2}\err{\loss}{\Fmean}\meanari^{1/2}.
+    \label{eq:spdnet-grad-gah-N}
+  \end{equation}
+\end{proposition}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Commenter la serie de propositions. Deux points seulement, il ne faut pas
+% paraphraser les formules:
+%  1. la hierarchie de complexite se lit directement: la moyenne arithmetique a
+%     le gradient le plus simple qui soit, GAH demande deux equations de
+%     Sylvester, la moyenne geometrique en demande deux *par iteration* du point
+%     fixe --- et c'est ce dernier point qui explique le comportement memoire de
+%     la differentiation automatique, qui doit stocker les $\Niterm$ iterees;
+%  2. renvoyer aux materiels supplementaires de \fullcite{PREP26b} pour les
+%     preuves, et indiquer que le code est disponible (depot
+%     on_batchnormalization_for_spdnet).
+% ====================================================================================
+
+\subsection{Invariances et complexité}
+\label{sec:spdnet-batchnorm-cout}
+
+\begin{property}[{Invariances des moyennes}]
+\label{prop:spdnet-invariances}
+  Une moyenne est dite invariante par congruence si la moyenne de
+  $\{\mat{A}\MCov_\iobs\mat{A}^\T\}$ vaut $\mat{A}\Fmean\mat{A}^\T$ pour toute
+  $\mat{A}$ inversible, et invariante par inversion si la moyenne de
+  $\{\inv{\MCov_\iobs}\}$ vaut $\inv{\Fmean}$. Les cinq moyennes de
+  \cref{eq:spdnet-moyennes-frechet} se répartissent comme indiqué dans
+  \cref{tab:spdnet-moyennes}: seules la moyenne géométrique et la moyenne GAH
+  possèdent les deux.
+\end{property}
+
+\begin{table}[htb]
+  \centering
+  \caption{Les cinq moyennes de \cref{prop:spdnet-moyennes-frechet}: géométrie
+    sous-jacente, lecture statistique, invariances et coût de calcul pour un
+    batch de $\Nobs$ matrices de taille $\Nvar$.}
+  \label{tab:spdnet-moyennes}
+  \footnotesize
+  \begin{tabular}{@{}llccc@{}}
+    \toprule
+    Moyenne & Géométrie / divergence & Congruence & Inversion & Coût \\
+    \midrule
+    Géométrique
+      & affine invariante (Rao gaussien)
+      & \checkmark & \checkmark
+      & $\bigO(\Niterm\Nobs\Nvar^3)$ \\
+    Log-euclidienne
+      & log-euclidienne
+      & $\times$ & \checkmark
+      & $\bigO(\Nobs\Nvar^3)$ \\
+    Arithmétique
+      & $\KL$ à gauche (Wishart)
+      & \checkmark & $\times$
+      & $\bigO(\Nobs\Nvar^2)$ \\
+    Harmonique
+      & $\KL$ à droite (Wishart inverse)
+      & \checkmark & $\times$
+      & $\bigO(\Nobs\Nvar^3)$ \\
+    \textsc{gah}
+      & $\KL$ symétrisée
+      & \checkmark & \checkmark
+      & $\bigO(\Nobs\Nvar^3)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Lire \cref{tab:spdnet-moyennes} en trois phrases:
+%  1. sur le plan des invariances, GAH est la seule alternative en forme close a
+%     la moyenne geometrique qui ne perde rien --- c'est la prediction theorique
+%     que les experiences vont confirmer;
+%  2. la moyenne log-euclidienne perd l'invariance par congruence, ce qui est
+%     coherent avec ce qui a ete dit en \cref{rem:context-riemann-LEbilan};
+%  3. le facteur $\Niterm$ de la premiere ligne est le seul ecart de complexite
+%     asymptotique, mais il se double du cout memoire de la differentiation
+%     automatique, qui doit conserver les $\Niterm$ iterees. Preciser aussi que
+%     la couche complete reste en $\bigO(\Nobs\Nvar^2+\Nvar^3)$ meme avec la
+%     moyenne arithmetique, a cause de l'etape de normalisation elle-meme.
+% ====================================================================================
+
+\subsection{Coût mesuré et performances de classification}
+\label{sec:spdnet-batchnorm-resultats}
+
+% ==================== TODO texte + experiences (~3 pages) ===========================
+% Deux volets, tous deux repris de \fullcite{PREP26b}. Le code etant public
+% (depot on_batchnormalization_for_spdnet) et les jeux de donnees publics, ces
+% resultats sont, contrairement a ceux de \cref{sec:spdnet-covpool-resultats},
+% *reproductibles*. Decision a prendre: les rejouer via qanat pour porter les
+% macros \prov, ou les reprendre de l'article avec citation. Le premier volet
+% (simulations) serait peu couteux a rejouer; le second (trois jeux de donnees
+% reels, recherche d'hyperparametres) ne l'est pas.
+%
+% VOLET 1 --- cout, sur donnees simulees. Matrices de nombre de conditionnement
+%   $10^5$, comparaison differentiation manuelle / automatique pour la moyenne
+%   geometrique et GAH.
+%   FIGURE 1/3: temps et memoire GPU en fonction de la taille de matrice (8 a
+%     512), batch de 64.
+%   FIGURE 2/3: idem en fonction de la taille de batch (8 a 512), matrices 64.
+%   FIGURE 3/3: idem en fonction de la profondeur (1 a 64 couches empilees).
+%   Enonce a retenir: le gain memoire atteint un facteur 2 et *croit* avec les
+%   trois parametres; le temps, lui, est comparable. C'est donc un argument de
+%   memoire, pas de vitesse --- le dire franchement plutot que de survendre.
+%
+% VOLET 2 --- trois jeux de donnees reels, trois tableaux (F1, temps
+%   d'entrainement, epoques a convergence, pic memoire GPU avec et sans
+%   autograd), 5 graines, architecture a deux blocs BiRe.
+%     - HDM05 \sidecite{muller2007mocap}: 2086 matrices $93\times93$, 117
+%       classes, conditionnement moyen $9{,}1\times10^{5}$. GAH en tete, jusqu'a
+%       5 % de F1 gagnes sur l'absence de normalisation; temps divise par deux au
+%       moins par rapport a la moyenne geometrique;
+%     - HyperLeaf \sidecite{Laprade_2024_CVPR}: 2410 images hyperspectrales de
+%       feuilles de ble, 4 varietes, matrices $204\times204$, conditionnement
+%       $6{,}0\times10^{6}$. Arithmetique, harmonique et GAH gagnent au moins
+%       4 % de F1 sur la moyenne geometrique, 10 % sur l'absence de
+%       normalisation; temps divise par 5, au prix de 10 a 20 epoques de plus;
+%     - Rices90 \sidecite{8970539}: 10 des 90 especes, matrices $256\times256$,
+%       conditionnement $1{,}2\times10^{7}$. Gain de 8 a 15 % de F1 par la
+%       normalisation, peu d'ecart entre les moyennes, temps divise par 3,5.
+%   Deux faits a mettre en avant et a relier explicitement:
+%     (i) l'autograd *echoue* pour les moyennes geometrique et log-euclidienne
+%         sur HyperLeaf et Rices90 --- ce n'est pas un gain marginal, c'est ce
+%         qui rend ces methodes utilisables. Le rattacher au conditionnement des
+%         donnees et a \cref{prop:spdnet-gradevd};
+%     (ii) la moyenne geometrique, la mieux fondee theoriquement, n'est jamais la
+%         meilleure. Renvoyer a \cref{prop:spdnet-moyennes-frechet} et conclure
+%         comme un enonce de modelisation: sur ces donnees, l'hypothese
+%         gaussienne sous-jacente a la geometrie affine invariante n'est pas la
+%         bonne, et GAH, compromis symetrique entre Wishart et Wishart inverse,
+%         l'est davantage. C'est la phrase que le chapitre doit produire.
+% Signaler enfin l'artefact honnete de l'article: le temps plus long du modele
+% sans normalisation vient de la taille de batch retenue par la recherche
+% d'hyperparametres (8 contre davantage ailleurs), pas d'un effet de fond.
+% ====================================================================================
+
+
+\section{Agréger des poids: moyenner sur Stiefel}
+\label{sec:spdnet-federe}
+
+\begin{contributions}
+  Cette section reprend \fullcite{EUSIPCO26b}.
+\end{contributions}
+
+% ============================ TODO texte (~2 paragraphes) ===========================
+% Ouvrir la section. Ordre suggere:
+%  1. le cadre federe en trois phrases \sidecite{mcmahan2017communication}:
+%     apprendre un modele commun sans centraliser les donnees, en alternant
+%     entrainements locaux et agregation sur un serveur. Motivation concrete du
+%     travail: des enregistrements EEG repartis entre sites cliniques, qui ne
+%     peuvent pas etre mis en commun;
+%  2. l'obstacle, qui est le meme que celui de \cref{sec:spdnet-batchnorm} mais
+%     un cran plus severe: la moyenne des poids est ici une moyenne sur la
+%     variete de Stiefel, ou non seulement la moyenne de Frechet n'a pas de
+%     forme close, mais le logarithme riemannien lui-meme n'en a pas
+%     (\cref{prop:spdnet-federe-obstacle}). La reponse retenue ne sera donc pas
+%     de changer de geometrie, mais d'approcher ses operateurs;
+%  3. situer par rapport aux travaux existants sur l'apprentissage federe
+%     riemannien \sidecite{li2022federated,huang2024riemannian,zhang2024nonconvex}:
+%     ils traitent des varietes generales mais lient la methode a un optimiseur
+%     local particulier (descente de gradient stochastique riemannienne). La
+%     contribution ici est independante de l'optimiseur local, ce qui compte des
+%     lors que les clients sont heterogenes.
+% ====================================================================================
+
+\subsection{Apprentissage fédéré et risque global}
+\label{sec:spdnet-federe-probleme}
+
+Soit $\clientset=\intrange{1}{\Nclient}$ l'ensemble des clients, le client
+$\iclient$ disposant du jeu local
+$\dataclient^{(\iclient)}=\{(\MCov_\iobs^{(\iclient)},\classlabel_\iobs^{(\iclient)})\}_{\iobs=1}^{|\dataclient^{(\iclient)}|}$
+et du risque empirique local $\riskloc_\iclient(\netparam)$ défini comme en
+\cref{eq:spdnet-risque}. L'objectif du serveur est
+\begin{equation}
+  \argmin_{\netparam}\ \frac{1}{\Nclient}\sum_{\iclient=1}^{\Nclient}\riskloc_\iclient(\netparam),
+  \label{eq:spdnet-federe-risque}
+\end{equation}
+approché en $\Nround$ tours de communication. À chaque tour $\iround$, un
+sous-ensemble $\selected_\iround\subset\clientset$ de $\Nselected$ clients est
+tiré uniformément, chaque client sélectionné part de $\netparam_\iround$,
+effectue $\Nepoch_\iclient$ époques locales et renvoie
+$\netparam_\iround^{(\iclient)}$. Les paramètres euclidiens s'agrègent par
+moyenne \sidecite[0cm]{mcmahan2017communication}
+\begin{equation}
+  \MSoftmax_{\iround+1}=\frac{1}{|\selected_\iround|}\sum_{\iclient\in\selected_\iround}\MSoftmax_\iround^{(\iclient)},
+  \qquad
+  \Vsoftmax_{\iround+1}=\frac{1}{|\selected_\iround|}\sum_{\iclient\in\selected_\iround}\Vsoftmax_\iround^{(\iclient)},
+  \label{eq:spdnet-federe-euclidien}
+\end{equation}
+mais cette formule n'a pas de sens pour les poids $\Wlayer_{\ilayer,\iround}^{(\iclient)}$.
+
+\subsection{L'obstacle: aucune moyenne de Fréchet accessible}
+\label{sec:spdnet-federe-obstacle}
+
+\begin{property}[{Inaccessibilité de la moyenne de Fréchet sur Stiefel}]
+\label{prop:spdnet-federe-obstacle}
+  La moyenne arithmétique de points de $\Stiefel{\Nvar}{k}$ n'appartient pas à
+  $\Stiefel{\Nvar}{k}$ en général. La moyenne de Fréchet
+  (\cref{def:context-riemann-frechet}) y est bien définie puisque la variété est
+  compacte, mais son calcul par flot de Karcher requiert le logarithme
+  riemannien et la distance géodésique, dont aucun n'admet de forme close sur
+  $\Stiefel{\Nvar}{k}$: chacun demande lui-même une procédure itérative
+  \sidecite[-0.5cm]{edelman1998geometry,bouchard2025beyond}. Son coût est donc
+  prohibitif à chaque tour et pour chaque couche.
+\end{property}
+
+% ======================= TODO texte (remarque, ~8 lignes) ===========================
+% Poser le label rem:spdnet-deux-obstacles. Mettre en regard explicite les deux
+% obstacles du chapitre, c'est le moment ou le fil devient visible:
+%  - sur le cone (\cref{sec:spdnet-batchnorm}), la moyenne de Frechet est
+%    calculable, par un point fixe dont chaque iteration coute une
+%    decomposition spectrale (\cref{eq:spdnet-geometrique-iteration}). Le
+%    probleme est le prix, et la sortie a ete de changer de geometrie;
+%  - sur Stiefel, le probleme n'est plus le prix mais la *disponibilite* des
+%    operateurs eux-memes. Changer de geometrie ne sert a rien ici, il faut
+%    approcher les operateurs: c'est ce que fournissent la retraction et le
+%    releve. Renvoyer a \cref{rem:context-riemann-stiefelvscone}, qui avait deja
+%    annonce que la compacite de Stiefel se paye par des exponentielles
+%    couteuses.
+% ====================================================================================
+
+\subsection{Agréger par projection, ou par relèvement}
+\label{sec:spdnet-federe-agregation}
+
+\begin{definition}[{Agrégation par projection (\layername{projavg})}]
+\label{def:spdnet-projavg}
+  L'agrégation par projection remplace la moyenne de Fréchet par la projection
+  de la moyenne arithmétique sur la variété:
+  \begin{equation}
+    \Wlayer_{\ilayer,\iround+1}
+    =
+    \polarf\!\left(\frac{1}{|\selected_\iround|}\sum_{\iclient\in\selected_\iround}\Wlayer_{\ilayer,\iround}^{(\iclient)}\right),
+    \label{eq:spdnet-projavg}
+  \end{equation}
+  où $\polarf(\cdot)$ désigne le facteur orthogonal de la décomposition polaire,
+  c'est-à-dire le point de $\Stiefel{\dlayer{\ilayer-1}}{\dlayer{\ilayer}}$ le
+  plus proche au sens de la norme de Frobenius
+  \sidecite[-0.5cm]{bouchard2025beyond}.
+\end{definition}
+
+\begin{definition}[{Relèvement et rétraction polaire}]
+\label{def:spdnet-lift}
+  La rétraction polaire et le relèvement associé sur
+  $\Stiefel{\Nvar}{k}$ sont
+  \begin{equation}
+    \Retr_{\Wlayer}(\tvec)
+    =
+    \polarf(\Wlayer+\tvec),
+    \qquad
+    \Lift_{\Wlayer}(\bar{\Wlayer})
+    =
+    \projman_{\Wlayer}(\bar{\Wlayer}-\Wlayer),
+    \label{eq:spdnet-lift}
+  \end{equation}
+  avec $\projman$ la projection sur l'espace tangent
+  \cref{eq:context-riemann-projstiefel}. Elles jouent respectivement le rôle de
+  l'exponentielle et du logarithme riemanniens
+  \cref{eq:context-riemann-explogspd}, dont elles sont des approximations au
+  premier ordre.
+\end{definition}
+
+\begin{definition}[{Agrégation par relèvement et rétraction (\layername{rlavg})}]
+\label{def:spdnet-rlavg}
+  Partant de la réécriture de la moyenne euclidienne
+  $\bar{\Wlayer}=\exp_{\Wlayer}\!\left(\frac{1}{\Nselected}\sum_\iclient\log_{\Wlayer}(\Wlayer^{(\iclient)})\right)$,
+  et en y substituant les approximations de \cref{def:spdnet-lift}, l'agrégation
+  s'écrit
+  \begin{equation}
+    \Wlayer_{\ilayer,\iround+1}
+    =
+    \Retr_{\Wlayer_{\ilayer,\iround}}\!\left(
+      \frac{1}{|\selected_\iround|}\sum_{\iclient\in\selected_\iround}
+      \Lift_{\Wlayer_{\ilayer,\iround}}\!\left(\Wlayer_{\ilayer,\iround}^{(\iclient)}\right)
+    \right).
+    \label{eq:spdnet-rlavg}
+  \end{equation}
+\end{definition}
+
+\begin{figure}[p]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/agregation_projavg.tex}}
+  \end{center}
+  \caption[Agrégation par projection]{\layername{projavg}: la moyenne
+    arithmétique des poids locaux quitte la variété, et l'on y revient par le
+    facteur orthogonal de la décomposition polaire. % TODO texte: completer la
+    % legende --- insister sur le fait que le point obtenu est le plus proche au
+    % sens de Frobenius, et que l'iteree precedente n'intervient pas.
+  }
+  \label{fig:spdnet-projavg}
+\end{figure}
+
+\begin{figure}[p]
+  \begin{center}
+    \makebox[\textwidth][c]{\input{gfx/tikZ/spdnet/agregation_rlavg.tex}}
+  \end{center}
+  \caption[Agrégation par relèvement et rétraction]{\layername{rlavg}: les poids
+    locaux sont relevés dans l'espace tangent en l'itérée globale précédente, où
+    la moyenne a un sens, puis ramenés sur la variété par rétraction.
+    % TODO texte: completer la legende --- souligner le contraste avec la
+    % \cref{fig:spdnet-projavg}: ici l'iteree precedente sert de point de
+    % reference, ce qui oblige a la conserver.
+  }
+  \label{fig:spdnet-rlavg}
+\end{figure}
+
+\begin{algorithm}[htb]
+  \caption{\layername{fedspdnet}}
+  \label{algo:spdnet-fedspdnet}
+  \begin{algorithmic}[1]
+    \Require nombre de tours $\Nround$, clients par tour $\Nselected$, époques locales $\{\Nepoch_\iclient\}$
+    \State Initialiser $\netparam_0=(\Wlayer_{1,0},\dots,\Wlayer_{\Nlayer,0},\MSoftmax_0,\Vsoftmax_0)$
+    \For{$\iround=0,\dots,\Nround-1$}
+      \State Tirer $\selected_\iround\subset\clientset$ avec $|\selected_\iround|=\Nselected$
+      \For{\textbf{chaque} client $\iclient\in\selected_\iround$ \textbf{en parallèle}}
+        \State Initialiser le modèle local avec $\netparam_\iround$
+        \State Entraîner $\Nepoch_\iclient$ époques, obtenir $\netparam_\iround^{(\iclient)}$
+      \EndFor
+      \State Agréger $\MSoftmax_{\iround+1},\Vsoftmax_{\iround+1}$ par \cref{eq:spdnet-federe-euclidien}
+      \For{$\ilayer=1,\dots,\Nlayer$}
+        \State Agréger $\Wlayer_{\ilayer,\iround+1}$ par \cref{eq:spdnet-projavg} ou \cref{eq:spdnet-rlavg}
+      \EndFor
+    \EndFor
+    \Ensure $\netparam_{\Nround}$
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Équivalence des deux schémas}
+\label{sec:spdnet-federe-equivalence}
+
+\begin{proposition}[{Équivalence des deux agrégations}]
+\label{prop:spdnet-federe-equivalence}
+  Les agrégations \cref{eq:spdnet-projavg} et \cref{eq:spdnet-rlavg} ont la même
+  complexité par tour,
+  $\bigO(\Nselected\,\dlayer{\ilayer-1}\dlayer{\ilayer}+\dlayer{\ilayer-1}\dlayer{\ilayer}^2)$.
+  Lorsque les poids locaux restent proches de l'itérée globale, c'est-à-dire
+  $\Wlayer^{(\iclient)}_{\ilayer,\iround}=\Wlayer_{\ilayer,\iround}+\bigO(\epsilon)$
+  uniformément en $\iclient$, elles coïncident à l'ordre $\bigO(\epsilon^2)$ près.
+\end{proposition}
+
+% ============================ TODO texte (~1 paragraphe) ============================
+% Justifier \cref{prop:spdnet-federe-equivalence} en deux lignes de calcul dans
+% le texte (le releve est lineaire en $\bar{\Wlayer}-\Wlayer$, donc sa moyenne
+% est le projete tangent de la moyenne arithmetique centree; la retraction
+% polaire de ce vecteur est le projete polaire de la moyenne arithmetique, a
+% l'ordre deux pres). Enoncer la consequence pratique: \layername{projavg} est
+% recommandee, car elle a des constantes plus faibles et n'exige pas de
+% conserver l'iteree globale precedente. Renvoyer aux courbes de
+% \cref{sec:spdnet-federe-resultats} qui montrent des trajectoires superposees.
+% ====================================================================================
+
+\subsection{Classification \textsc{eeg} multi-sites}
+\label{sec:spdnet-federe-resultats}
+
+% ==================== TODO texte + experiences (~2 pages) ===========================
+% Resultats repris de \fullcite{EUSIPCO26b}, sur deux jeux de donnees publics
+% d'imagerie motrice EEG issus de MOABB \sidecite{chevallier2024largest}:
+%   - Weibo2014: 10 sujets, 60 voies, 7 classes, ~80 essais par classe;
+%   - PhysionetMI: 106 sujets (3 exclus), 64 voies, 4 classes, ~23 essais.
+% Entree: matrice de covariance empirique de chaque essai centre, filtre en
+% [8, 32] Hz. Un seul bloc BiRe. Reference euclidienne: EEGnet
+% \sidecite{lawhern2018eegnet} federe par FedAvg. Federation simulee par
+% partition des sujets, deux par client ($\Nclient=5$ et $53$), $\Nround=150$
+% tours, $\Nepoch_\iclient=2$, participation totale et a moitie.
+%
+% FIGURE 1/2 --- F1 de validation en fonction du tour, pour les deux jeux, avec
+%   \layername{projavg}, \layername{rlavg} et FedEEGnet. Deux enonces: les
+%   courbes des deux agregations se superposent (c'est la verification
+%   empirique de \cref{prop:spdnet-federe-equivalence}), et FedSPDnet atteint son
+%   plateau en moins de tours.
+%
+% TABLEAU 1/1 --- F1 final, centralise / participation totale / participation a
+%   moitie, avec le nombre de parametres. Chiffres a reprendre: Weibo2014,
+%   SPDnet 51,7 en centralise et 43,3 en federe (perte 8,4) contre EEGnet 50,7 et
+%   39,9 (perte 10,8); PhysionetMI, SPDnet 43,1 et 39,5 (perte 3,6) contre EEGnet
+%   50,8 et 38,3 (perte 12,5). Nombres de parametres: 4 715 contre 5 303, et
+%   2 452 contre 3 284.
+%
+% Texte a ecrire autour, et il faut etre honnete sur le point suivant: sur
+% PhysionetMI, SPDnet est *battu* en centralise et le reste ne doit pas etre
+% presente autrement. Ce qui est remarquable est ailleurs: c'est la quantite de
+% performance *conservee* sous federation, et la stabilite a la participation
+% partielle. Formuler l'hypothese explicative avec la prudence de l'article ---
+% la contrainte de Stiefel restreint l'espace des parametres et limite la derive
+% des clients --- en indiquant que ce n'est pas demontre.
+% Mentionner enfin la limite annoncee dans l'article: garder les donnees chez le
+% client ne garantit pas la confidentialite, les poids communiques restant
+% attaquables; la confidentialite differentielle sur variete est ouverte, et
+% c'est un des points repris au \cref{ch:perspectives}.
+% ====================================================================================
+
+
+\section{Bilan: trois substitutions, un même arbitrage}
+\label{sec:spdnet-bilan}
+
+\begin{table}[htb]
+  \centering
+  \caption{Les trois substitutions du chapitre. Dans chaque cas, l'objet
+    géométriquement correct est une moyenne de Fréchet inaccessible, et la
+    contribution consiste à choisir l'approximation puis à en dériver le
+    gradient.}
+  \label{tab:spdnet-bilan}
+  \footnotesize
+  \begin{tabular}{@{}p{2.2cm}p{2.6cm}p{2.6cm}p{2.6cm}p{2.6cm}@{}}
+    \toprule
+    & Opération standard & Contrepartie géométrique & Obstacle & Réponse retenue \\
+    \midrule
+    \cref{sec:spdnet-covpool}
+      & caractéristique du premier ordre
+      & covariance apprise sur $\SPD{\Nfilter}$
+      & régime dimensionnel, conditionnement
+      & réduction \BiMap{} et seuil \ReEig, gradient explicite \\
+    \cref{sec:spdnet-batchnorm}
+      & moyenne empirique du batch
+      & moyenne de Fréchet sur $\SPD{\Nvar}$
+      & pas de forme close pour la métrique affine invariante
+      & changer de géométrie: moyennes en forme close \\
+    \cref{sec:spdnet-federe}
+      & moyenne des poids
+      & moyenne de Fréchet sur $\Stiefel{}{}$
+      & ni logarithme ni distance en forme close
+      & approcher les opérateurs: rétraction et relèvement \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================ TODO texte (~4 paragraphes) ===========================
+% Bilan du chapitre. Ce qu'il doit produire, dans cet ordre:
+%  1. relire \cref{tab:spdnet-bilan} comme une progression et non comme une
+%     liste: le meme probleme se pose trois fois, de plus en plus severement, et
+%     les deux sorties possibles --- changer de geometrie, ou approcher ses
+%     operateurs --- sont exhibees l'une apres l'autre;
+%  2. l'enseignement de modelisation, qui est ce que ce chapitre apporte de plus
+%     specifique: le choix d'une moyenne est un choix de modele
+%     (\cref{prop:spdnet-moyennes-frechet}), et il est mesurable. C'est aussi la
+%     ou le memoire depasse les articles, qui presentent ce choix comme un
+%     arbitrage cout/performance;
+%  3. l'enseignement numerique: deriver a la main n'est pas une coquetterie. La
+%     ou la differentiation automatique echoue (\cref{sec:spdnet-batchnorm-resultats}),
+%     c'est la structure de la formule --- sommes de valeurs propres au
+%     denominateur plutot que differences --- qui sauve le calcul;
+%  4. l'ouverture vers le \cref{ch:perspectives}: la moyenne ponderee que calcule
+%     un mecanisme d'attention est une moyenne de Karcher ponderee, donc la
+%     quatrieme occurrence du meme probleme, et la question du cout s'y pose dans
+%     les memes termes (\cref{sec:perspectives-transformers}). Mentionner aussi
+%     la mise a disposition logicielle: anotherspdnet pour les couches de
+%     \cref{sec:spdnet-covpool}, le depot de \fullcite{PREP26b} pour la
+%     normalisation, et \fullcite{PREP26} (SPD Learn) pour la suite.
+% ====================================================================================

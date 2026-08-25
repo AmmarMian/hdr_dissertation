@@ -1,0 +1,27 @@
+% Variete, courbe tracee dessus, et espace tangent en un point.
+% Utilise dans la \cref{sec:context-riemann-notion}.
+\input{gfx/tikZ/riemann/style.tex}
+\begin{tikzpicture}[riemann]
+  \coordinate (P) at (-1.04,1.38);
+
+  \path (0,0) pic {rsurface};
+  \node[rmanifold!85] at (2.55,1.55) {$\Manifold$};
+
+  % plan tangent
+  \path (P) pic[scale=0.85] {rplane};
+  \node[rtangent!90, anchor=east, inner sep=1pt] at ($(P)+(-1.20,0.50)$)
+    {$\Tangent{\param}{\Manifold}$};
+
+  % courbe tracee sur la variete
+  \draw[rgeodesic, very thick]
+    (-2.6,0.85) .. controls (-2.0,1.30) and (-0.2,1.55) .. (0.9,1.62);
+  \node[rgeodesic, anchor=south west, inner sep=1pt] at (0.72,1.62) {$\geod$};
+
+  % vitesse : un vecteur tangent
+  \draw[rvector, very thick, ->] (P) -- ($(P)+(1.20,0.15)$);
+  \node[rvector, anchor=north west, inner sep=1pt] at ($(P)+(0.55,0.10)$)
+    {$\dot{\geod}(0)$};
+
+  \fill (P) circle (1.7pt);
+  \node[anchor=south east, inner sep=2pt] at (P) {$\param$};
+\end{tikzpicture}
