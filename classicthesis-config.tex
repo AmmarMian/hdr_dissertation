@@ -308,14 +308,30 @@
 % alors sur \AM@currentdocname@fix. Les articles ne contiennent aucune
 % tikzpicture: les sauter dans ces passes ne decale pas la numerotation des
 % figures externalisees, et la compilation normale les inclut comme avant.
-\newcommand{\joinedpaper}[2]{%
+%
+% Le test ne peut PAS etre \ifdefined\tikzexternalrealjob: la bibliotheque
+% external fait \global\let\tikzexternalrealjob=\jobname des la passe
+% principale (tikzlibraryexternal.code.tex, l. 109), donc la macro y est
+% toujours definie et les articles disparaissaient de tout le document.
+% Ce qui distingue reellement les deux passes est \jobname, qui vaut
+% "ext-tikz/dissertation-figureNN" pendant une externalisation.
+% Argument optionnel: une cle de label. \joinedpaper[SP24]{titre}{chemin} pose
+% \label{paper:SP24}, ce qui permet d'ecrire dans le texte « annexe
+% p.~\paperpage{SP24} » comme le fait Chatelain. Sans cet argument, comportement
+% inchange.
+\newcommand{\joinedpaper}[3][]{%
   \cleardoublepage
   \phantomsection
-  \addcontentsline{toc}{subsection}{#1}%
-  \ifdefined\tikzexternalrealjob\else
-    \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#2}%
+  \if\relax\detokenize{#1}\relax\else\label{paper:#1}\fi
+  \addcontentsline{toc}{subsection}{#2}%
+  \edef\jpCurrentJob{\jobname}%
+  \edef\jpRealJob{\tikzexternalrealjob}%
+  \ifx\jpCurrentJob\jpRealJob
+    \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#3}%
   \fi
 }
+% Renvoi vers un article reproduit: \paperpage{SP24} -> le folio de sa premiere page.
+\newcommand{\paperpage}[1]{\pageref{paper:#1}}
 
 % ********************************************************************
 % Math environments
