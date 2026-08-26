@@ -238,6 +238,7 @@
 % ****************************************************************************************************
 
 
+
 % ****************************************************************************************************
 % 6. Last calls before the bar closes
 % ****************************************************************************************************
@@ -502,6 +503,66 @@
 % and keeps its plain italic look).
 \BeforeBeginEnvironment{mdframed}{\tikzexternaldisable}
 \AfterEndEnvironment{mdframed}{\tikzexternalenable}
+
+% ********************************************************************
+% Blocs « reste a ecrire », visibles a l'ecran, absents de la version finale
+% ********************************************************************
+% Les consignes de redaction vivent dans le source sous forme de commentaires
+% (% TODO texte ...), donc invisibles a la compilation: en relisant le pdf on
+% ne voit qu'un chapitre vide. Les macros ci-dessous rendent ces emplacements
+% VISIBLES pendant la redaction et les font disparaitre pour la version finale.
+%
+%   \wip{titre court}{ce qu'il faut ecrire ici}   bloc a rediger
+%   \wipfig{titre court}{ce que la figure doit montrer}  figure manquante
+%
+% Basculer en version finale: passer \draftnotestrue a \draftnotesfalse
+% ci-dessous. Tous les blocs disparaissent alors, ainsi que l'index
+% « Reste a ecrire » place apres la table des matieres. Aucun autre changement
+% n'est requis, et la pagination du texte redige n'en depend pas.
+\newif\ifdraftnotes
+\draftnotestrue        % <<<< METTRE A \draftnotesfalse POUR LA VERSION FINALE
+
+\ifdraftnotes
+  % Les cadres sont dessines avec mdframed, deja entoure plus bas des hooks
+  % \tikzexternaldisable/\tikzexternalenable: aucun bloc ne part donc a
+  % l'externalisation. L'index est construit dans un fichier .tdo maison.
+  \mdfdefinestyle{wipstyle}{%
+    linewidth=0.6pt, linecolor=orange!60, backgroundcolor=orange!8,
+    innertopmargin=5pt, innerbottommargin=5pt,
+    innerleftmargin=7pt, innerrightmargin=7pt,
+    skipabove=8pt, skipbelow=8pt, roundcorner=2pt}
+  \mdfdefinestyle{wipfigstyle}{%
+    linewidth=0.6pt, linecolor=cyan!55, backgroundcolor=cyan!7,
+    innertopmargin=5pt, innerbottommargin=5pt,
+    innerleftmargin=7pt, innerrightmargin=7pt,
+    skipabove=8pt, skipbelow=8pt, roundcorner=2pt}
+  \makeatletter\newcommand{\wip@entry}[2]{%
+    \addcontentsline{tdo}{figure}{\protect\numberline{\protect\textcolor{#2}{\textbullet}}#1}}
+  \newcommand{\wip}[2]{%
+    \wip@entry{#1}{orange!80!black}%
+    \begin{mdframed}[style=wipstyle]%
+      \footnotesize\textbf{À rédiger --- #1.}\ #2
+    \end{mdframed}}
+  \newcommand{\wipfig}[2]{%
+    \wip@entry{Figure: #1}{cyan!60!black}%
+    \begin{mdframed}[style=wipfigstyle]%
+      \footnotesize\textbf{Figure manquante --- #1.}\ #2
+    \end{mdframed}}
+  \newcommand{\resteaecrire}{%
+    \cleardoublepage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{\tocEntry{Reste à écrire}}%
+    \chapter*{Reste à écrire}%
+    \begingroup
+      \setlength{\parskip}{0pt}%
+      \@starttoc{tdo}%
+    \endgroup}
+  \makeatother
+\else
+  \newcommand{\wip}[2]{}
+  \newcommand{\wipfig}[2]{}
+  \newcommand{\resteaecrire}{}
+\fi
 
 \addtotheorempostheadhook[theorem]{\ctmarginhead{theorem}}
 \addtotheorempostheadhook[proposition]{\ctmarginhead{proposition}}
