@@ -101,28 +101,28 @@ embed_npy = false
 
 [figures.mse-icrb]
 exp       = "sar_mc_kron_mse"
-sha       = "2052344"
+sha       = "9512517"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
 
 [figures.structure-vs-n]
 exp       = "sar_mc_kron_struct"
-sha       = "2052344"
+sha       = "9512517"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
 
 [figures.puissance-gaussien]
-exp       = "sar_mc_power_gauss"
-sha       = "2052344"
+exp       = "sar_mc_power"
+sha       = "9512517"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
 
 [figures.puissance-k]
 exp       = "sar_mc_power"
-sha       = "2052344"
+sha       = "9512517"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false
@@ -143,7 +143,7 @@ embed_npy = false
 
 [figures.convergence-tyler]
 exp       = "sonar_tyler_conv"
-sha       = "2052344"
+sha       = "9512517"
 run_date  = "2026-08-25"
 seed      = "42"
 embed_npy = false

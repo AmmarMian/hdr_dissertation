@@ -303,11 +303,18 @@
   \section*{Articles reproduits}%
   #1%
 }
+% Pendant une passe d'externalisation tikz, \includegraphics est « optimise »
+% et n'est plus execute; pdfpages, qui s'en sert pour compter les pages, echoue
+% alors sur \AM@currentdocname@fix. Les articles ne contiennent aucune
+% tikzpicture: les sauter dans ces passes ne decale pas la numerotation des
+% figures externalisees, et la compilation normale les inclut comme avant.
 \newcommand{\joinedpaper}[2]{%
   \cleardoublepage
   \phantomsection
   \addcontentsline{toc}{subsection}{#1}%
-  \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#2}%
+  \ifdefined\tikzexternalrealjob\else
+    \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#2}%
+  \fi
 }
 
 % ********************************************************************
