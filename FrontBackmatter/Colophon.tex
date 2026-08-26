@@ -4,20 +4,71 @@
 
 \vfill
 
-
 \pdfbookmark[0]{Colophon}{colophon}
 \section*{Colophon}
-This document was typeset using the typographical look-and-feel \texttt{classicthesis} developed by Andr\'e Miede and Ivo Pletikosić.
-The style was inspired by Robert Bringhurst's seminal book on typography ``\emph{The Elements of Typographic Style}''.
-\texttt{classicthesis} is available for both \LaTeX\ and \mLyX:
-\begin{center}
-\url{https://bitbucket.org/amiede/classicthesis/}
-\end{center}
-Happy users of \texttt{classicthesis} usually send a real postcard to the author, a collection of postcards received so far is featured here:
-\begin{center}
-\url{http://postcards.miede.de/}
-\end{center}
-Thank you very much for your feedback and contribution.
+
+% ====================================================================================
+% Le colophon classicthesis d'origine a ete retire: il sollicitait l'envoi d'une
+% carte postale a Andre Miede et ne disait rien de ce document-ci. L'attribution
+% du style, elle, est conservee ci-dessous: elle est due.
+%
+% Ce colophon a desormais deux fonctions distinctes. Les separer nettement.
+% ====================================================================================
+
+% ============================ TODO texte (~15 lignes) ==============================
+% (1) COMMENT CE MEMOIRE A ETE FABRIQUE. Factuel, sans emphase.
+%
+%   - compose en \LaTeX{} avec le style classicthesis d'Andre Miede et Ivo
+%     Pletikosic, inspire de « The Elements of Typographic Style » de Robert
+%     Bringhurst. Garder l'url du depot; retirer la sollicitation de carte
+%     postale;
+%   - fontes employees (Palatino / URW Palladio pour le texte, les petites
+%     capitales espacees pour les titres) --- verifier dans
+%     classicthesis-config.tex avant d'affirmer;
+%   - figures explicatives dessinees en Ti\emph{k}Z; figures de simulation
+%     exportees en PGFPlots depuis matplotlib;
+%   - LA CHAINE DE REPRODUCTIBILITE, qui est le point qui merite d'etre
+%     detaille ici plutot qu'ailleurs: chaque figure de simulation est produite
+%     par une experience versionnee sous \texttt{qanat}, qui enregistre le
+%     commit, la graine et les parametres; l'export produit conjointement la
+%     figure et son fichier de provenance, traduit en macros \LaTeX{} appelees
+%     par la legende. La ligne grise sous chaque figure n'est donc pas recopiee
+%     a la main et ne peut pas se desynchroniser. Renvoyer au depot public;
+%   - bibliographie geree par biblatex/bibtex8.
+% ====================================================================================
+
+% ============================ TODO texte (~12 lignes) ==============================
+% (2) DECLARATION D'USAGE D'OUTILS GENERATIFS (Claude, Anthropic).
+%
+% NE PAS SOUS-DECLARER: une formulation qui minimise est pire qu'une absence de
+% mention, parce qu'elle invite le lecteur a faire l'inference lui-meme. La
+% liste ci-dessous correspond a l'usage reel; l'ajuster si elle depasse ce que
+% vous souhaitez declarer, mais en connaissance de cause.
+%
+%   USAGE REEL, par ordre d'importance decroissante:
+%     - CODE DE SIMULATION: redaction des experiences \texttt{qanat}, des
+%       algorithmes correspondants dans \texttt{hdrlib} (couts et gradients
+%       riemanniens, minimiseurs, moyennes de Frechet) et de leurs tests;
+%       detection et correction d'erreurs, dont plusieurs erreurs de signe et
+%       de conjugaison presentes dans du code deja publie; banc de
+%       non-regression contre l'implementation MATLAB de reference;
+%     - STRUCTURE ET REDACTION: mise en place des squelettes de chapitre
+%       (enonces, equations, algorithmes, blocs a rediger), figures Ti\emph{k}Z
+%       explicatives, carte des dependances, et redaction de certaines parties
+%       de l'etat des lieux a partir de mes propres notes et des sources citees;
+%     - HOMOGENEISATION DES NOTATIONS: conversion des equations de plusieurs
+%       articles vers la convention unique adoptee ici;
+%     - CHAINE DE COMPILATION: systeme de figures, provenance, externalisation;
+%     - RELECTURE.
+%
+%   CE QUI N'EN RELEVE PAS, et qu'il faut dire aussi clairement: les resultats,
+%   les demonstrations, le choix de ce qui figure dans ce memoire et de ce qui
+%   n'y figure pas, les orientations scientifiques, et la responsabilite
+%   entiere du contenu.
+%
+%   COHERENCE: cette declaration doit s'accorder avec
+%   \cref{ch:declaration} (FrontBackmatter/Declaration.tex) et avec ce que
+%   l'ecole doctorale exige. Verifier les deux avant de figer la formulation.
+% ====================================================================================
 
 \bigskip
-
