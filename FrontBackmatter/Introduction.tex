@@ -1,0 +1,170 @@
+%*******************************************************
+% Introduction generale
+% Chapitre non numerote, place avant la partie CV.
+%*******************************************************
+\pdfbookmark[1]{Introduction générale}{IntroductionGenerale}
+\phantomsection
+\addcontentsline{toc}{chapter}{\tocEntry{Introduction générale}}
+
+\chapter*{Introduction générale}
+\label{ch:introduction}
+\markboth{Introduction générale}{Introduction générale}
+
+% ====================================================================================
+% GABARIT. Les trois hdr de reference (Rabaste, Ovarlez, Chatelain) enchainent
+% les memes huit mouvements, dans cet ordre. Les blocs ci-dessous les suivent.
+% Aucun des trois n'ouvre par « ce memoire presente »: l'accroche vient d'abord,
+% la premiere personne n'arrive qu'au mouvement 5.
+%
+% Longueur visee: 6 a 8 pages. A ecrire APRES les bilans de chapitre, qui auront
+% deja dit le detail --- sinon l'introduction double leur contenu et gonfle.
+% ====================================================================================
+
+% ============ TODO texte (~1 page) --- MOUVEMENT 1: L'ACCROCHE =====================
+% Une accroche qui ne parle pas de soi. Rabaste ouvre sur l'etymologie de RADAR
+% en 1942 et un amateur de palindromes; Chatelain sur le deluge de donnees, les
+% puces a ADN et Efron; Ovarlez sur sa filiation intellectuelle.
+%
+% Proposition pour ce memoire --- un objet qui a change de statut:
+%  - la matrice de covariance arrive comme statistique descriptive du XIXe
+%    siecle (Pearson, puis Wishart en 1928);
+%  - elle devient le parametre de nuisance d'un test de detection, ce qui
+%    deplace la question de « la decrire » vers « l'estimer assez bien pour
+%    decider »;
+%  - elle finit comme une couche a l'interieur d'un reseau de neurones, qu'il
+%    faut differentier --- donc comme un objet que l'on apprend, et non plus
+%    seulement que l'on estime.
+% Cet arc est celui du memoire et permet d'atteindre le \cref{ch:spdnet} des le
+% premier paragraphe plutot qu'a la centieme page.
+% ====================================================================================
+
+% ============ TODO texte (~1,5 page) --- MOUVEMENT 2: POURQUOI LE PROBLEME EXISTE ==
+% Le modele a etudier est la chaine causale d'Ovarlez: physique, puis
+% consequence, puis besoin --- sans parler de soi. Chez lui: resolution plus
+% fine -> moins de diffuseurs par case, variant d'une case a l'autre ->
+% heterogeneite et impulsivite -> l'hypothese gaussienne tombe -> la regulation
+% des fausses alarmes se degrade -> il devient *imperatif* d'avoir des outils
+% robustes.
+%
+% La chaine de ce memoire est DOUBLE, et le dire tot est ce qui justifie la
+% \cref{pt:context}:
+%
+%  BRANCHE 1 (robustesse). Resolution -> peu de diffuseurs par cellule ->
+%  fouillis non gaussien, heterogene -> la scm et le cfar gaussien echouent
+%  ensemble -> M-estimateurs, Tyler, modeles gaussiens composes
+%  (\cref{ch:context-distributions}).
+%
+%  BRANCHE 2 (dimension). Nombre de variables croissant -> observations rares
+%  relativement a la dimension ($\Nobs < \Nvar$) -> estimee singuliere ou mal
+%  conditionnee (\cref{sec:context-definition-estimation}) -> structure et
+%  regularisation -> et la structure est une contrainte GEOMETRIQUE, pas
+%  seulement algebrique (\cref{ch:context-riemann}).
+%
+% Insister sur le fait que les deux branches ne sont pas independantes: c'est
+% la these du memoire, annoncee ici et demontree au \cref{ch:spdnet}.
+% ====================================================================================
+
+% ============ TODO texte (~5 lignes) --- MOUVEMENT 3: LA PHRASE PIVOT ==============
+% UNE phrase nommant le probleme unique dont tout le dossier est une facette.
+% Rabaste: « peuvent etre consideres comme des facettes differentes d'un seul et
+% meme probleme general: la detection de cibles faibles en environnement
+% complexe ». Un jury cite cette phrase.
+%
+% Registre vise ici: estimer, contraindre et apprendre une matrice de covariance
+% lorsque les observations sont rares, non gaussiennes, et vivent dans un espace
+% courbe.
+% Trois adjectifs -> trois chapitres d'etat des lieux -> trois contributions.
+% A ciseler: c'est la phrase la plus relue du memoire.
+% ====================================================================================
+
+% ============ TODO texte (~0,5 page) --- MOUVEMENT 4: LE VOCABULAIRE ===============
+% Rabaste forge « cibles faibles », dit immediatement que ce n'est PAS l'usage
+% radar standard, et en donne trois sens en liste --- qui sont ses trois
+% chapitres.
+%
+% Ici, nommer les trois tensions, puis dire qu'elles ne sont pas independantes:
+%   (i)   $\Nobs$ contre $\Nvar$;
+%   (ii)  gaussien contre elliptique / gaussien compose;
+%   (iii) euclidien contre riemannien.
+% Puis la formule qui porte le memoire, en une ligne: choisir une moyenne, c'est
+% choisir une geometrie, donc un modele statistique. L'annoncer ici comme une
+% these; \cref{prop:spdnet-moyennes-frechet} l'etablit cent pages plus loin.
+% ====================================================================================
+
+% ============ TODO texte (~2 pages) --- MOUVEMENT 5: UN PARAGRAPHE PAR CHAPITRE ====
+% Un paragraphe par chapitre de contribution. Chacun doit dire QUATRE choses:
+% le probleme, l'approche retenue, CE QUI LA DEMARQUE DE LA LITTERATURE, et LA
+% THESE OU LE STAGE QU'ELLE A PRODUIT. Rabaste nomme cinq doctorants dans sa
+% seule introduction.
+%
+%  - \cref{ch:robust-detection}: tests d'hypotheses robustes sur trois capteurs
+%    (croix de Mills, sonar frontal multi-pings, series temporelles RSO), avec
+%    le compromis selectivite/robustesse comme motif recurrent.
+%    Nommer les collaborations sonar et le volet detection de changements.
+%
+%  - \cref{ch:spdnet}: trois endroits ou une moyenne euclidienne doit ceder la
+%    place a une moyenne de Frechet --- la donnee, le batch, les poids.
+%    Nommer Jafuno (these), Pautrel (M2 puis post-doc), et Gallet EN PRECISANT
+%    qu'il s'agit d'une collaboration entre pairs et non d'un encadrement.
+%
+%  - \cref{ch:perspectives}: deux directions ou un objet de la
+%    \cref{pt:context} n'a pas ete pousse jusqu'au bout.
+%
+% C'est ici que le dossier montre l'encadrement comme partie de la science, et
+% pas seulement comme une rubrique du \cref{ch:cv}.
+% ====================================================================================
+
+% ============ TODO texte (~0,5 page) --- MOUVEMENT 6: LE CREDO =====================
+% Une phrase disant quel chercheur on est. Ovarlez, explicitement: « je me suis
+% toujours interesse aux lacunes potentielles des techniques couramment
+% utilisees et souvent considerees A TORT comme valides ».
+%
+% Deux elements disponibles ici, et tous deux verifiables:
+%
+%  (a) LE MOTIF RECURRENT, a annoncer comme un fil que le lecteur recroisera:
+%      l'hypothese gaussienne n'est jamais une simple approximation, c'est
+%      toujours une geometrie deguisee.
+%
+%  (b) LA REPRODUCTIBILITE COMME POSITION DE METHODE, et non comme note
+%      technique. Chaque figure de simulation porte son commit, sa graine et
+%      tous ses parametres, et se rejoue depuis la ligne imprimee sous elle.
+%      Dire POURQUOI: un resultat qu'on ne peut pas rejouer n'est pas un
+%      resultat --- et, en ecrivant ce memoire, c'est precisement cet appareil
+%      qui a fait apparaitre plusieurs erreurs de signe et de conjugaison dans
+%      du code deja publie. Aucun des memoires de reference ne peut en dire
+%      autant: c'est un element differenciant, il faut l'assumer comme tel.
+% ====================================================================================
+
+% ============ TODO texte (~1 page) --- MOUVEMENTS 7 ET 8: PLAN ET PREMIERE PERSONNE
+% (7) Annoncer la structure, Y COMPRIS ce qu'elle a d'inhabituel.
+%
+%  - LE PARAGRAPHE QUI JUSTIFIE LA \cref{pt:context}. C'est le paragraphe le
+%    plus important de l'introduction, parce qu'aucun des trois memoires de
+%    reference n'a a le faire: aucun n'a pris le risque d'une partie
+%    pedagogique autonome. Deux lectorats, chacun depourvu de ce que l'autre
+%    possede: le traiteur de signal radar/sonar qui connait les modeles
+%    elliptiques et la M-estimation mais pas le vocabulaire riemannien, et le
+%    geometre ou praticien de l'apprentissage sur varietes dans la situation
+%    inverse. Dire clairement que cette partie n'est pas un passage oblige mais
+%    un point de rencontre, qu'un lecteur peut accepter un outil sur parole et
+%    y revenir, et que la carte des dependances existe pour que personne n'en
+%    lise plus que necessaire.
+%    C'est ce paragraphe qui transforme une structure de 70 pages inhabituelle
+%    en choix editorial assume.
+%
+%  - Les quatre parties, et pourquoi le \cref{ch:cv} est place la ou il est.
+%
+%  - Un renvoi d'une ligne vers \cref{ch:commentlire} pour les parcours de
+%    lecture, afin que les deux chapitres se partagent le travail au lieu de se
+%    recouvrir. NE PAS refaire ici la carte des dependances.
+%
+% (8) Le passage a la premiere personne, annonce explicitement. Rabaste le fait
+% et cela se lit bien.
+% ====================================================================================
+
+% ====================================================================================
+% TODO decision: cette introduction rend caduque toute mise en contexte
+% scientifique presente dans \cref{ch:commentlire}. Une fois ce chapitre ecrit,
+% relire CommentLire.tex et en retirer ce qui releve du « quelle est la
+% question »: il ne doit plus y rester que du « comment circuler ».
+% ====================================================================================

@@ -65,6 +65,13 @@
 \tableofcontents
 
 %******************************************************************
+% Introduction generale (chapitre non numerote)
+% Elle pose la question scientifique; \cref{ch:commentlire} dit seulement
+% comment circuler dans le document. Les deux ne doivent pas se recouvrir.
+%*******************************************************
+\cleardoublepage\include{FrontBackmatter/Introduction}
+
+%******************************************************************
 % Mode d'emploi du memoire (chapitre non numerote)
 %*******************************************************
 \cleardoublepage\include{FrontBackmatter/CommentLire}
@@ -123,6 +130,14 @@ proprement dites, qui mettent \`a l'\oe uvre les outils rassembl\'es dans la
 \include{Chapters/5-Detection}
 \include{Chapters/6-SPDNet}
 \include{Chapters/7-Perspectives}
+
+%******************************************************************
+% Conclusion generale (chapitre non numerote)
+% A ecrire d'une traite avec FrontBackmatter/Introduction: elle referme ce que
+% l'introduction ouvre. Elle dit ce qui est acquis et ce qui ne l'est pas;
+% \cref{ch:perspectives} dit ce que l'on va faire.
+%*******************************************************
+\cleardoublepage\include{FrontBackmatter/Conclusion}
 
 % ********************************************************************
 % Backmatter

@@ -1,23 +1,58 @@
 %*******************************************************
-% Abstract
+% Resume / Abstract
 %*******************************************************
-%\renewcommand{\abstractname}{Abstract}
-\pdfbookmark[1]{Abstract}{Abstract}
-% \addcontentsline{toc}{chapter}{\tocEntry{Abstract}}
+\pdfbookmark[1]{Résumé}{Resume}
 \begingroup
 \let\clearpage\relax
 \let\cleardoublepage\relax
-\let\cleardoublepage\relax
 
-\chapter*{Abstract}
-Short summary of the contents in English\dots a great guide by
-Kent Beck how to write good abstracts can be found here:
-\begin{center}
-\url{https://plg.uwaterloo.ca/~migod/research/beckOOPSLA.html}
-\end{center}
+\chapter*{Résumé}
+
+% ============================ TODO texte (~250 mots) ===============================
+% Le contenu classicthesis d'origine (« Short summary of the contents in English,
+% a great guide by Kent Beck... ») a ete retire: il etait encore en place et
+% partait a l'impression.
+%
+% Huit elements a faire tenir en 250 mots, dans cet ordre:
+%
+%  1. LA MATRICE DE COVARIANCE comme fil unique du dossier: le seul objet que
+%     les trois chapitres de contribution estiment, contraignent ou apprennent.
+%
+%  2. LES DEUX FORCES qui s'exercent sur elle, et le fait qu'elles ne sont pas
+%     independantes: robustesse (donnees non gaussiennes, heterogenes, a
+%     queues lourdes) et geometrie (cone SPD, invariance affine).
+%
+%  3. LES TROIS CAPTEURS, NOMMEMENT --- sonar a croix de Mills, sonar frontal
+%     multi-pings, series temporelles d'images RSO. Des instruments concrets se
+%     lisent bien mieux que « applications radar et sonar ».
+%
+%  4. LE SECOND AXE: la geometrie comme contrainte d'architecture en
+%     apprentissage profond (la donnee, le batch, les poids).
+%
+%  5. L'AFFIRMATION METHODOLOGIQUE, a plat: choisir une moyenne, c'est choisir
+%     une geometrie, donc un modele statistique.
+%
+%  6. L'APPAREIL DE REPRODUCTIBILITE: chaque figure de simulation porte son
+%     commit, sa graine et ses parametres, et se rejoue. Aucun memoire
+%     comparable ne peut l'annoncer: c'est un element differenciant.
+%
+%  7. UNE PHRASE sur ce que les perspectives ouvrent (attention sur le cone SPD,
+%     phase geometrique).
+%
+%  8. MOTS-CLES en fin de resume si l'ecole doctorale les demande.
+% ====================================================================================
 
 \vfill
 
+\chapter*{Abstract}
+
+% ============================ TODO texte (~250 mots) ===============================
+% Version anglaise du bloc ci-dessus. NE PAS traduire mot a mot: l'anglais d'un
+% resume d'hdr est plus direct que le francais, et la phrase 5 gagne a etre
+% plus seche encore.
+% ====================================================================================
+
+\vfill
 
 \endgroup
 

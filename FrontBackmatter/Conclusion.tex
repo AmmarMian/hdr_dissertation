@@ -1,0 +1,76 @@
+%*******************************************************
+% Conclusion generale
+% Chapitre non numerote, place apres le chapitre Perspectives.
+%*******************************************************
+\pdfbookmark[1]{Conclusion générale}{ConclusionGenerale}
+\phantomsection
+\addcontentsline{toc}{chapter}{\tocEntry{Conclusion générale}}
+
+\chapter*{Conclusion générale}
+\label{ch:conclusion}
+\markboth{Conclusion générale}{Conclusion générale}
+
+% ====================================================================================
+% Longueur visee: 3 pages. Celle de Chatelain en fait 2.
+%
+% A ECRIRE EN MEME TEMPS QUE \cref{ch:introduction}, d'une seule traite: le role
+% de la conclusion est de refermer ce que l'introduction a ouvert. Ecrites a
+% quelques semaines d'intervalle, elles se repetent au lieu de se repondre.
+%
+% CE QUE CE CHAPITRE N'EST PAS: un resume chapitre par chapitre. Les bilans de
+% \cref{ch:robust-detection} et \cref{ch:spdnet} ont deja fait ce travail, et le
+% refaire ici est la facon la plus sure de perdre le lecteur a la derniere page.
+% ====================================================================================
+
+% ============ TODO texte (~1 page) --- CE QUE LES CHAPITRES ETABLISSENT ENSEMBLE ===
+% Ce que les trois chapitres de contribution etablissent CONJOINTEMENT, et
+% qu'aucun n'etablit seul.
+%
+% Piste: dans les trois cas, la contrainte --- statistique au
+% \cref{ch:robust-detection}, geometrique au \cref{ch:spdnet} --- n'est pas un
+% raffinement de performance mais ce qui rend le probleme faisable au nombre
+% d'observations reellement disponible. C'est la meme phrase que le bilan du
+% \cref{ch:robust-detection}, mais elevee d'un cran: elle vaut aussi quand la
+% contrainte est apprise et non imposee.
+% ====================================================================================
+
+% ============ TODO texte (~0,5 page) --- LA THESE QUE L'ON DEFENDRAIT ==============
+% L'unique affirmation methodologique que l'on defendrait a la soutenance:
+% choisir une moyenne, c'est choisir une geometrie, donc un modele statistique.
+%
+% La reformuler autrement qu'en \cref{ch:introduction} et qu'en
+% \cref{prop:spdnet-moyennes-frechet} --- ici, ce n'est plus une annonce ni une
+% proposition, c'est un bilan: on a vu ce que cela coute et ce que cela achete.
+% ====================================================================================
+
+% ============ TODO texte (~0,5 page) --- LA REPRODUCTIBILITE COMME RESULTAT ========
+% Ce que l'appareil de reproductibilite demontre en tant que METHODE DE TRAVAIL,
+% et non comme detail technique.
+%
+% L'argument le plus fort est factuel: c'est en instrumentant les simulations
+% que des erreurs de signe et de conjugaison presentes dans du code deja publie
+% sont apparues. Le dire sobrement, sans en faire une lecon.
+% ====================================================================================
+
+% ============ TODO texte (~0,5 page) --- CE QUE LE MEMOIRE NE TRANCHE PAS ==========
+% Un jury d'hdr attend cette section, et elle se lit comme de la maturite et non
+% comme un aveu. Points disponibles, tous deja etablis dans le corps du texte:
+%
+%  - l'unicite de l'estimateur a deux textures n'est etablie que numeriquement
+%    (\cref{eq:detection-mills-tyler}); la convergence sous-lineaire mesuree est
+%    un RESULTAT, pas un dysfonctionnement --- le dire ainsi;
+%  - les seuils en forme close manquent pour les detecteurs structures
+%    adaptatifs, d'ou le recours systematique a la simulation;
+%  - aucun des travaux ne combine estimation en ligne ET contrainte de structure
+%    (Toeplitz), la contrainte n'etant pas compatible avec la geometrie du cone;
+%  - une anomalie non expliquee subsiste sur la puissance en regime gaussien
+%    (non-monotonie a T faible). Si elle est mentionnee en legende, y renvoyer;
+%    sinon, ne pas l'introduire ici.
+% ====================================================================================
+
+% ============ TODO texte (~4 lignes) --- PASSAGE DE RELAIS ========================
+% Une transition courte vers \cref{ch:perspectives}, de sorte que les deux
+% chapitres ne se recouvrent pas: la conclusion dit ce qui est acquis et ce qui
+% ne l'est pas, les perspectives disent ce que l'on va faire. Si les deux
+% chapitres disent la meme chose, c'est celui-ci qu'il faut raccourcir.
+% ====================================================================================
