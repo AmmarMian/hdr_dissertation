@@ -31,18 +31,18 @@
 %    ouvert (la piste rmt reapparait au \cref{ch:perspectives}).
 % ====================================================================================
 
-Les deux chapitres qui encadrent celui-ci se ressemblent moins qu'il n'y
-paraît. Le \cref{ch:robust-detection} construit des détecteurs: le modèle
-statistique y est spécifié jusqu'au bout, et c'est de lui que sort la réponse
---- le rapport de vraisemblance, le test de Rao, le test de Wald sont des
-\emph{dérivations}, et les critères qui les jugent, la constance du taux de
-fausse alarme et la courbe $\pdet$ contre $\snr$, sont eux aussi internes au
-modèle. Le \cref{ch:spdnet} fait l'inverse: aucune vraisemblance n'y subsiste,
-la réponse vient des données par l'intermédiaire de paramètres appris, et le
-critère est une erreur de classification. Entre les deux, il manque un pas, et
-c'est celui que ce chapitre décrit.
+Le chapitre qui précède s'est déroulé dans une situation confortable, et il
+faut commencer par dire en quoi. Le \cref{ch:robust-detection} construit des
+détecteurs à partir d'un modèle spécifié jusqu'au bout, et c'est de ce modèle
+que sort la réponse: le rapport de vraisemblance, le test de Rao et le test de
+Wald y sont des \emph{dérivations}, non des inventions. Mais le confort ne
+s'arrête pas là, et c'est le point que l'on a peut-être lu trop vite: les
+critères qui jugent ces détecteurs --- la constance du taux de fausse alarme,
+la courbe $\pdet$ contre $\snr$ --- sont eux aussi internes au modèle. Celui-ci
+fournit donc deux choses à la fois: la réponse, et de quoi la noter.
 
-Ce pas n'est pas seulement affaire de dimension. On dit souvent que
+Ce chapitre est celui où la seconde de ces deux fonctions disparaît, et où la
+première doit s'en accommoder. Ce n'est pas seulement affaire de dimension. On dit souvent que
 l'apprentissage sur des matrices de covariance se distingue par son régime
 d'échantillonnage --- peu d'observations pour beaucoup de variables --- et
 c'est exact, mais c'est un \emph{mécanisme}, pas une raison. La raison est
@@ -69,6 +69,16 @@ biaisé dans le régime où l'on travaille, et la théorie des matrices aléatoi
 fournit le terme correctif qui le rend consistant. Contrainte d'un côté,
 correction de l'autre; dans les deux cas, un objet statistique qui n'est plus
 là pour répondre mais pour rattraper.
+
+Le mouvement ne s'arrête pas là, et autant l'annoncer tout de suite pour que
+ce chapitre se lise à sa place. Le \cref{ch:spdnet}, qui suit, ira jusqu'au
+terme: il n'y subsistera aucune vraisemblance, la réponse viendra des données
+par l'intermédiaire de paramètres appris, et le critère y sera une erreur de
+classification. Le présent chapitre est le pas intermédiaire, celui où le
+modèle a déjà cessé de juger mais n'a pas encore cessé d'estimer. On verra en
+temps voulu qu'il ne disparaît pas non plus au chapitre suivant --- il y
+revient par la fenêtre, sous la forme du choix d'une moyenne --- mais c'est
+l'affaire de ce chapitre-là.
 
 Un mot sur ce que ce chapitre ne fait pas. Les deux travaux qu'il rassemble
 sont des articles de conférence, denses et complets, et ils sont reproduits à
@@ -865,11 +875,11 @@ l'\cref{alg:learning-frechet-rmt} s'écrit alors sans difficulté.
   le même argument: l'objet géométriquement juste n'a pas de forme close, sa
   minimisation est itérative, et le travail consiste à en dériver le gradient
   explicitement plutôt qu'à laisser un outil de différentiation automatique
-  parcourir les itérations. Ici, la raison est différente de celle du
-  \cref{sec:spdnet-batchnorm-resultats} --- il ne s'agit pas d'économiser de la
-  mémoire dans un graphe de calcul, mais simplement d'avoir un algorithme ---
-  mais le constat est le même. C'est un des rares fils qui traverse les deux
-  chapitres au niveau technique et non au niveau des idées.
+  parcourir les itérations. La raison n'y sera pourtant pas la même qu'ici. Là-bas,
+  il s'agira d'économiser la mémoire d'un graphe de calcul qui stockerait
+  sinon toutes les itérées; ici, plus simplement, d'avoir un algorithme du
+  tout. Le constat, lui, est identique --- et c'est un des rares fils qui
+  traverse les deux chapitres au niveau technique et non au niveau des idées.
 \end{remark}
 
 \subsection{Ce que la correction achète}
@@ -978,9 +988,9 @@ le modèle ne disparaît pas quand le critère sort, il change de rôle et devie
 contrainte ou correction; (ii) le fait que ces deux rôles ne sont pas
 interchangeables, et ce qui décide de l'un ou de l'autre (a-t-on une structure
 à imposer, ou un biais à quantifier?); (iii) la transition vers le
-\cref{ch:spdnet}, où il ne reste plus ni contrainte ni correction, mais
-seulement la géométrie --- et où le choix d'une moyenne redevient, par un
-détour, un choix de modèle statistique.}
+\cref{ch:spdnet}, à écrire au futur: il n'y restera plus ni contrainte ni
+correction, mais seulement la géométrie --- et le choix d'une moyenne y
+redeviendra, par un détour, un choix de modèle statistique.}
 
 \joinedpapers{%
   Les deux travaux dont rend compte ce chapitre sont reproduits ci-après dans
