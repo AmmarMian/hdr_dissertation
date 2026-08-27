@@ -31,101 +31,84 @@
 %    ouvert (la piste rmt reapparait au \cref{ch:perspectives}).
 % ====================================================================================
 
-Le chapitre qui précède s'est déroulé dans une situation confortable, et il
-faut commencer par dire en quoi. Le \cref{ch:robust-detection} construit des
-détecteurs à partir d'un modèle spécifié jusqu'au bout, et c'est de ce modèle
-que sort la réponse: le rapport de vraisemblance, le test de Rao et le test de
-Wald y sont des \emph{dérivations}, non des inventions. Mais le confort ne
-s'arrête pas là, et c'est le point que l'on a peut-être lu trop vite: les
-critères qui jugent ces détecteurs --- la constance du taux de fausse alarme,
-la courbe $\pdet$ contre $\snr$ --- sont eux aussi internes au modèle. Celui-ci
-fournit donc deux choses à la fois: la réponse, et de quoi la noter.
-
-Ce chapitre est celui où la seconde de ces deux fonctions disparaît, et où la
-première doit s'en accommoder. Ce n'est pas seulement affaire de dimension. On dit souvent que
-l'apprentissage sur des matrices de covariance se distingue par son régime
-d'échantillonnage --- peu d'observations pour beaucoup de variables --- et
-c'est exact, mais c'est un \emph{mécanisme}, pas une raison. La raison est
-ailleurs: dans les deux travaux dont ce chapitre rend compte, ce que l'on
-cherche n'est pas une décision ni un paramètre, mais un objet que le modèle ne
-sait pas noter. Dans le premier, c'est un graphe de dépendances conditionnelles
-que l'on veut pouvoir \emph{lire}; dans le second, une partition d'une
-collection de covariances que l'on veut voir coïncider avec une vérité terrain.
-Aucune vraisemblance ne mesure la lisibilité d'un graphe, aucune probabilité de
-fausse alarme ne mesure la qualité d'une partition. Le critère a quitté le
-modèle.
-
-Il ne s'ensuit pas que le modèle disparaisse: c'est là toute la thèse du
-chapitre, et elle tient en une phrase. \emph{Faire de l'apprentissage sur des
-covariances ne dispense pas du modèle; celui-ci revient sous forme de
-correction.} Il revient de deux façons, et les deux travaux illustrent chacune
-la sienne. Dans la \cref{sec:learning-graphes}, il revient comme
-\textbf{contrainte}: la vraisemblance elliptique, pénalisée pour favoriser la
-parcimonie et contrainte à un modèle factoriel de rang faible, fournit
-l'estimateur, et c'est la structure imposée qui rend le graphe lisible. Dans la
-\cref{sec:learning-frechet}, il revient comme \textbf{correction asymptotique}:
-l'estimateur naïf --- la moyenne de Fréchet des covariances empiriques --- est
-biaisé dans le régime où l'on travaille, et la théorie des matrices aléatoires
-fournit le terme correctif qui le rend consistant. Contrainte d'un côté,
-correction de l'autre; dans les deux cas, un objet statistique qui n'est plus
-là pour répondre mais pour rattraper.
-
-Le mouvement ne s'arrête pas là, et autant l'annoncer tout de suite pour que
-ce chapitre se lise à sa place. Le \cref{ch:spdnet}, qui suit, ira jusqu'au
-terme: il n'y subsistera aucune vraisemblance, la réponse viendra des données
-par l'intermédiaire de paramètres appris, et le critère y sera une erreur de
-classification. Le présent chapitre est le pas intermédiaire, celui où le
-modèle a déjà cessé de juger mais n'a pas encore cessé d'estimer. On verra en
-temps voulu qu'il ne disparaît pas non plus au chapitre suivant --- il y
-revient par la fenêtre, sous la forme du choix d'une moyenne --- mais c'est
-l'affaire de ce chapitre-là.
-
-Un mot sur ce que ce chapitre ne fait pas. Les deux travaux qu'il rassemble
-sont des articles de conférence, denses et complets, et ils sont reproduits à
-la fin du chapitre. Le texte qui suit ne les paraphrase pas: il pose les
-modèles, énonce les résultats principaux et discute ce qui se passe quand on
-les met en \oe uvre, mais il renvoie systématiquement aux articles pour les
-démonstrations, les variantes et le détail des campagnes numériques. C'est la
-règle retenue dans toute la \cref{pt:contributions}, et elle se justifie ici
-plus qu'ailleurs: le lecteur a les articles sous la main, à
-\paperpage{ECML23} et \paperpage{ICML24}.
+\begin{itemize}
+  \item \textbf{D'où l'on vient.} Le \cref{ch:robust-detection} construit des
+    détecteurs à partir d'un modèle spécifié jusqu'au bout: glrt, Rao et Wald
+    y sont des \emph{dérivations}. Le modèle y fournit \textbf{deux} choses:
+    la réponse, et de quoi la noter (loi sous $\hypothesis_0$, seuil, $\pfa$,
+    propriété cfar).
+  \item \textbf{Ce chapitre.} La seconde de ces deux fonctions disparaît. Ce
+    n'est pas affaire de dimension --- le régime $\Nvar\sim\Nobs$ est un
+    \emph{mécanisme}, pas une raison.
+  \item \textbf{La raison.} Ce que l'on cherche n'est pas une décision ni un
+    paramètre, mais un objet que le modèle ne sait pas noter: un graphe que
+    l'on veut \emph{lire}, une partition que l'on veut voir coïncider avec une
+    vérité terrain. Aucune vraisemblance ne mesure la lisibilité d'un graphe;
+    aucune $\pfa$ ne mesure la qualité d'une partition.
+  \item \textbf{La thèse, en une phrase.} \emph{Faire de l'apprentissage sur
+    des covariances ne dispense pas du modèle; celui-ci revient sous forme de
+    correction.}
+  \begin{itemize}
+    \item \cref{sec:learning-graphes} --- il revient comme
+      \textbf{contrainte}: vraisemblance elliptique pénalisée, contrainte à un
+      modèle factoriel de rang faible;
+    \item \cref{sec:learning-frechet} --- il revient comme \textbf{correction
+      asymptotique}: la moyenne de Fréchet des covariances empiriques est
+      biaisée, la théorie des matrices aléatoires fournit le terme correctif.
+  \end{itemize}
+  \item \textbf{Où cela va.} Le \cref{ch:spdnet}, qui suit, ira au terme: plus
+    aucune vraisemblance, une réponse issue de paramètres appris, un critère
+    qui sera une erreur de classification. Ce chapitre-ci est le pas
+    intermédiaire, celui où le modèle a cessé de juger sans cesser d'estimer.
+    \wip{Intro: la fenêtre}{Une phrase à écrire ici: le modèle ne disparaît
+    pas non plus au \cref{ch:spdnet}, il y revient par la fenêtre sous la
+    forme du choix d'une moyenne --- mais c'est l'affaire de ce chapitre-là.}
+  \item \textbf{Ce que le chapitre ne fait pas.} Il ne paraphrase pas les deux
+    articles, reproduits p.~\paperpage{ECML23} et \paperpage{ICML24}: il pose
+    les modèles, énonce les résultats et renvoie aux articles pour les
+    démonstrations, les variantes et le détail des campagnes numériques.
+\end{itemize}
 
 \paragraph{Ce qu'il faut avoir en tête.} Ce chapitre se lit sans revenir à la
-\cref{pt:context}, mais il s'appuie sur quatre choses qui y sont construites.
-La covariance empirique et son comportement quand $\Nobs$ n'écrase plus
-$\Nvar$, en \cref{sec:context-covariance-regularized-estimation}: c'est le
-point de départ des deux sections. Les distributions elliptiques et la
-$M$-estimation, en \cref{sec:context-distributions-reel}, qui portent toute la
-modélisation de la \cref{sec:learning-graphes}. Le cône $\SPD{\Nvar}$, sa métrique
-affine invariante et la distance associée
-(\cref{sec:context-riemann-spd,prop:context-riemann-distspd}), ainsi que la
-moyenne de Fréchet (\cref{def:context-riemann-frechet}), qui sont l'objet même
-de la \cref{sec:learning-frechet}. Enfin l'optimisation riemannienne
-(\cref{sec:context-riemann-optimization}), gradient, rétraction et transport,
-qui est l'outil commun aux deux travaux: c'est même la seule chose qu'ils
-partagent au niveau algorithmique.
+\cref{pt:context}. Les quatre appuis:
+\begin{itemize}
+  \item la covariance empirique quand $\Nobs$ n'écrase plus $\Nvar$
+    (\cref{sec:context-covariance-regularized-estimation}) --- point de départ
+    des deux sections;
+  \item les distributions elliptiques et la $M$-estimation
+    (\cref{sec:context-distributions-reel}) --- toute la modélisation de la
+    \cref{sec:learning-graphes};
+  \item le cône $\SPD{\Nvar}$, sa métrique affine invariante, sa distance
+    (\cref{sec:context-riemann-spd,prop:context-riemann-distspd}) et la
+    moyenne de Fréchet (\cref{def:context-riemann-frechet}) --- l'objet même
+    de la \cref{sec:learning-frechet};
+  \item l'optimisation riemannienne
+    (\cref{sec:context-riemann-optimization}) --- le seul outil que les deux
+    travaux partagent au niveau algorithmique.
+\end{itemize}
 
-Deux notions nouvelles n'ont en revanche pas de place dans l'état des lieux et
-sont introduites ici, au strict nécessaire: les modèles graphiques gaussiens
-au début de la \cref{sec:learning-graphes}, et la théorie des matrices aléatoires
-en \cref{subsec:learning-rmt}. Ce choix est délibéré. Aucune des deux n'est
-mobilisée ailleurs dans le mémoire, et la \cref{pt:context} n'a vocation à
-contenir que ce qui sert à plusieurs chapitres.
+Deux notions nouvelles sont introduites ici, au strict nécessaire, et non dans
+l'état des lieux: les modèles graphiques gaussiens
+(\cref{sec:learning-graphes}) et la théorie des matrices aléatoires
+(\cref{subsec:learning-rmt}). Aucune des deux n'est mobilisée ailleurs dans le
+mémoire.
 
 \section{Cadre commun: quand le critère sort du modèle}
 \label{sec:learning-cadre}
 
-Cette section n'est dans aucun des deux articles. Elle est écrite pour ce
-mémoire, et c'est elle qui fait du chapitre autre chose qu'une juxtaposition:
-elle dit ce que les deux travaux ont en commun, et pourquoi ce commun est un
-énoncé de modélisation et non une coïncidence de vocabulaire.
+\begin{itemize}
+  \item section écrite pour ce mémoire, absente des deux articles;
+  \item c'est elle qui fait du chapitre autre chose qu'une juxtaposition: ce
+    que les deux travaux ont en commun est un \emph{énoncé de modélisation},
+    pas une coïncidence de vocabulaire.
+\end{itemize}
 
 \subsection{Deux tâches, un même déplacement}
 \label{subsec:learning-taches}
 
-Le point de départ est le même que partout dans ce mémoire: on dispose
-d'observations multivariées, et on résume leur structure de second ordre par
-une matrice de covariance. Ce qui change est ce que l'on en fait.
+Point de départ commun à tout le mémoire: des observations multivariées, dont
+on résume la structure de second ordre par une covariance. Ce qui change ici
+est \emph{ce que l'on en fait}.
 
 \begin{definition}[{Apprentissage d'un graphe de dépendances}]
 \label{def:learning-tache-graphe}
@@ -144,38 +127,35 @@ une matrice de covariance. Ce qui change est ce que l'on en fait.
   $\Nclass$ groupes, qui regroupe les covariances semblables.
 \end{definition}
 
-Ces deux problèmes n'ont, en apparence, rien à voir: l'un travaille sur une
-seule covariance et cherche à en lire la structure interne, l'autre sur une
-collection entière et cherche à l'organiser. Ils partagent pourtant un trait
-qui les sépare tous deux du \cref{ch:robust-detection}, et ce trait commande
-tout ce qui suit.
+\begin{itemize}
+  \item en apparence sans rapport: l'un lit la structure interne d'une seule
+    covariance, l'autre organise une collection entière;
+  \item un trait commun les sépare pourtant tous deux du
+    \cref{ch:robust-detection}, et ce trait commande tout ce qui suit.
+\end{itemize}
 
 \begin{remark}[{Le critère n'est plus dans le modèle}]
 \label{rem:learning-critere}
-  Dans les deux archétypes de test du \cref{ch:robust-detection}
-  (\cref{def:detection-archetype-cible,def:detection-archetype-egalite}), le
-  modèle statistique remplit deux fonctions simultanément: il fournit
-  l'estimateur --- par maximum de vraisemblance ou $M$-estimation --- et il
-  fournit le critère qui juge la décision, à savoir la loi de la statistique
-  sous $\hypothesis_0$, dont dérivent le seuil, la $\pfa$ et la propriété cfar.
-  Que la dispersion y soit un paramètre de nuisance ou le paramètre testé ne
-  change rien à cette double fonction; c'est même l'unique point commun des
-  deux archétypes.
-
-  Ici, la seconde fonction tombe. La qualité d'un graphe appris se juge sur sa
-  \emph{modularité} ou sur son accord avec une interprétation experte; celle
-  d'une partition, sur son accord avec une vérité terrain. Ni l'une ni l'autre
-  n'est une fonction de la vraisemblance, et aucune ne s'écrit dans le
-  paramètre du modèle. L'estimateur, lui, continue d'en venir --- mais rien,
-  dans le modèle, ne dit plus s'il fait l'affaire.
+  \begin{itemize}
+    \item dans les deux archétypes du \cref{ch:robust-detection}
+      (\cref{def:detection-archetype-cible,def:detection-archetype-egalite}), le
+      modèle remplit deux fonctions: il fournit l'estimateur (vraisemblance ou
+      $M$-estimation) \emph{et} le critère qui juge la décision (loi sous
+      $\hypothesis_0$, seuil, $\pfa$, cfar);
+    \item que la dispersion y soit paramètre de nuisance ou paramètre testé n'y
+      change rien --- c'est même l'unique point commun des deux archétypes;
+    \item ici la seconde fonction tombe: modularité, accord avec une lecture
+      experte, accord avec une vérité terrain, aucune n'est une fonction de la
+      vraisemblance ni ne s'écrit dans le paramètre du modèle;
+    \item l'estimateur continue d'en venir --- mais rien, dans le modèle, ne
+      dit plus s'il fait l'affaire.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
-C'est cette dissymétrie qui rend nécessaire, ici et pas ailleurs, un travail
-sur l'estimateur lui-même. Tant que le modèle certifie sa propre sortie, il
-suffit de le résoudre; dès qu'il ne la certifie plus, il faut se demander
-\emph{où} il échoue, et le corriger là. Les deux sections suivantes répondent à
-cette question de deux manières différentes. Avant cela, il faut dire
-précisément ce qui échoue.
+Conséquence: tant que le modèle certifie sa propre sortie, il suffit de le
+résoudre; dès qu'il ne la certifie plus, il faut se demander \emph{où} il
+échoue et le corriger là. Reste à dire précisément ce qui échoue.
 
 \subsection{Ce que le régime dimensionnel casse}
 \label{subsec:learning-rmt}
@@ -187,12 +167,14 @@ précisément ce qui échoue.
 % distances --- qui est la seule chose dont la \cref{sec:learning-frechet} a
 % reellement besoin.
 
-La \cref{sec:context-covariance-regularized-estimation} a déjà signalé que la
-covariance empirique se dégrade lorsque $\Nvar$ devient comparable à $\Nobs$,
-et l'a fait par le conditionnement. Cette lecture est juste mais grossière:
-elle dit que l'estimateur devient instable, elle ne dit pas \emph{comment}. La
-théorie des matrices aléatoires le dit exactement, et c'est ce qui permet de
-corriger plutôt que de régulariser à l'aveugle.
+\begin{itemize}
+  \item la \cref{sec:context-covariance-regularized-estimation} a signalé la
+    dégradation de la scm quand $\Nvar$ approche $\Nobs$, par le
+    conditionnement: lecture juste mais grossière --- elle dit que l'estimateur
+    devient instable, pas \emph{comment};
+  \item la théorie des matrices aléatoires le dit exactement, et c'est ce qui
+    permet de \emph{corriger} plutôt que de régulariser à l'aveugle.
+\end{itemize}
 
 \begin{definition}[{Régime des matrices aléatoires}]
 \label{def:learning-regime-rmt}
@@ -371,14 +353,16 @@ bruit. C'est une correction, au sens le plus littéral.
   \label{tab:learning-deux-facons}
 \end{table}
 
-Le \cref{tab:learning-deux-facons} met les deux travaux en regard. On y lit
-surtout ceci: le déplacement décrit plus haut --- le critère n'est plus dans le
-modèle --- ne laisse pas le praticien sans ressource. Il l'oblige à choisir \emph{où} injecter ce
-qu'il sait. Contraindre l'espace de recherche, ou corriger l'estimateur dans un
-espace inchangé --- ce sont deux stratégies distinctes, et il n'est pas
-indifférent que les deux passent par la même boîte à outils riemannienne. C'est
-d'ailleurs la raison pour laquelle ces deux travaux, menés avec des équipes
-différentes et publiés dans des lieux différents, se lisent ensemble.
+Le \cref{tab:learning-deux-facons} met les deux travaux en regard.
+\begin{itemize}
+  \item le critère qui sort du modèle ne laisse pas le praticien sans
+    ressource: il l'oblige à choisir \emph{où} injecter ce qu'il sait;
+  \item contraindre l'espace de recherche, ou corriger l'estimateur dans un
+    espace inchangé: deux stratégies distinctes;
+  \item les deux passent par la même boîte à outils riemannienne --- c'est ce
+    qui fait que ces travaux, menés avec des équipes différentes et publiés
+    dans des lieux différents, se lisent ensemble.
+\end{itemize}
 
 \section{Apprendre un graphe: vraisemblance elliptique pénalisée et modèle factoriel}
 \label{sec:learning-graphes}
@@ -390,8 +374,7 @@ différentes et publiés dans des lieux différents, se lisent ensemble.
 \subsection{Du graphe à la matrice de précision}
 \label{subsec:learning-graphe-precision}
 
-Le pont entre un graphe et une matrice est classique, et il passe par
-l'inverse de la covariance.
+Le pont entre un graphe et une matrice passe par l'inverse de la covariance.
 
 \begin{definition}[{Modèle graphique gaussien}]
 \label{def:learning-ggm}
@@ -417,35 +400,37 @@ l'inverse de la covariance.
   de précision}.
 \end{property}
 
-L'approche standard consiste alors à estimer $\Precision$ par maximum de
-vraisemblance régularisé,
+L'approche standard estime $\Precision$ par maximum de vraisemblance
+régularisé,
 \begin{equation}
   \max_{\Precision\in\SPD{\Nvar}}
   \;
   \log\Det(\Precision)-\trace{\SCM\Precision}-\regparam\,\penfun(\Precision),
   \label{eq:learning-glasso}
 \end{equation}
-où $\penfun$ est une pénalité favorisant la parcimonie et $\regparam\in\R_+$ un
-paramètre de régularisation. Le choix $\penfun=\norm{\cdot}_1$ donne
-l'algorithme \algname{glasso} \sidecite[0cm]{friedman2008sparse}, qui est la
-référence du domaine.
+avec $\penfun$ une pénalité de parcimonie et $\regparam\in\R_+$ un paramètre de
+régularisation. Le choix $\penfun=\norm{\cdot}_1$ donne \algname{glasso}
+\sidecite[0cm]{friedman2008sparse}, référence du domaine.
 
 \subsection{Deux insuffisances}
 \label{subsec:learning-insuffisances}
 
-La formulation \cref{eq:learning-glasso} appelle deux objections, et ce sont
-elles qui motivent tout le travail.
+Deux objections à \cref{eq:learning-glasso}, et ce sont elles qui motivent tout
+le travail.
 
-\paragraph{L'hypothèse gaussienne.} La vraisemblance de
-\cref{eq:learning-glasso} est celle du modèle gaussien, dont la fragilité aux
-queues lourdes et aux points aberrants est le fil conducteur du
-\cref{ch:context-distributions}. Les données réelles pour lesquelles on
-souhaite un graphe --- réponses catégorielles, séries financières, séries
-géodésiques --- ne sont pas gaussiennes, et une seule observation atypique
-suffit à déplacer des arêtes. Le remède est celui déjà employé au
-\cref{ch:robust-detection}: passer à la famille elliptique
-(\cref{def:context-distributions-elliptical}), dont la log-vraisemblance
-négative s'écrit
+\paragraph{L'hypothèse gaussienne.}
+\begin{itemize}
+  \item la vraisemblance de \cref{eq:learning-glasso} est celle du modèle
+    gaussien, dont la fragilité aux queues lourdes est le fil conducteur du
+    \cref{ch:context-distributions};
+  \item les données pour lesquelles on veut un graphe --- réponses
+    catégorielles, séries financières, séries géodésiques --- ne sont pas
+    gaussiennes, et une seule observation atypique suffit à déplacer des
+    arêtes;
+  \item remède déjà employé au \cref{ch:robust-detection}: passer à la famille
+    elliptique (\cref{def:context-distributions-elliptical}), de
+    log-vraisemblance négative
+\end{itemize}
 \begin{equation}
   \loss(\MCov)
   \;\propto\;
@@ -456,18 +441,21 @@ négative s'écrit
   \rho(t)=-\log\densgen(t),
   \label{eq:learning-nll-elliptique}
 \end{equation}
-et qui redonne le cas gaussien pour $\densgen(t)=\exp(-t/2)$
-\sidecite[0cm]{vogel2011elliptical}. Dans les expériences des articles, le
-générateur retenu est celui de la $t$ de Student à $\dof=5$ degrés de liberté.
+qui redonne le cas gaussien pour $\densgen(t)=\exp(-t/2)$
+\sidecite[0cm]{vogel2011elliptical}. Générateur retenu dans les expériences: la
+$t$ de Student à $\dof=5$ degrés de liberté.
 
-\paragraph{L'absence de structure.} La seconde objection est celle du régime
-dimensionnel, sous la forme déjà rencontrée en
-\cref{sec:context-covariance-regularized-estimation}: lorsque
-$\Nobs\simeq\Nvar$ ou $\Nobs<\Nvar$, la covariance empirique qui alimente
-\cref{eq:learning-glasso} n'est plus fiable, et la parcimonie seule ne suffit
-pas à compenser. Il faut réduire le nombre de paramètres, et la façon
-canonique de le faire est de supposer les données engendrées par un modèle
-linéaire de faible dimension.
+\paragraph{L'absence de structure.}
+\begin{itemize}
+  \item le régime dimensionnel, sous la forme rencontrée en
+    \cref{sec:context-covariance-regularized-estimation}: à
+    $\Nobs\simeq\Nvar$ ou $\Nobs<\Nvar$, la scm qui alimente
+    \cref{eq:learning-glasso} n'est plus fiable;
+  \item la parcimonie seule ne compense pas: il faut réduire le nombre de
+    paramètres;
+  \item façon canonique de le faire: supposer les données engendrées par un
+    modèle linéaire de faible dimension.
+\end{itemize}
 
 \begin{definition}[{Modèle factoriel de rang faible}]
 \label{def:learning-facteur}
@@ -492,13 +480,16 @@ linéaire de faible dimension.
 
 \begin{remark}[{Le gain en paramètres}]
 \label{rem:learning-gain-parametres}
-  Cette paramétrisation fait passer la dimension du problème d'estimation de
-  $\Nvar(\Nvar+1)/2$ à $\Nvar(\Nrank+1)-\Nrank(\Nrank-3)/2$. Pour
-  $\Nvar=33$ et $\Nrank=10$ --- les valeurs du jeu \texttt{animals} de la
-  \cref{subsec:learning-graphe-resultats} --- cela fait passer de $561$ à
-  $328$ paramètres. Le gain est réel sans être spectaculaire; l'intérêt du
-  modèle factoriel n'est d'ailleurs pas seulement là. La
-  \cref{prop:learning-composantes} donne la vraie raison.
+  \begin{itemize}
+    \item la dimension du problème passe de $\Nvar(\Nvar+1)/2$ à
+      $\Nvar(\Nrank+1)-\Nrank(\Nrank-3)/2$;
+    \item pour $\Nvar=33$, $\Nrank=10$ (jeu \texttt{animals} de la
+      \cref{subsec:learning-graphe-resultats}): de $561$ à $328$ paramètres;
+    \item gain réel sans être spectaculaire --- et ce n'est pas là l'intérêt
+      principal du modèle factoriel. La \cref{prop:learning-composantes} donne
+      la vraie raison.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \begin{property}[{Rang et composantes connexes}]
@@ -508,11 +499,13 @@ linéaire de faible dimension.
   \sidecite[1.5cm]{kumar2020unified}.
 \end{property}
 
-C'est ce dernier énoncé qui transforme une contrainte de calcul en une
-contrainte \emph{interprétable}: la structure spectrale que l'on impose pour
-des raisons d'estimation gouverne aussi le nombre de groupes que le graphe
-appris fera apparaître. Là où les méthodes concurrentes exigent que ce nombre
-soit fixé a priori, il découle ici du rang.
+\begin{itemize}
+  \item cet énoncé transforme une contrainte de calcul en contrainte
+    \emph{interprétable}: la structure spectrale imposée pour des raisons
+    d'estimation gouverne le nombre de groupes que le graphe fera apparaître;
+  \item les méthodes concurrentes exigent que ce nombre soit fixé a priori;
+    ici il découle du rang.
+\end{itemize}
 
 \subsection{Le problème posé, et pourquoi il est difficile}
 \label{subsec:learning-probleme-graphe}
@@ -536,34 +529,39 @@ pour pénalité, une fonction élément par élément appliquée à la
 
 \begin{remark}[{La difficulté est dans le mélange}]
 \label{rem:learning-difficulte}
-  Aucun des deux ingrédients n'est neuf pris isolément: les modèles graphiques
-  elliptiques existent, les modèles factoriels aussi. Ce qui résiste, c'est
-  leur réunion, et pour une raison précise: la vraisemblance
-  \cref{eq:learning-nll-elliptique} et la contrainte
-  \cref{eq:learning-factorman} portent sur la \emph{covariance}, tandis que la
-  pénalité \cref{eq:learning-penalite} porte sur son \emph{inverse}. Le
-  problème mêle donc des termes exprimés dans les deux représentations, ce
-  qu'aucun schéma de descente coordonnée à la \algname{glasso} ne sait
-  traiter. La réponse habituelle est le fractionnement de variables et
-  l'\algname{admm}, qui résout un problème approché et introduit ses propres
-  paramètres de réglage.
+  \begin{itemize}
+    \item aucun ingrédient n'est neuf isolément: modèles graphiques elliptiques
+      et modèles factoriels existent;
+    \item ce qui résiste est leur \emph{réunion}: la vraisemblance
+      \cref{eq:learning-nll-elliptique} et la contrainte
+      \cref{eq:learning-factorman} portent sur la \textbf{covariance}, la
+      pénalité \cref{eq:learning-penalite} sur son \textbf{inverse};
+    \item aucun schéma de descente coordonnée à la \algname{glasso} ne sait
+      traiter des termes exprimés dans les deux représentations;
+    \item réponse habituelle: fractionnement de variables et \algname{admm},
+      qui résout un problème \emph{approché} et ajoute ses propres paramètres
+      de réglage.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \subsection{Résolution par optimisation riemannienne}
 \label{subsec:learning-resolution-graphe}
 
-La contribution de \fullcite{ECML23} est de traiter
-\cref{eq:learning-probleme-gfm} directement, en tirant parti du fait que
-$\Factorman{\Nvar}{\Nrank}$ est une sous-variété lisse de $\SPD{\Nvar}$. Le
-problème contraint devient alors un problème \emph{libre} sur une variété, et
-la machinerie de la \cref{sec:context-riemann-optimization} s'applique sans
-approximation ni paramètre supplémentaire.
+\begin{itemize}
+  \item la contribution de \fullcite{ECML23} est de traiter
+    \cref{eq:learning-probleme-gfm} \textbf{directement}, en tirant parti du
+    fait que $\Factorman{\Nvar}{\Nrank}$ est une sous-variété lisse de
+    $\SPD{\Nvar}$;
+  \item le problème contraint devient un problème \emph{libre} sur une
+    variété: la machinerie de la \cref{sec:context-riemann-optimization}
+    s'applique sans approximation ni paramètre supplémentaire.
+\end{itemize}
 
-Sur $\SPD{\Nvar}$ --- c'est-à-dire quand on relâche la contrainte de rang ---
-les trois ingrédients sont ceux du \cref{ch:context-riemann}: la métrique
-affine invariante \cref{eq:context-riemann-metriqueaffine}, le transport
-parallèle \cref{eq:context-riemann-transportspd}, et la rétraction du second
-ordre
+Sur $\SPD{\Nvar}$ --- contrainte de rang relâchée --- les trois ingrédients
+sont ceux du \cref{ch:context-riemann}: métrique affine invariante
+\cref{eq:context-riemann-metriqueaffine}, transport parallèle
+\cref{eq:context-riemann-transportspd}, et rétraction du second ordre
 \begin{equation}
   \Retr_{\MCov}(\tvec)=\MCov+\tvec+\tfrac{1}{2}\tvec\inv{\MCov}\tvec,
   \label{eq:learning-retraction-spd}
@@ -592,33 +590,40 @@ $\Rgrad f(\MCov)=\MCov\,\symop(\nabla f(\MCov))\,\MCov$.
 
 \begin{remark}[{La fonction de poids, encore}]
 \label{rem:learning-poids}
-  La fonction $\weight$ de \cref{eq:learning-gradient-nll} est exactement celle
-  de la $M$-estimation de la \cref{subsec:context-robust-m-estimation}:
-  $\weight(t)=1$ dans le cas gaussien, $\weight(t)=(\dof+\Nvar)/(\dof+t)$ pour
-  la $t$ de Student. La robustesse ne vient donc d'aucun mécanisme nouveau ---
-  elle est la même pondération des observations par leur distance de
-  Mahalanobis, que celle qui produit l'estimateur de Tyler au
-  \cref{ch:robust-detection}. C'est un exemple net de ce que ce mémoire essaie
-  de montrer: le même objet, ici une fonction de poids, sert à décider dans un
-  chapitre et à apprendre dans un autre.
+  \begin{itemize}
+    \item $\weight$ de \cref{eq:learning-gradient-nll} est exactement celle de
+      la $M$-estimation de la \cref{subsec:context-robust-m-estimation}:
+      $\weight(t)=1$ dans le cas gaussien,
+      $\weight(t)=(\dof+\Nvar)/(\dof+t)$ pour la $t$ de Student;
+    \item la robustesse ne vient d'aucun mécanisme nouveau: c'est la même
+      pondération des observations par leur distance de Mahalanobis que celle
+      qui produit l'estimateur de Tyler au \cref{ch:robust-detection};
+    \item exemple net de ce que le mémoire cherche à montrer: le même objet ---
+      ici une fonction de poids --- sert à décider dans un chapitre et à
+      apprendre dans un autre.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 Pour le modèle factoriel, la géométrie retenue est celle des matrices
 semi-définies positives de rang fixe
-\sidecite[-0.4cm]{bonnabel2009riemannian,bouchard2021lowrank}, combinée à celle du
-cône diagonal. Le détail de cette construction --- paramétrisation, projections,
-rétraction sur $\Factorman{\Nvar}{\Nrank}$ --- est dans l'article; on retiendra
-ici son effet pratique.
+\sidecite[-0.4cm]{bonnabel2009riemannian,bouchard2021lowrank}, combinée à celle
+du cône diagonal. Le détail --- paramétrisation, projections, rétraction sur
+$\Factorman{\Nvar}{\Nrank}$ --- est dans l'article; on retient ici son effet
+pratique.
 
 \begin{remark}[{Le vrai gain est algorithmique}]
 \label{rem:learning-gain-algorithmique}
-  Une itération de la méthode proposée ne demande que la \textsc{svd} tronquée
-  du facteur de rang faible, là où les méthodes à contrainte laplacienne
-  concurrentes demandent la décomposition complète du laplacien ou de la
-  matrice d'adjacence à chaque itération. Le goulot d'étranglement passe donc
-  de $\bigO(\Nvar^3)$ à $\bigO(\Nvar\Nrank^2)$. Comme au
-  \cref{ch:robust-detection}, la structure ne sert pas seulement à mieux
-  estimer: elle sert aussi à calculer moins.
+  \begin{itemize}
+    \item une itération ne demande que la \textsc{svd} tronquée du facteur de
+      rang faible, là où les méthodes à contrainte laplacienne concurrentes
+      demandent la décomposition complète du laplacien ou de l'adjacence à
+      chaque itération;
+    \item le goulot passe de $\bigO(\Nvar^3)$ à $\bigO(\Nvar\Nrank^2)$;
+    \item comme au \cref{ch:robust-detection}, la structure ne sert pas
+      seulement à mieux estimer: elle sert aussi à calculer moins.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \subsection{Ce que la structure achète}
@@ -647,15 +652,16 @@ ici son effet pratique.
 
 \begin{remark}[{Pourquoi aucune figure ici}]
 \label{rem:learning-pas-de-figure}
-  Les graphes appris sur les jeux \texttt{animals} et \textsc{gnss} figurent
-  dans l'article reproduit, p.~\paperpage{ECML23}, et ne sont pas reproduits
-  ici. La règle de reproductibilité annoncée au chapitre
-  \hyperref[ch:commentlire]{\emph{Comment lire ce mémoire}} veut que toute
-  figure de simulation du mémoire porte sa ligne de provenance et son
-  expérience rejouable; recopier une figure d'article sans cette chaîne
-  reviendrait à en afficher la forme sans la garantie. Le lecteur intéressé par
-  les graphes eux-mêmes les trouvera à quelques pages d'ici, dans leur contexte
-  d'origine.
+  \begin{itemize}
+    \item les graphes appris sur \texttt{animals} et \textsc{gnss} sont dans
+      l'article reproduit, p.~\paperpage{ECML23};
+    \item la règle annoncée au chapitre
+      \hyperref[ch:commentlire]{\emph{Comment lire ce mémoire}} veut que toute
+      figure de simulation porte sa ligne de provenance et son expérience
+      rejouable; recopier une figure d'article sans cette chaîne en afficherait
+      la forme sans la garantie.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \section{Corriger la moyenne: matrices aléatoires et moyenne de Fréchet}
@@ -668,12 +674,11 @@ ici son effet pratique.
 \subsection{Classer et partitionner avec des moyennes}
 \label{subsec:learning-centroides}
 
-Il faut commencer par la tâche, car c'est elle qui fait apparaître l'objet à
-corriger. On dispose de $\Nmat$ collections d'observations
-$\{\X_\imat\}_{\imat=1}^{\Nmat}$, chacune résumée par sa covariance empirique
-$\SCM_\imat=\frac{1}{\Nobs}\X_\imat\X_\imat^\T$, et l'on veut soit leur
-attribuer une classe, soit les regrouper. La méthode de référence sur le cône
-est d'une simplicité désarmante.
+Commencer par la tâche, car c'est elle qui fait apparaître l'objet à corriger:
+$\Nmat$ collections d'observations $\{\X_\imat\}_{\imat=1}^{\Nmat}$, chacune
+résumée par sa covariance empirique
+$\SCM_\imat=\frac{1}{\Nobs}\X_\imat\X_\imat^\T$, à classer ou à regrouper. La
+méthode de référence sur le cône est d'une simplicité désarmante.
 
 \begin{definition}[{Classification au plus proche centroïde}]
 \label{def:learning-centroide}
@@ -706,13 +711,17 @@ euclidiennes \sidecite[0cm]{barachant2011multiclass,congedo2015approximate}.
 
 \begin{remark}[{Tout repose sur la moyenne}]
 \label{rem:learning-tout-repose}
-  Ces deux algorithmes n'ont, au fond, qu'un seul ingrédient statistique: la
-  moyenne de Fréchet de la \cref{def:context-riemann-frechet}. Le reste est de
-  la comparaison de distances. Il s'ensuit que la qualité de la classification
-  ou de la partition est entièrement gouvernée par la qualité de cet
-  estimateur --- et que si celui-ci est biaisé, tout l'est. C'est là que la
-  \cref{prop:learning-distance-biaisee} devient un problème pratique et non une
-  curiosité asymptotique.
+  \begin{itemize}
+    \item ces deux algorithmes n'ont qu'un seul ingrédient statistique: la
+      moyenne de Fréchet de la \cref{def:context-riemann-frechet}. Le reste est
+      de la comparaison de distances;
+    \item la qualité de la classification ou de la partition est donc
+      entièrement gouvernée par celle de cet estimateur: s'il est biaisé, tout
+      l'est;
+    \item c'est là que la \cref{prop:learning-distance-biaisee} devient un
+      problème pratique et non une curiosité asymptotique.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \subsection{La distance corrigée}
@@ -720,15 +729,18 @@ euclidiennes \sidecite[0cm]{barachant2011multiclass,congedo2015approximate}.
 
 \begin{remark}[{Une normalisation à signaler}]
 \label{rem:learning-normalisation}
-  Les travaux de cette section emploient la distance affine invariante
-  \emph{normalisée},
-  $\geodist^2(\MCov_0,\MCov_1)=\frac{1}{2\Nvar}\norm{\logm(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})}_\frob^2$,
-  soit la \cref{eq:context-riemann-distspd} divisée par $2\Nvar$. La
-  normalisation par la dimension est sans effet sur les minimiseurs --- donc
-  sur la \cref{def:learning-centroide} --- mais elle est indispensable pour que
-  la quantité admette une limite dans le régime
-  \cref{eq:learning-regime-rmt}, où $\Nvar\to\infty$. Les formules qui suivent
-  la supposent en place.
+  \begin{itemize}
+    \item cette section emploie la distance affine invariante
+      \emph{normalisée},
+      $\geodist^2(\MCov_0,\MCov_1)=\frac{1}{2\Nvar}\norm{\logm(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})}_\frob^2$,
+      soit \cref{eq:context-riemann-distspd} divisée par $2\Nvar$;
+    \item sans effet sur les minimiseurs, donc sur la
+      \cref{def:learning-centroide};
+    \item indispensable en revanche pour que la quantité admette une limite
+      dans le régime \cref{eq:learning-regime-rmt}, où $\Nvar\to\infty$. Les
+      formules qui suivent la supposent en place.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \begin{proposition}[{Distance de Fisher corrigée par la théorie des matrices aléatoires}]
@@ -763,24 +775,27 @@ euclidiennes \sidecite[0cm]{barachant2011multiclass,congedo2015approximate}.
 
 \begin{remark}[{Comment lire cette formule}]
 \label{rem:learning-lecture-correction}
-  Le détail des quantités auxiliaires figure dans l'article et n'a pas besoin
-  d'être reproduit ici; ce qui compte est la \emph{forme} de
-  \cref{eq:learning-distance-corrigee}. Le premier terme est la distance
-  empirique naïve, à un décalage près. Tout le reste est du correctif, et ce
-  correctif ne fait intervenir que des quantités observables: le rapport
-  $\cratio=\Nvar/\Nobs$, que l'on connaît, et le spectre $\eigvec$, que l'on
-  mesure. Rien n'exige de connaître $\MCov$. C'est précisément ce qui rend la
-  correction utilisable: elle transforme une connaissance théorique du biais en
-  une opération sur les données. On notera aussi que le correctif s'évanouit
-  quand $\cratio\to0$, c'est-à-dire quand on retombe dans le régime
-  asymptotique classique --- la formule contient l'ancienne comme cas limite.
+  \begin{itemize}
+    \item le détail des quantités auxiliaires est dans l'article; ce qui compte
+      est la \emph{forme} de \cref{eq:learning-distance-corrigee};
+    \item premier terme: la distance empirique naïve, à un décalage près. Tout
+      le reste est du correctif;
+    \item le correctif ne fait intervenir que des quantités \textbf{observables}
+      --- le rapport $\cratio=\Nvar/\Nobs$, que l'on connaît, et le spectre
+      $\eigvec$, que l'on mesure. Rien n'exige de connaître $\MCov$;
+    \item c'est ce qui rend la correction utilisable: elle transforme une
+      connaissance théorique du biais en une opération sur les données;
+    \item le correctif s'évanouit quand $\cratio\to0$: la formule contient
+      l'ancienne comme cas limite.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \subsection{La moyenne corrigée et son gradient}
 \label{subsec:learning-moyenne-corrigee}
 
-L'idée de la contribution tient en une substitution: remplacer $\geodist^2$ par
-$\distrmt^2$ dans la définition même de la moyenne de Fréchet.
+L'idée tient en une substitution: remplacer $\geodist^2$ par $\distrmt^2$ dans
+la définition même de la moyenne de Fréchet.
 
 \begin{definition}[{Moyenne de Fréchet corrigée}]
 \label{def:learning-frechet-rmt}
@@ -800,21 +815,26 @@ $\distrmt^2$ dans la définition même de la moyenne de Fréchet.
 
 \begin{remark}[{Une substitution qui coûte cher}]
 \label{rem:learning-substitution-couteuse}
-  La \cref{def:learning-frechet-rmt} est immédiate à écrire et beaucoup moins à
-  résoudre. La moyenne de Fréchet ordinaire dispose, pour la métrique affine
-  invariante, d'une condition d'optimalité de forme close
-  \cref{eq:context-riemann-frechetopt} qui donne directement l'algorithme de
-  point fixe usuel; rien de tel ici, car $\distrmt^2$ n'est pas la distance
-  d'une métrique riemannienne --- c'est un estimateur d'une distance. La
-  \cref{eq:learning-frechet-rmt} reste néanmoins un problème d'optimisation sur
-  $\SPD{\Nvar}$, et c'est la voie retenue: descente riemannienne avec la
-  rétraction \cref{eq:learning-retraction-spd}. Ce qui manque alors est le
-  gradient, et c'est lui la contribution technique de l'article.
+  \begin{itemize}
+    \item la \cref{def:learning-frechet-rmt} est immédiate à écrire, beaucoup
+      moins à résoudre;
+    \item la moyenne de Fréchet ordinaire dispose d'une condition d'optimalité
+      de forme close \cref{eq:context-riemann-frechetopt}, qui donne
+      directement le point fixe usuel;
+    \item rien de tel ici: $\distrmt^2$ n'est pas la distance d'une métrique
+      riemannienne, c'est un \emph{estimateur} d'une distance;
+    \item \cref{eq:learning-frechet-rmt} reste un problème d'optimisation sur
+      $\SPD{\Nvar}$, et c'est la voie retenue: descente riemannienne avec la
+      rétraction \cref{eq:learning-retraction-spd};
+    \item ce qui manque alors est le gradient --- c'est lui la contribution
+      technique de l'article.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
-Le gradient s'obtient en deux temps. D'abord, on remarque que le coût ne dépend
-de $\MCov$ qu'à travers le spectre de $\MCov^{-1/2}\SCM_\imat\MCov^{-1/2}$, ce
-qui permet de ramener le calcul sur le cône diagonal.
+Le gradient s'obtient en deux temps. D'abord, le coût ne dépend de $\MCov$ qu'à
+travers le spectre de $\MCov^{-1/2}\SCM_\imat\MCov^{-1/2}$, ce qui ramène le
+calcul sur le cône diagonal.
 
 \begin{proposition}[{Réduction au spectre}]
 \label{prop:learning-gradient-reduction}
@@ -833,14 +853,17 @@ qui permet de ramener le calcul sur le cône diagonal.
   $\Eigmat_\imat$ dans $\Diagpos{\Nvar}$.
 \end{proposition}
 
-Il reste à calculer $\Rgrad g$, c'est-à-dire à dériver
-\cref{eq:learning-distance-corrigee} par rapport aux valeurs propres. Le
-résultat est une expression longue mais entièrement close, faisant intervenir
-trois matrices $\mat{A}$, $\mat{B}$, $\mat{C}$ dont les entrées sont des
-fonctions explicites des $\eig_\ivar$ et de $\Nobs$; on la trouvera à
-p.~\paperpage{ICML24}. Le gradient du coût complet en découle par moyenne,
-$\Rgrad h(\MCov)=\frac{1}{\Nmat}\sum_\imat\Rgrad f_\imat(\MCov)$, et
-l'\cref{alg:learning-frechet-rmt} s'écrit alors sans difficulté.
+Reste à calculer $\Rgrad g$, c'est-à-dire à dériver
+\cref{eq:learning-distance-corrigee} par rapport aux valeurs propres.
+\begin{itemize}
+  \item expression longue mais entièrement close, faisant intervenir trois
+    matrices $\mat{A}$, $\mat{B}$, $\mat{C}$ dont les entrées sont des
+    fonctions explicites des $\eig_\ivar$ et de $\Nobs$; elle est à
+    p.~\paperpage{ICML24};
+  \item le gradient du coût complet en découle par moyenne,
+    $\Rgrad h(\MCov)=\frac{1}{\Nmat}\sum_\imat\Rgrad f_\imat(\MCov)$;
+  \item l'\cref{alg:learning-frechet-rmt} s'écrit alors sans difficulté.
+\end{itemize}
 
 \begin{algorithm}[htb]
   \caption{Moyenne de Fréchet corrigée par la théorie des matrices aléatoires}
@@ -864,79 +887,113 @@ l'\cref{alg:learning-frechet-rmt} s'écrit alors sans difficulté.
 
 \begin{remark}[{Dériver à la main, encore}]
 \label{rem:learning-deriver-main}
-  Le lecteur qui poursuivra au \cref{ch:spdnet} y retrouvera le même geste, et
-  le même argument: l'objet géométriquement juste n'a pas de forme close, sa
-  minimisation est itérative, et le travail consiste à en dériver le gradient
-  explicitement plutôt qu'à laisser un outil de différentiation automatique
-  parcourir les itérations. La raison n'y sera pourtant pas la même qu'ici. Là-bas,
-  il s'agira d'économiser la mémoire d'un graphe de calcul qui stockerait
-  sinon toutes les itérées; ici, plus simplement, d'avoir un algorithme du
-  tout. Le constat, lui, est identique --- et c'est un des rares fils qui
-  traverse les deux chapitres au niveau technique et non au niveau des idées.
+  \begin{itemize}
+    \item le \cref{ch:spdnet} reprendra le même geste et le même argument:
+      l'objet géométriquement juste n'a pas de forme close, sa minimisation est
+      itérative, et le travail consiste à en dériver le gradient explicitement
+      plutôt qu'à laisser la différentiation automatique parcourir les itérées;
+    \item la raison n'y sera pas la même: là-bas, économiser la mémoire d'un
+      graphe de calcul qui stockerait toutes les itérées; ici, plus simplement,
+      avoir un algorithme du tout;
+    \item le constat, lui, est identique --- un des rares fils qui traverse les
+      deux chapitres au niveau technique et non au niveau des idées.
+  \end{itemize}
+  \leavevmode
 \end{remark}
 
 \subsection{Ce que la correction achète}
 \label{subsec:learning-mse}
 
-Le premier critère est interne: à quelle distance de la vraie moyenne se trouve
-la moyenne estimée? C'est une erreur quadratique moyenne, mesurée sur données
-synthétiques où la vérité est connue, et c'est le critère qui mesure le
-\emph{mécanisme} décrit en \cref{subsec:learning-rmt}.
+Premier critère, \emph{interne}: à quelle distance de la vraie moyenne se
+trouve la moyenne estimée? Erreur quadratique moyenne sur données synthétiques,
+où la vérité est connue. C'est le critère qui mesure le \emph{mécanisme} décrit
+en \cref{subsec:learning-rmt}.
 
-\wipfig{FIGURE 2/3 --- eqm contre nombre d'échantillons}{eqm (en dB) de
-l'estimation de la moyenne de Fréchet en fonction de $\Nobs$, à $\Nvar$ et
-$\Nmat$ fixés, pour cinq estimateurs: scm, Ledoit-Wolf linéaire, oas,
-Ledoit-Wolf non linéaire, et la moyenne corrigée. Courbe moyenne et bande
-interpercentile 5/95. \textbf{Les données existent déjà}: fichiers
-\texttt{figures/mse\_nsamples/\{mean,5,95\}.csv} du dépôt de slides HCERES, et
-le code est public (\texttt{github.com/AmmarMian/icml-rmt-2024}). Ce qui manque
-est le passage sous \texttt{qanat} pour la ligne de provenance, et le
-réhabillage aux couleurs du mémoire --- l'export actuel est aux couleurs du
-thème L2S, qui n'ont rien à faire dans le \texttt{.tex}.}
+\begin{figure}[htb]
+  \centering
+  \input{gfx/generated/learning_frechet_mse/mse/plot.tex}
+  \provMseQR[1cm]
+  \caption[Erreur d'estimation de la moyenne de Fréchet]{Erreur quadratique
+    moyenne de l'estimation de la moyenne de Fréchet, en dimension
+    $\Nvar=64$, sur $100$ tirages, la moyenne vraie ayant un conditionnement
+    de $100$. Cinq estimateurs: la moyenne de Fréchet des scm, celle des
+    covariances rétrécies linéairement (Ledoit-Wolf, \algname{oas}), celle des
+    covariances rétrécies non linéairement, et la moyenne corrigée
+    \cref{eq:learning-frechet-rmt}. Les bandes sont les interpercentiles
+    $5/95$. À gauche, l'erreur en fonction du nombre d'échantillons $\Nobs$
+    par covariance, à $\Nmat=10$ matrices; à droite, en fonction du nombre de
+    matrices $\Nmat$, à $\Nobs=128$ échantillons. \provMse}
+  \label{fig:learning-mse}
+\end{figure}
 
-\wipfig{FIGURE 3/3 --- eqm contre nombre de matrices}{Même chose en fonction de
-$\Nmat$, à $\Nobs$ fixé. C'est la figure qui porte l'argument spécifique de
-l'article: le gain \emph{croît} avec le nombre de matrices moyennées, alors que
-l'intuition voudrait qu'accumuler des matrices compense le manque
-d'échantillons. Données dans \texttt{figures/mse\_nmatrices/}. Contrainte:
-partager axes, unités et jeu d'estimateurs avec la figure 2/3.}
+Les deux panneaux de la \cref{fig:learning-mse} ne disent pas la même chose, et
+c'est le second qui porte l'argument.
+\textbf{Panneau de gauche --- contre $\Nobs$.}
+\begin{itemize}
+  \item l'erreur de toutes les méthodes décroît quand $\Nobs$ augmente, et la
+    moyenne corrigée reste la plus faible sur tout l'intervalle;
+  \item elle gagne $8{,}1$~dB sur la scm à $\Nobs=65$ --- dimension et nombre
+    d'échantillons presque égaux --- et l'écart tombe à $2{,}2$~dB à
+    $\Nobs=300$;
+  \item signature d'un \emph{biais de régime} et non d'une variance: ce que la
+    correction rattrape est ce que $\cratio=\Nvar/\Nobs$ mesure, et cela
+    s'efface quand $\cratio$ devient négligeable;
+  \item ce panneau confirme le mécanisme de la \cref{subsec:learning-rmt}. Il
+    ne surprendra personne.
+\end{itemize}
 
-% ============================== FIGURES 2/3 et 3/3 =================================
-% Placeholders. Une fois les experiences portees sous qanat:
-%
-% \begin{figure}[htb]
-%   \centering
-%   \input{gfx/generated/learning_frechet_mse/mse-nsamples/plot.tex}
-%   \provMseNsamplesQR[1cm]
-%   \caption{...\provMseNsamples}
-%   \label{fig:learning-mse-nsamples}
-% \end{figure}
-%
-% idem pour mse-nmatrices. Penser a lancer `just figures`.
-% ====================================================================================
+\textbf{Panneau de droite --- contre $\Nmat$.} C'est lui qui porte l'argument,
+et il est contre-intuitif: on s'attendrait à ce qu'accumuler des matrices
+compense le manque d'échantillons.
+\begin{itemize}
+  \item l'erreur de la scm décroît d'abord puis \emph{plafonne}:
+    $12{,}7$~dB à $\Nmat=3$, $8{,}2$~dB à $\Nmat=100$, l'essentiel de la
+    baisse acquis dès $\Nmat=20$;
+  \item celle de la moyenne corrigée continue de descendre, jusqu'à
+    $-4{,}3$~dB;
+  \item l'écart entre les deux passe de $1{,}4$~dB à $\Nmat=3$ à $12{,}5$~dB à
+    $\Nmat=100$: il ne se referme pas, il \textbf{s'ouvre}.
+\end{itemize}
+referme pas, il \emph{s'ouvre}.
+\begin{remark}[{Pourquoi moyenner ne suffit pas}]
+\label{rem:learning-moyenner-ne-suffit-pas}
+  \begin{itemize}
+    \item moyenner réduit la variance, pas le biais;
+    \item les $\Nmat$ covariances empiriques ne sont pas indépendantes dans
+      leur erreur: elles partagent le déplacement spectral de la
+      \cref{prop:learning-spiked}, qui ne dépend que de $\cratio$ et non du
+      tirage. Ce déplacement survit intact à la moyenne;
+    \item passé un certain $\Nmat$, la variance a disparu et il ne reste que
+      lui: c'est là que les méthodes se séparent, et que la correction devient
+      le seul recours;
+    \item le régime « beaucoup de matrices mal estimées » est exactement celui
+      du partitionnement hyperspectral, où chaque pixel fournit une covariance
+      sur une petite fenêtre.
+  \end{itemize}
+  \leavevmode
+\end{remark}
 
-% ============================ TODO texte (~2 paragraphes) ===========================
-% Commentaire des deux figures, a ecrire une fois les runs qanat faits. Points
-% a couvrir, dans cet ordre:
-%  1. lecture de la figure 2/3: l'ecart entre la scm et la moyenne corrigee est
-%     de plusieurs dizaines de dB a faible \Nobs et se referme quand \Nobs
-%     croit --- c'est la signature d'un biais de regime et non d'une variance;
-%  2. lecture de la figure 3/3, qui est le point NON TRIVIAL: le gain croit
-%     avec \Nmat. L'expliquer: moyenner davantage de matrices reduit la
-%     variance mais PAS le biais, qui est commun a toutes les scm; passe un
-%     certain \Nmat, c'est le biais qui domine et lui seul distingue les
-%     methodes. C'est l'argument qui justifie a lui seul la correction;
-%  3. situer les concurrents: Ledoit-Wolf et oas regularisent chaque covariance
-%     AVANT de moyenner, la methode proposee corrige la DISTANCE. Dire que ce
-%     n'est pas le meme geste.
-% ====================================================================================
+Un mot sur les concurrents, dont la position n'est pas accidentelle.
+\begin{itemize}
+  \item le rétrécissement linéaire (Ledoit-Wolf, \algname{oas}) est \emph{le
+    plus mauvais} des cinq, et son erreur ne décroît presque pas --- ni avec
+    $\Nobs$, ni avec $\Nmat$;
+  \item le rétrécissement non linéaire fait mieux et suit la scm de près;
+  \item différence de \textbf{nature} et non de degré: ces méthodes
+    régularisent chaque covariance \emph{avant} de moyenner --- elles corrigent
+    un objet dont on ne veut pas --- là où la méthode proposée corrige la
+    \emph{distance} que la moyenne minimise;
+  \item contracter chaque spectre vers un multiple de l'identité rapproche
+    chaque matrice de la cible, mais introduit dans toutes le même biais de
+    contraction, que la moyenne conserve là encore.
+\end{itemize}
 
 \subsection{Partitionnement hyperspectral}
 \label{subsec:learning-hyperspectral}
 
-L'erreur quadratique est un critère interne, et l'on a dit plus haut --- dans
-la remarque \emph{Le critère n'est plus dans le modèle} --- que ce n'était pas
-celui qui juge réellement ce chapitre. Le juge est en aval: la partition produite.
+L'erreur quadratique est un critère \emph{interne}, et l'on a dit plus haut ---
+remarque \emph{Le critère n'est plus dans le modèle} --- que ce n'est pas celui
+qui juge réellement ce chapitre. Le juge est en aval: la partition produite.
 
 % ============================ TODO texte (~2 paragraphes) ===========================
 % Resultats de partitionnement. L'article couvre \textsc{eeg} et
