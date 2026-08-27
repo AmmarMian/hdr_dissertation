@@ -314,8 +314,15 @@
 % external fait \global\let\tikzexternalrealjob=\jobname des la passe
 % principale (tikzlibraryexternal.code.tex, l. 109), donc la macro y est
 % toujours definie et les articles disparaissaient de tout le document.
-% Ce qui distingue reellement les deux passes est \jobname, qui vaut
-% "ext-tikz/dissertation-figureNN" pendant une externalisation.
+%
+% Il ne peut pas non plus comparer \jobname a \tikzexternalrealjob: pendant une
+% passe d'externalisation, la bibliotheque redefinit \jobname pour qu'il rende
+% le nom du document principal (les fichiers auxiliaires doivent se resoudre),
+% de sorte que les deux valent toujours "dissertation" et que le test passe
+% *tout le temps*. C'est ce qui faisait echouer `just build` sur figure0.
+%
+% Le bon discriminant est \tikzifexternalizing, la macro publique de PGF prevue
+% pour cela: premier argument pendant une passe figure, second sinon.
 % Argument optionnel: une cle de label. \joinedpaper[SP24]{titre}{chemin} pose
 % \label{paper:SP24}, ce qui permet d'ecrire dans le texte « annexe
 % p.~\paperpage{SP24} » comme le fait Chatelain. Sans cet argument, comportement
@@ -325,11 +332,9 @@
   \phantomsection
   \if\relax\detokenize{#1}\relax\else\label{paper:#1}\fi
   \addcontentsline{toc}{subsection}{#2}%
-  \edef\jpCurrentJob{\jobname}%
-  \edef\jpRealJob{\tikzexternalrealjob}%
-  \ifx\jpCurrentJob\jpRealJob
+  \tikzifexternalizing{}{%
     \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#3}%
-  \fi
+  }%
 }
 % Renvoi vers un article reproduit: \paperpage{SP24} -> le folio de sa premiere page.
 \newcommand{\paperpage}[1]{\pageref{paper:#1}}

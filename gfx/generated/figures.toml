@@ -66,8 +66,8 @@ embed_npy = false
 
 [figures.moyennes]
 exp       = "context_riemann_moyennes"
-sha       = "590ac0f"
-run_date  = "2026-08-19"
+sha       = "0264bed"
+run_date  = "2026-08-27"
 seed      = "42"
 embed_npy = false
 

@@ -502,7 +502,7 @@ Cette définition ne demande rien d'autre qu'une distance, et elle redonne bien 
   soit «~la moyenne est le point depuis lequel les autres se compensent~», et il faut recourir à un algorithme itératif \sidecite[0.5cm]{jeuris2012survey}. Ce sera notre premier exemple concret d'optimisation riemannienne, en \cref{sec:context-riemann-optimization}.
 \end{itemize}
 
-Le cas de deux points est instructif car il est le seul à admettre une forme close pour la métrique affine invariante: on obtient le milieu de la géodésique, $\Fmean=\MCov_0\geodmean_{1/2}\MCov_1=\MCov_0^{1/2}(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})^{1/2}\MCov_0^{1/2}$. Pour $\Nvar=1$ cette expression se réduit à $\sqrt{\sigma_0\sigma_1}$: c'est la moyenne géométrique. La moyenne riemannienne du cône est donc la généralisation matricielle exacte de la moyenne géométrique scalaire, et l'absence d'effet de gonflement en découle directement puisque $\Det(\Fmean)=\sqrt{\Det(\MCov_0)\Det(\MCov_1)}$. La \cref{fig:context-riemann-moyennes} compare les trois moyennes --- arithmétique, log-euclidienne, de Fréchet --- sur un échantillon, et rend cet effet visible.
+Le cas de deux points est instructif car il est le seul à admettre une forme close pour la métrique affine invariante: on obtient le milieu de la géodésique, $\Fmean=\MCov_0\geodmean_{1/2}\MCov_1=\MCov_0^{1/2}(\MCov_0^{-1/2}\MCov_1\MCov_0^{-1/2})^{1/2}\MCov_0^{1/2}$. Pour $\Nvar=1$ cette expression se réduit à $\sqrt{\sigma_0\sigma_1}$: c'est la moyenne géométrique. La moyenne riemannienne du cône est donc la généralisation matricielle exacte de la moyenne géométrique scalaire, et l'absence d'effet de gonflement en découle directement puisque $\Det(\Fmean)=\sqrt{\Det(\MCov_0)\Det(\MCov_1)}$. La \cref{fig:context-riemann-moyennes} compare cinq moyennes sur un échantillon, et rend cet effet visible.
 
 \begin{remark}[{Existence et unicité}]
   Rien ne garantit \emph{a priori} qu'un minimiseur de \cref{eq:context-riemann-frechet} existe ni qu'il soit unique --- sur une sphère, la moyenne de deux points antipodaux ne l'est pas. Pour le cône muni de la métrique affine invariante, tout se passe bien: la variété est complète, simplement connexe et de courbure sectionnelle négative ou nulle, ce qui en fait une variété de Hadamard, et la fonction objectif de \cref{eq:context-riemann-frechet} y est strictement convexe le long des géodésiques. Le minimiseur existe donc et est unique. Nous admettons ce résultat, dont la démonstration demande l'appareil de courbure que nous avons choisi de ne pas introduire, et renvoyons à \sidecite[0cm]{moakher2005differential,bhatia2007positive}.
@@ -520,11 +520,20 @@ Le cas de deux points est instructif car il est le seul à admettre une forme cl
   \caption{Moyennes d'une collection de matrices de covariance $2\times 2$
     tirées le long de géodésiques issues d'un même centre. À gauche, les
     ellipses de concentration: la moyenne arithmétique est sensiblement plus
-    large que les deux autres, ce qui est l'effet de gonflement. À droite, les
+    large que les autres, ce qui est l'effet de gonflement, et la moyenne
+    harmonique s'écarte symétriquement de l'autre côté. À droite, les
     déterminants: celui de la moyenne arithmétique dépasse la plupart de ceux
-    de l'échantillon, tandis que les moyennes log-euclidienne et de Fréchet
-    ont toutes deux pour déterminant la moyenne géométrique des déterminants,
-    conséquence de la $g$-linéarité de $\log\Det$ le long des géodésiques.
+    de l'échantillon ($1{,}32$ contre $1{,}03$) quand celui de la moyenne
+    harmonique reste en deçà ($0{,}86$), tandis que les moyennes
+    log-euclidienne et de Fréchet ont toutes deux pour déterminant la moyenne
+    géométrique des déterminants, conséquence de la $g$-linéarité de
+    $\log\Det$ le long des géodésiques. La moyenne \textsc{gah}, milieu de la
+    géodésique joignant les moyennes arithmétique et harmonique, est le
+    compromis symétrique entre ces deux écarts: elle se place au voisinage de
+    la moyenne de Fréchet sans qu'aucune itération soit nécessaire. Cette
+    lecture est reprise au \cref{ch:spdnet}
+    (\cref{prop:spdnet-moyennes-frechet}), où chacune de ces moyennes est
+    identifiée à la moyenne de Fréchet d'une géométrie ou d'une divergence.
     \provMoyennes}
   \label{fig:context-riemann-moyennes}
 \end{figure}
