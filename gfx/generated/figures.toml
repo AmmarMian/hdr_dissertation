@@ -99,6 +99,13 @@ run_date  = "2026-07-02"
 seed      = "42"
 embed_npy = false
 
+[figures.marchenko]
+exp       = "learning_marchenko_pastur"
+sha       = "3acd057"
+run_date  = "2026-08-27"
+seed      = "42"
+embed_npy = false
+
 [figures.mse-icrb]
 exp       = "sar_mc_kron_mse"
 sha       = "9512517"

@@ -1,4 +1,4 @@
-\chapter{Apprendre sur des covariances: quand le critère sort du modèle}
+\chapter{Apprendre sous un modèle corrigé: graphes et moyennes en grande dimension}
 \label{ch:learning}
 
 \section{Introduction}
@@ -215,7 +215,7 @@ corriger plutôt que de régulariser à l'aveugle.
 \label{rem:learning-pourquoi-regime}
   Le régime classique fait de la covariance empirique un estimateur consistant,
   et c'est sur lui que reposent les garanties usuelles. Il décrit mal les
-  situations de ce chapitre. Dans le partitionnement hyperspectral du
+  situations de ce chapitre. Dans le partitionnement hyperspectral de la
   \cref{subsec:learning-hyperspectral}, la covariance d'un pixel est estimée
   sur une fenêtre spatiale de quelques dizaines d'échantillons pour une
   dizaine de bandes après réduction; dans les données \textsc{eeg}, la
@@ -246,8 +246,8 @@ corriger plutôt que de régulariser à l'aveugle.
 
 \begin{remark}[{Ce que cette loi dit vraiment}]
 \label{rem:learning-lecture-mp}
-  L'énoncé mérite d'être lu lentement, car il est plus fort qu'il n'en a
-  l'air. La vraie covariance est l'identité: \emph{toutes} ses valeurs propres
+  La \cref{fig:learning-marchenko} donne à voir l'énoncé, qui mérite d'être lu
+  lentement, car il est plus fort qu'il n'en a l'air. La vraie covariance est l'identité: \emph{toutes} ses valeurs propres
   valent $1$. Celles de son estimateur, elles, s'étalent sur tout l'intervalle
   $[(1-\sqrt{\cratio})^2,(1+\sqrt{\cratio})^2]$, et cet étalement ne disparaît
   pas quand on ajoute des données --- il ne dépend que de $\cratio$. À
@@ -260,29 +260,22 @@ corriger plutôt que de régulariser à l'aveugle.
   spectre sans savoir de combien.
 \end{remark}
 
-\wipfig{FIGURE 1/3 --- Marchenko-Pastur}{Histogramme des valeurs propres de la
-scm pour $\MCov=\Id{\Nvar}$, superposé à la densité
-\cref{eq:learning-marchenko-pastur}, pour trois valeurs de $\cratio$
-($0{,}1$, $0{,}5$, $1$). C'est la figure explicative dont dépend toute la remarque
-\emph{Ce que cette loi dit vraiment}. Le code existe déjà: dépôt
-\texttt{marcenko} des slides HCERES (\texttt{visualize\_standard\_marcenko.py}),
-qui exporte déjà en PGFPlots. À porter sous \texttt{qanat} avec les conventions
-\texttt{hdrlib} (backend-free, \texttt{make\_mc\_parser}) pour obtenir la ligne
-de provenance et le QR code.}
-
-% ============================== FIGURE 1/3 =========================================
-% Placeholder. Une fois l'experience portee sous qanat, remplacer par:
-%
-% \begin{figure}[htb]
-%   \centering
-%   \input{gfx/generated/learning_marchenko/marchenko/plot.tex}
-%   \provMarchenkoQR[1cm]
-%   \caption{...\provMarchenko}
-%   \label{fig:learning-marchenko}
-% \end{figure}
-%
-% et lancer `just figures` pour que \provMarchenko soit definie.
-% ====================================================================================
+\begin{figure}[htb]
+  \centering
+  \input{gfx/generated/learning_marchenko_pastur/marchenko/plot.tex}
+  \provMarchenkoQR[1cm]
+  \caption[Loi de Mar\v{c}enko-Pastur]{Ce que le régime dimensionnel fait à un
+    spectre. Pour chacun des trois rapports de concentration, l'histogramme
+    rassemble les valeurs propres des matrices de covariance empiriques de
+    $400$ tirages en dimension $\Nvar=200$, et la courbe est la densité
+    \cref{eq:learning-marchenko-pastur}. La vraie covariance est l'identité
+    dans les trois cas: son spectre est le trait vertical, un point unique.
+    Seul le nombre d'observations change d'un panneau à l'autre --- $\Nobs$
+    vaut $2000$, $400$ puis $200$ --- et c'est lui seul qui gouverne
+    l'étalement. À $\cratio=1$, un spectre constamment égal à $1$ est observé
+    étalé sur $[0,4]$. \provMarchenko}
+  \label{fig:learning-marchenko}
+\end{figure}
 
 Le modèle blanc n'est évidemment pas celui des applications: les covariances
 que l'on manipule ont une structure. Le modèle de référence est alors le
@@ -378,7 +371,7 @@ bruit. C'est une correction, au sens le plus littéral.
   \label{tab:learning-deux-facons}
 \end{table}
 
-La \cref{tab:learning-deux-facons} met les deux travaux en regard. On y lit
+Le \cref{tab:learning-deux-facons} met les deux travaux en regard. On y lit
 surtout ceci: le déplacement décrit plus haut --- le critère n'est plus dans le
 modèle --- ne laisse pas le praticien sans ressource. Il l'oblige à choisir \emph{où} injecter ce
 qu'il sait. Contraindre l'espace de recherche, ou corriger l'estimateur dans un
