@@ -32,15 +32,25 @@ Elle se lit de gauche à droite: à gauche les quatre chapitres de mise à nivea
 avec le détail de leurs sections, à droite les chapitres qui s'en servent, et
 sur chaque flèche les outils empruntés. La couleur désigne la destination, les
 traits discontinus les pistes ouvertes du chapitre
-\hyperref[ch:perspectives]{\textsc{iii}.3}, qui ne sont
+\hyperref[ch:perspectives]{\textsc{iii}.4}, qui ne sont
 pas des résultats acquis mais des directions de travail.
 
 Une lecture verticale de la carte est instructive: le chapitre
-\hyperref[ch:spdnet]{\textsc{iii}.2} est le seul à mobiliser les quatre
+\hyperref[ch:spdnet]{\textsc{iii}.3} est le seul à mobiliser les quatre
 chapitres de l'état des lieux, et il le fait pour des raisons de nature
 différente --- le régime dimensionnel pour former ses matrices, la loi de
 Wishart et les divergences pour choisir ses moyennes, la variété de Stiefel pour
-contraindre ses poids.
+contraindre ses poids. Une lecture horizontale l'est tout autant: la
+\cref{sec:context-riemann-optimization} sur l'optimisation riemannienne est le
+seul outil que les trois chapitres de contribution empruntent tous les trois.
+
+Le chapitre \hyperref[ch:learning]{\textsc{iii}.2} fait exception à la logique
+d'ensemble, et il faut le signaler ici. Il a besoin de deux notions --- les
+modèles graphiques gaussiens et la théorie des matrices aléatoires --- qui ne
+figurent nulle part dans la \cref{pt:context}, et qui sont donc introduites dans
+le chapitre lui-même, au strict nécessaire. Ce n'est pas un oubli: la partie
+d'état des lieux n'a vocation à contenir que ce qui sert à plusieurs chapitres,
+et ces deux notions-là ne servent qu'une fois.
 
 Deux remarques sur l'usage de cette carte. D'abord, une flèche signale une
 dépendance réelle, pas un prérequis absolu: un lecteur pressé peut toujours
@@ -60,19 +70,19 @@ métrique de Fisher, et peut être sautée sans dommage.
     (\cref{pt:contributions}) et de perspective sont à droite. Chaque flèche
     porte les sections effectivement mobilisées, et sa couleur désigne sa
     destination. Les traits discontinus mènent aux pistes du chapitre
-    \textsc{iii}.3.}
+    \textsc{iii}.4.}
   \label{fig:commentlire-carte}
 \end{figure}
 
 \section*{Parcours de lecture}
 \label{sec:commentlire-parcours}
 
-Quatre entrées possibles, selon ce que l'on connaît déjà et ce que l'on cherche.
+Cinq entrées possibles, selon ce que l'on connaît déjà et ce que l'on cherche.
 
 \begin{figure}[htb]
   \centering
   \makebox[\textwidth][c]{\input{gfx/tikZ/lecture/parcours.tex}}
-  \caption[Les quatre parcours de lecture]{Les quatre parcours de lecture.}
+  \caption[Les parcours de lecture]{Les parcours de lecture.}
   \label{fig:commentlire-parcours}
 \end{figure}
 
@@ -94,13 +104,24 @@ déjà-vu, mais la
 sous-sections sur les distributions elliptiques et la M-estimation, qui portent
 toute la modélisation statistique du chapitre
 \hyperref[ch:robust-detection]{\textsc{iii}.1}. Pour le chapitre
-\hyperref[ch:spdnet]{\textsc{iii}.2}, ce sont plutôt la loi de Wishart
+\hyperref[ch:spdnet]{\textsc{iii}.3}, ce sont plutôt la loi de Wishart
 (\cref{def:context-distributions-wishart}) et les divergences de la
 \cref{sec:context-geometry-divergences} qu'il faut avoir en tête: ce sont elles
 qui font des différentes moyennes du cône une famille indexée par un modèle
 statistique, et non un catalogue de recettes. Le chapitre
 \hyperref[ch:context-geometry]{\textsc{ii}.4} fait le pont entre les deux mondes et
 constitue, de ce point de vue, le chapitre le plus rentable du mémoire.
+
+\paragraph{Apprentissage statistique.} Un troisième profil, apparu avec le
+chapitre \hyperref[ch:learning]{\textsc{iii}.2}: celui qui vient de
+l'apprentissage et cherche ce que la modélisation statistique lui apporte. Le
+plus court chemin est la \cref{sec:context-covariance-regularized-estimation}
+sur le régime dimensionnel, puis la \cref{sec:context-riemann-spd} sur le cône
+et la \cref{sec:context-riemann-moyennes} sur les moyennes, et enfin la
+\cref{sec:context-riemann-optimization} sur l'optimisation riemannienne --- qui
+est l'outil commun aux trois chapitres de contribution. Les modèles graphiques
+et la théorie des matrices aléatoires dont ce chapitre a besoin sont introduits
+sur place et ne demandent aucun détour.
 
 \paragraph{Lecture rapide.} Pour prendre la mesure de l'ensemble sans entrer
 dans le détail: le \hyperref[ch:cv]{curriculum vitae}, puis la section de bilan qui clôt
@@ -298,4 +319,23 @@ lorsqu'elles diffèrent.
   $\obsmat$ & remise en matrice d'une observation vectorisée \\
   $\Ntime$, $\itime$ & nombre d'instants et indice temporel \\
   $\HH$, $\HV$, $\VH$, $\VV$ & canaux de polarisation en imagerie RSO \\
+}
+
+\subsection*{Apprentissage sur les covariances}
+\notatable{
+  $\Nmat$, $\imat$ & nombre de covariances de la collection, indice associé \\
+  $\SCM$ & covariance empirique (scm) \\
+  $\cratio$ & rapport de concentration $\Nvar/\Nobs$ \\
+  $\MPdens$, $\eig_\pm$ & densité de Mar\v{c}enko-Pastur et bornes de son support \\
+  $\eigvec$, $\Eigmat$ & vecteur et matrice diagonale des valeurs propres \\
+  $\distrmt$, $\Fmeanrmt$ & distance et moyenne de Fréchet corrigées par la théorie des matrices aléatoires \\
+  $\Diagpos{\Nvar}$ & matrices diagonales définies positives \\
+  $\Nclass$, $\iclass$, $\classlabel$ & nombre de classes, indice de classe, étiquette \\
+  $\Fmeanclass{\iclass}$ & moyenne de Fréchet de la classe $\iclass$ \\
+  $\graph=(\vertexset,\edgeset)$ & graphe appris, ses sommets et ses arêtes \\
+  $\Precision=\inv{\MCov}$ & matrice de précision \\
+  $\penfun$, $\penaltyelem$, $\regparam$ & pénalité, pénalité élément par élément, paramètre de régularisation \\
+  $\Lowrank$, $\Diagpart$, $\Factormat$ & c\oe ur de rang faible, partie diagonale, matrice des facteurs \\
+  $\PSDrank{\Nvar}{\Nrank}$ & matrices semi-définies positives de rang $\Nrank$ \\
+  $\Factorman{\Nvar}{\Nrank}$ & matrices « rang faible plus diagonale » \\
 }

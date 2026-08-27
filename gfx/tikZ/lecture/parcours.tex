@@ -1,10 +1,16 @@
-% Les quatre parcours de lecture, en regard de la section « Parcours de
-% lecture » de FrontBackmatter/CommentLire.tex. Meme palette que carte.tex:
-% chaque couloir est une suite de jalons, du point d'entree au chapitre vise.
+% Les parcours de lecture, en regard de la section « Parcours de lecture » de
+% FrontBackmatter/CommentLire.tex. Meme palette que carte.tex: chaque couloir
+% est une suite de jalons, du point d'entree au chapitre vise.
+%
+% Revision du 2026-08-27: ajout du couloir « apprentissage statistique », qui
+% mene au \cref{ch:learning}. La couleur d'un couloir est celle du chapitre
+% vise dans carte.tex --- lsix pour III.2, lsept pour III.3 --- de sorte que
+% les deux figures se lisent ensemble.
 \definecolor{lctx}{RGB}{90,90,90}
 \definecolor{lcinq}{RGB}{40,70,140}
-\definecolor{lsix}{RGB}{50,110,120}
-\definecolor{lsept}{RGB}{125,125,125}
+\definecolor{lsix}{RGB}{110,80,140}
+\definecolor{lsept}{RGB}{50,110,120}
+\definecolor{lhuit}{RGB}{125,125,125}
 \begin{tikzpicture}[
     >={Stealth[length=4pt,width=3pt]},
     line join=round,
@@ -34,36 +40,48 @@
     {\S4.1 en appoint\\(tests de Rao)};
 
   %--------------------------------------------------- 2. geometres
-  \node[lane, text=lsix] at (2.30,-2.05) {Géométrie riemannienne, apprentissage sur variétés};
-  \node[jalon, draw=lsix!55, text=lsix] (b1) at (\ca,-2.05) {\S2.1.2\\elliptiques};
-  \node[jalon, draw=lsix!55, text=lsix] (b2) at (\cb,-2.05) {\S2.1.3\\M-estimation};
-  \node[jalon, draw=lsix!55, text=lsix] (b3) at (\cc,-2.05) {ch.~\textsc{ii}.4\\Fisher};
-  \node[goal, draw=lsix, text=lsix, fill=lsix!7] (b4) at (\cd,-2.05) {ch.~\textsc{iii}.2 et \textsc{iii}.3};
-  \draw[hop, lsix] (b1) -- (b2);
-  \draw[hop, lsix] (b2) -- (b3);
-  \draw[hop, lsix] (b3) -- (b4);
+  \node[lane, text=lsept] at (2.30,-2.05) {Géométrie riemannienne, apprentissage sur variétés};
+  \node[jalon, draw=lsept!55, text=lsept] (b1) at (\ca,-2.05) {\S2.1.2\\elliptiques};
+  \node[jalon, draw=lsept!55, text=lsept] (b2) at (\cb,-2.05) {\S2.1.3\\M-estimation};
+  \node[jalon, draw=lsept!55, text=lsept] (b3) at (\cc,-2.05) {ch.~\textsc{ii}.4\\Fisher};
+  \node[goal, draw=lsept, text=lsept, fill=lsept!7] (b4) at (\cd,-2.05) {ch.~\textsc{iii}.3\\\SPDnet};
+  \draw[hop, lsept] (b1) -- (b2);
+  \draw[hop, lsept] (b2) -- (b3);
+  \draw[hop, lsept] (b3) -- (b4);
 
-  %--------------------------------------------------- 3. lecture rapide
-  \node[lane, text=lsept] at (2.30,-4.10) {Lecture rapide};
-  \node[jalon, draw=lsept!60, text=lsept] (c1) at (\ca,-4.10) {curriculum vitae};
-  \node[jalon, draw=lsept!60, text=lsept] (c2) at (\cb,-4.10) {bilans des ch.~\textsc{ii}.1 à \textsc{ii}.4};
-  \node[goal, draw=lsept, text=lsept, fill=lsept!7] (c3) at (\cc,-4.10)
+  %--------------------------------------------------- 3. apprentissage statistique
+  \node[lane, text=lsix] at (2.30,-4.10) {Apprentissage statistique};
+  \node[jalon, draw=lsix!55, text=lsix] (e1) at (\ca,-4.10) {\S1.4\\régime dimensionnel};
+  \node[jalon, draw=lsix!55, text=lsix] (e2) at (\cb,-4.10) {\S3.2--3.3\\cône, moyennes};
+  \node[jalon, draw=lsix!55, text=lsix] (e3) at (\cc,-4.10) {\S3.5\\optimisation};
+  \node[goal, draw=lsix, text=lsix, fill=lsix!7] (e4) at (\cd,-4.10) {ch.~\textsc{iii}.2\\apprentissage};
+  \draw[hop, lsix] (e1) -- (e2);
+  \draw[hop, lsix] (e2) -- (e3);
+  \draw[hop, lsix] (e3) -- (e4);
+  \node[note, anchor=north] at ($(e2)!0.5!(e3)+(0,-0.50)$)
+    {graphes et matrices aléatoires:\\introduits dans le chapitre};
+
+  %--------------------------------------------------- 4. lecture rapide
+  \node[lane, text=lhuit] at (2.30,-6.35) {Lecture rapide};
+  \node[jalon, draw=lhuit!60, text=lhuit] (c1) at (\ca,-6.35) {curriculum vitae};
+  \node[jalon, draw=lhuit!60, text=lhuit] (c2) at (\cb,-6.35) {bilans des ch.~\textsc{ii}.1 à \textsc{ii}.4};
+  \node[goal, draw=lhuit, text=lhuit, fill=lhuit!7] (c3) at (\cc,-6.35)
     {intro.\ et bilans de la partie \textsc{iii}};
-  \draw[hop, lsept] (c1) -- (c2);
-  \draw[hop, lsept] (c2) -- (c3);
+  \draw[hop, lhuit] (c1) -- (c2);
+  \draw[hop, lhuit] (c2) -- (c3);
   \node[note, anchor=west] at ($(c3.east)+(0.35,0)$)
     {les blocs \emph{Contributions}\\donnent les publications};
 
-  %--------------------------------------------------- 4. lecture lineaire
-  \node[lane, text=lctx] at (2.30,-5.85) {Lecture linéaire};
+  %--------------------------------------------------- 5. lecture lineaire
+  \node[lane, text=lctx] at (2.30,-8.10) {Lecture linéaire};
   \node[jalon, draw=lctx!55, text=lctx, text width=8.65cm, minimum height=0.7cm,
-        anchor=west] (d1) at (\ca-0.95,-5.85)
+        anchor=west] (d1) at (\ca-0.95,-8.10)
     {l'intégralité, dans l'ordre du mémoire: chaque chapitre de l'état des lieux
      naît d'une insuffisance du précédent};
 
   %--------------------------------------------------- reperes de colonne
   \node[note, anchor=south] at (\ca,0.75) {point d'entrée};
   \node[note, anchor=south] at (\cd,0.75) {chapitre visé};
-  \draw[lctx!30, dashed, thin] (\ca,0.65) -- (\ca,-5.35);
-  \draw[lctx!30, dashed, thin] (\cd,0.65) -- (\cd,-2.75);
+  \draw[lctx!30, dashed, thin] (\ca,0.65) -- (\ca,-7.60);
+  \draw[lctx!30, dashed, thin] (\cd,0.65) -- (\cd,-4.80);
 \end{tikzpicture}

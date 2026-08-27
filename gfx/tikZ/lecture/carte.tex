@@ -3,6 +3,13 @@
 % droite). Chaque arete porte les sections effectivement mobilisees; la couleur
 % designe la destination. Utilise dans FrontBackmatter/CommentLire.tex.
 %
+% Revision du 2026-08-27: insertion du \cref{ch:learning} entre le chapitre de
+% detection et celui sur SPDnet. Il mobilise trois des quatre chapitres de
+% l'etat des lieux --- pas le chapitre 4, ce qui laisse au \cref{ch:spdnet} son
+% statut de seul chapitre a les mobiliser tous les quatre. Les deux notions
+% nouvelles dont il a besoin (modeles graphiques, matrices aleatoires) sont
+% introduites dans le chapitre lui-meme et n'apparaissent donc pas ici.
+%
 % Revision du 2026-08-24: le \cref{ch:spdnet} etant ecrit, ses dependances
 % reelles sont desormais connues et elles sont bien plus larges que la seule
 % arete depuis le chapitre 3 qui figurait ici. Il mobilise en fait les quatre
@@ -11,8 +18,9 @@
 % ete ouverte dans le bloc du chapitre 2.
 \definecolor{lctx}{RGB}{90,90,90}
 \definecolor{lcinq}{RGB}{40,70,140}
-\definecolor{lsix}{RGB}{50,110,120}
-\definecolor{lsept}{RGB}{125,125,125}
+\definecolor{lsix}{RGB}{110,80,140}
+\definecolor{lsept}{RGB}{50,110,120}
+\definecolor{lhuit}{RGB}{125,125,125}
 \begin{tikzpicture}[
     >={Stealth[length=4pt,width=3pt]},
     line join=round,
@@ -67,14 +75,16 @@
   %--------------------------------------------------------------- destinations
   \node[dest, draw=lcinq, text=lcinq, fill=lcinq!5] (ch5) at (10.9,-2.10)
     {\textbf{\textsc{iii}.1}\\Test d'hypothèses robustes\\\textit{sonar, RSO}};
-  \node[dest, draw=lsix, text=lsix, fill=lsix!5] (ch6) at (10.9,-6.60)
-    {\textbf{\textsc{iii}.2}\\Apprentissage profond\\sur la variété SPD};
-  \node[dest, draw=lsept, dashed, text=lsept] (ch7a) at (10.9,-9.45)
-    {\textbf{\textsc{iii}.3}, \S2\\Transformers SPD};
-  \node[dest, draw=lsept, dashed, text=lsept] (ch7b) at (10.9,-11.05)
-    {\textbf{\textsc{iii}.3}, \S3\\Phase géométrique};
+  \node[dest, draw=lsix, text=lsix, fill=lsix!5] (ch6) at (10.9,-4.35)
+    {\textbf{\textsc{iii}.2}\\Apprendre sur\\des covariances};
+  \node[dest, draw=lsept, text=lsept, fill=lsept!5] (ch7) at (10.9,-6.90)
+    {\textbf{\textsc{iii}.3}\\Apprentissage profond\\sur la variété SPD};
+  \node[dest, draw=lhuit, dashed, text=lhuit] (ch8a) at (10.9,-9.55)
+    {\textbf{\textsc{iii}.4}, \S2\\Transformers SPD};
+  \node[dest, draw=lhuit, dashed, text=lhuit] (ch8b) at (10.9,-11.05)
+    {\textbf{\textsc{iii}.4}, \S3\\Phase géométrique};
 
-  \node[font=\scriptsize\bfseries, text=lsept, anchor=south west] at (9.45,-8.65)
+  \node[font=\scriptsize\bfseries, text=lhuit, anchor=south west] at (9.45,-8.75)
     {Perspectives};
   \node[font=\scriptsize\bfseries, text=lcinq!80, anchor=south] at (10.9,-1.05)
     {Contributions};
@@ -86,54 +96,74 @@
       node[elab,pos=0.52,text=lcinq]{\S1.3 SCM \textperiodcentered\ \S1.4 régularisation\\\S1.5 circularité}
       (ch5.west);
     \draw ($(F2.east)+(0,0.30)$) to[out=0,in=195]
-      node[elab,pos=0.50,text=lcinq]{\S2.1.2 SIRV\\\S2.1.3 Tyler, $M$-estimation}
+      node[elab,pos=0.62,text=lcinq]{\S2.1.2 SIRV\\\S2.1.3 Tyler, $M$-estimation}
       (ch5.west);
     \draw ($(F3.east)+(0,0.95)$) to[out=25,in=215]
-      node[elab,pos=0.55,text=lcinq]{\S3.2 distance affine invariante\\\S3.3 moyennes \textperiodcentered\ \S3.5 descente}
+      node[elab,pos=0.32,yshift=-13pt,text=lcinq]{\S3.2 distance affine invariante\\\S3.3 moyennes \textperiodcentered\ \S3.5 descente}
       (ch5.south);
     % contournement par la droite: ne pas traverser le bloc III.2
     \draw[rounded corners=4pt] ($(F4.east)+(0,0.55)$)
       -- (9.05,-8.49) -- (9.05,-2.90)
-      node[elab,pos=0.55,text=lcinq]{\S4.1 test de Rao\\\S4.6 divergences}
+      node[elab,pos=0.86,text=lcinq]{\S4.1 test de Rao\\\S4.6 divergences}
       -- ($(ch5.west)+(0,-0.45)$);
   \end{scope}
 
-  % ---- vers le chapitre III.2
+  % ---- vers le chapitre III.2 (apprentissage sur des covariances)
+  % Trois aretes seulement: ce chapitre n'emprunte rien au chapitre 4, et les
+  % deux notions dont il a besoin en propre (modeles graphiques, matrices
+  % aleatoires) sont introduites dans le chapitre lui-meme.
+  \begin{scope}[edge, lsix]
+    % ch.1: le regime dimensionnel, dont la theorie des matrices aleatoires est
+    % la description fine.
+    \draw ($(F1.east)+(0,-0.75)$) to[out=-25,in=170]
+      node[elab,pos=0.25,text=lsix]{\S1.4 régime\\dimensionnel}
+      ($(ch6.west)+(0,0.30)$);
+    % ch.2: la vraisemblance elliptique penalisee de l'apprentissage de graphes.
+    \draw ($(F2.east)+(0,-0.95)$) to[out=-12,in=178]
+      node[elab,pos=0.20,yshift=-3pt,text=lsix]{\S2.1.2 elliptiques\\\S2.1.3 $M$-estimation}
+      (ch6.west);
+    % ch.3: cone, moyennes et descente riemannienne, communs aux deux travaux.
+    \draw ($(F3.east)+(0,1.30)$) to[out=18,in=200]
+      node[elab,pos=0.74,yshift=11pt,text=lsix]{\S3.2 cône \textperiodcentered\ \S3.3 moyennes\\\S3.5 optimisation}
+      ($(ch6.west)+(0,-0.32)$);
+  \end{scope}
+
+  % ---- vers le chapitre III.3 (apprentissage profond sur la variete SPD)
   % Quatre aretes: c'est le seul chapitre du memoire a mobiliser les quatre
   % chapitres de l'etat des lieux.
-  \begin{scope}[edge, lsix]
+  \begin{scope}[edge, lsept]
     % ch.1: la covariance apprise est une SCM, et son conditionnement decide
     % du seuil de ReEig. Contournement par le haut et par la droite.
     \draw[rounded corners=4pt] ($(F1.east)+(0,0.20)$)
       -- (12.85,0.20)
-      node[elab,pos=0.55,text=lsix]{\S1.3 covariance empirique\\\S1.4 conditionnement}
-      -- (12.85,-6.60) -- (ch6.east);
+      node[elab,pos=0.55,text=lsept]{\S1.3 covariance empirique\\\S1.4 conditionnement}
+      -- (12.85,-6.90) -- (ch7.east);
     % ch.2: Wishart et Wishart inverse donnent la lecture statistique des
     % moyennes arithmetique et harmonique.
-    \draw ($(F2.east)+(0,-0.50)$) to[out=-10,in=155]
-      node[elab,pos=0.55,text=lsix]{\S2.1.1 Wishart} ($(ch6.west)+(0,0.42)$);
+    \draw ($(F2.east)+(0,-0.45)$) to[out=-20,in=150]
+      node[elab,pos=0.82,text=lsept]{\S2.1.1 Wishart} ($(ch7.west)+(0,0.42)$);
     % ch.3: le gros de la dependance.
     \draw ($(F3.east)+(0,0.05)$) to[out=0,in=180]
-      node[elab,pos=0.48,text=lsix]{\S3.2 cône (AI, LE) \textperiodcentered\ \S3.3 moyennes\\\S3.4 Stiefel \textperiodcentered\ \S3.5 rétractions}
-      (ch6.west);
+      node[elab,pos=0.48,text=lsept]{\S3.2 cône (AI, LE) \textperiodcentered\ \S3.3 moyennes\\\S3.4 Stiefel \textperiodcentered\ \S3.5 rétractions}
+      (ch7.west);
     % ch.4: c'est lui qui fait de la liste des moyennes une famille indexee par
     % un modele statistique.
     \draw ($(F4.east)+(0,-0.35)$) to[out=10,in=250]
-      node[elab,pos=0.62,text=lsix]{\S4.2 distance de Rao gaussienne\\\S4.6 divergences}
-      ($(ch6.south)+(0.35,0)$);
+      node[elab,pos=0.30,text=lsept]{\S4.2 distance de Rao gaussienne\\\S4.6 divergences}
+      ($(ch7.south)+(0.35,0)$);
   \end{scope}
 
   % ---- vers les perspectives
-  \begin{scope}[edge, lsept, dashed]
+  \begin{scope}[edge, lhuit, dashed]
     \draw ($(F3.east)+(0,-0.85)$) to[out=-15,in=180]
-      node[elab,pos=0.62,text=lsept]{\S3.3 moyenne de\\Karcher pondérée} (ch7a.west);
+      node[elab,pos=0.62,text=lhuit]{\S3.3 moyenne de\\Karcher pondérée} (ch8a.west);
     \draw ($(F3.east)+(0,-1.35)$) to[out=-30,in=180]
-      node[elab,pos=0.60,text=lsept]{\S3.1 transport\\parallèle} (ch7b.west);
+      node[elab,pos=0.82,text=lhuit]{\S3.1 transport\\parallèle} (ch8b.west);
     \draw[rounded corners=4pt] ($(F1.east)+(0,-0.40)$)
       -- (5.25,-0.95) -- (5.25,-12.05)
       -- (10.9,-12.05)
-      node[elab,pos=0.88,text=lsept]{\S1.5 pseudo-covariance} (ch7b.south);
-    \draw ($(ch6.south east)+(-0.90,0)$) -- ($(ch7a.north east)+(-0.90,0)$);
+      node[elab,pos=0.88,text=lhuit]{\S1.5 pseudo-covariance} (ch8b.south);
+    \draw ($(ch7.south east)+(-0.90,0)$) -- ($(ch8a.north east)+(-0.90,0)$);
   \end{scope}
 
   %--------------------------------------------------------------- legende
@@ -142,7 +172,9 @@
      \quad
      \textcolor{lsix}{\rule[0.4ex]{7pt}{0.5pt}}~en \textsc{iii}.2
      \quad
-     \textcolor{lsept}{\rule[0.4ex]{3pt}{0.5pt}\hspace{1.5pt}\rule[0.4ex]{3pt}{0.5pt}}~piste ouverte en \textsc{iii}.3
-     \qquad
+     \textcolor{lsept}{\rule[0.4ex]{7pt}{0.5pt}}~en \textsc{iii}.3
+     \quad
+     \textcolor{lhuit}{\rule[0.4ex]{3pt}{0.5pt}\hspace{1.5pt}\rule[0.4ex]{3pt}{0.5pt}}~piste ouverte en \textsc{iii}.4
+     \\
      (les numéros de chapitre repartent à 1 dans chaque partie)};
 \end{tikzpicture}

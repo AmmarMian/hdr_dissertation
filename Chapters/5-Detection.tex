@@ -1691,9 +1691,17 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 %         (Toeplitz), ou la contrainte n'est justement pas compatible avec la
 %         geometrie du cone. C'est la perspective la plus naturelle du chapitre.
 %
-%  4. TRANSITION vers le \cref{ch:spdnet}: apres avoir contraint le modele par
-%     la physique du capteur, on laisse la contrainte s'apprendre sur les
-%     donnees.
+%  4. TRANSITION vers le \cref{ch:learning} --- ATTENTION, ce n'est plus le
+%     \cref{ch:spdnet} qui suit. Le point de bascule a formuler est celui-ci:
+%     dans tout ce chapitre, le modele fait DEUX choses a la fois --- il
+%     fournit l'estimateur ET il fournit le critere qui juge la decision (la
+%     loi sous $\hypothesis_0$, le seuil, la propriete cfar). Que la dispersion
+%     y soit parametre de nuisance ou parametre teste n'y change rien: c'est
+%     meme le seul point commun des deux archetypes de la
+%     \cref{subsec:detection-archetypes}. Le chapitre suivant est celui ou la
+%     seconde de ces deux fonctions tombe, et ou le modele doit se contenter de
+%     la premiere. NE PAS annoncer la transition en termes de regime
+%     dimensionnel: ce n'est pas ce qui change.
 % ====================================================================================
 
 % ============ TODO texte (~1 page) --- LES SIX MOUVEMENTS DE CHATELAIN =============

@@ -89,6 +89,16 @@
 % Puis la formule qui porte le memoire, en une ligne: choisir une moyenne, c'est
 % choisir une geometrie, donc un modele statistique. L'annoncer ici comme une
 % these; \cref{prop:spdnet-moyennes-frechet} l'etablit cent pages plus loin.
+%
+% ANNONCER AUSSI, en une phrase, l'arc des trois chapitres de contribution ---
+% c'est lui qui donne son ordre a la \cref{pt:contributions}, et le lecteur doit
+% l'avoir en tete avant les paragraphes du mouvement 5:
+%   le modele repond (\cref{ch:robust-detection}, le critere est interne au
+%   modele: vraisemblance, cfar, \pfa) -> le modele se corrige
+%   (\cref{ch:learning}, le critere passe en aval et le modele devient contrainte
+%   ou correction) -> le modele s'efface (\cref{ch:spdnet}, il ne reste que la
+%   geometrie, et le choix d'une moyenne y redevient un choix de modele).
+% Le regime dimensionnel n'est PAS cet arc: il en est le mecanisme.
 % ====================================================================================
 
 % ============ TODO texte (~2 pages) --- MOUVEMENT 5: UN PARAGRAPHE PAR CHAPITRE ====
@@ -101,6 +111,14 @@
 %    (croix de Mills, sonar frontal multi-pings, series temporelles RSO), avec
 %    le compromis selectivite/robustesse comme motif recurrent.
 %    Nommer les collaborations sonar et le volet detection de changements.
+%
+%  - \cref{ch:learning}: le chapitre charniere. Le critere quitte le modele ---
+%    on ne cherche plus une decision mais un graphe qu'on veut lire et une
+%    partition qu'on veut juste --- et le modele revient sous deux formes,
+%    contrainte (vraisemblance elliptique penalisee et contrainte a un modele
+%    factoriel) et correction (theorie des matrices aleatoires appliquee a la
+%    moyenne de Frechet). C'est le seul chapitre du memoire ou l'auteur n'est
+%    ni premier auteur ni encadrant: le dire, et dire avec qui.
 %
 %  - \cref{ch:spdnet}: trois endroits ou une moyenne euclidienne doit ceder la
 %    place a une moyenne de Frechet --- la donnee, le batch, les poids.

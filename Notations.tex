@@ -415,3 +415,54 @@
 % Projection sur la variete de Stiefel (facteur orthogonal de la decomposition
 % polaire), a distinguer de \projman qui projette sur l'espace tangent.
 \DeclareMathOperator{\polarf}{\operatorname{uf}}
+
+%----------------------------------------------------------------------------------------
+% Apprentissage sur les covariances (partie contributions, ch:learning)
+% Convention : on reutilise sans les redefinir \MCov, \SPD, \Sym, \Manifold,
+% \geodist, \Fmean, \metric, \Rgrad, \Retr, \transport, \projman, \symop,
+% \logm, \expm, \likelihood, \densgen, \weight, \Nvar (= \vdim) et \Nobs.
+% Deux comptages coexistent dans ce chapitre et ne doivent pas etre confondus :
+%   \Nobs  = nombre d'echantillons ayant servi a estimer UNE covariance (le n
+%            des deux articles), deja utilise en ce sens au \cref{ch:context-definition};
+%   \Nmat  = nombre de covariances de la collection (le K de \fullcite{ICML24}).
+% L'index de collection est \imat ; il imprime le meme k que \iobs, dont il
+% prend la place dans ce chapitre pour eviter toute ambiguite de role.
+%----------------------------------------------------------------------------------------
+
+% Collection de covariances
+\newcommand{\Nmat}{K}                      % nombre de matrices de la collection
+\newcommand{\imat}{k}                      % index sur la collection de matrices
+\newcommand{\SCM}{\widehat{\MCov}}         % matrice de covariance empirique (scm)
+\newcommand{\Diagpos}[1]{\mathcal{D}_{#1}^{++}} % matrices diagonales definies positives
+\newcommand{\ones}[1]{\vector{1}_{#1}}     % vecteur de uns
+\newcommand{\algname}[1]{\textsc{#1}}      % nom d'un algorithme dans le texte
+
+% Theorie des matrices aleatoires
+\newcommand{\cratio}{c}                    % rapport de concentration p/n
+\newcommand{\eigvec}{\vector{\eig}}       % vecteur des valeurs propres
+\newcommand{\MPdens}{\rho_{\mathrm{mp}}}   % densite de Marchenko-Pastur
+\newcommand{\stieltjes}{\mathsf{m}}        % transformee de Stieltjes
+\newcommand{\Eigmat}{\mat{\eigset}}       % matrice diagonale des valeurs propres
+\newcommand{\distrmt}{\widehat{\geodist}}  % distance corrigee par la rmt
+\newcommand{\Fmeanrmt}{\Fmean_{\mathrm{rmt}}} % moyenne de Frechet corrigee
+\newcommand{\rmtaux}{\vector{\zeta}}       % vecteur auxiliaire de la correction rmt
+
+% Partitionnement et classification au plus proche centroide
+\newcommand{\cluster}[1]{\mathsf{C}_{#1}}  % groupe (cluster) d'indice donne
+\newcommand{\Fmeanclass}[1]{\Fmean^{(#1)}} % moyenne de la classe #1
+
+% Apprentissage de graphes
+\newcommand{\graph}{\mathcal{G}}           % graphe
+\newcommand{\vertexset}{\mathsf{V}}        % ensemble des sommets
+\newcommand{\edgeset}{\mathsf{E}}          % ensemble des aretes (\ambient occupe deja E)
+\newcommand{\Precision}{\mat{\Theta}}      % matrice de precision
+\newcommand{\Laplacian}{\mat{L}}           % laplacien du graphe
+\newcommand{\penfun}{h}                   % penalite de parcimonie
+\newcommand{\penaltyelem}{\phi}            % penalite element par element
+\newcommand{\regparam}{\gamma}             % parametre de regularisation
+\newcommand{\Lowrank}{\mat{H}}             % coeur de rang faible
+\newcommand{\Diagpart}{\mat{\Psi}}         % partie diagonale du modele factoriel
+\newcommand{\Factormat}{\mat{W}}           % matrice des facteurs
+\newcommand{\PSDrank}[2]{\mathcal{S}_{#1,#2}^{+}} % psd de rang fixe
+\newcommand{\Factorman}[2]{\mathcal{M}_{#1,#2}}   % rang faible plus diagonale
+\newcommand{\modularity}{m}                % modularite d'un graphe appris
