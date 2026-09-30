@@ -119,7 +119,12 @@
 \usepackage{pgfplots} % External TikZ/PGF support (thanks to Andreas Nautsch)
 \usepgfplotslibrary{groupplots}
 \usetikzlibrary{external,calc,arrows.meta,positioning,decorations.markings,fit,backgrounds}
-\tikzexternalize[mode=list and make, prefix=ext-tikz/]
+% Le nom des figures externalisees est positionnel (prefixe + figureN). Avec un
+% \includeonly (voir `just chapter`), N ne designe plus la meme figure: reutiliser
+% le cache du document complet afficherait donc de mauvaises figures. Chaque
+% selection de chapitres recoit son propre prefixe, defini dans build-mode.tex.
+\ifdefined\TIKZPREFIX\else\def\TIKZPREFIX{ext-tikz/}\fi
+\tikzexternalize[mode=list and make, prefix=\TIKZPREFIX]
 \usepackage{qrcode}
 % ****************************************************************************************************
 
@@ -297,6 +302,17 @@
 % \joinedpaper{<titre court>}{<chemin pdf>} y insere un article. Les pages
 % reproduites gardent la pagination de l'editeur, donc pas de bandeau ni de
 % folio du memoire par-dessus: \thispagestyle{empty}.
+%
+% \ifjoinedpapers commande l'inclusion effective des pdf (vrai par defaut).
+% Pour compiler sans les pdf des articles (absents du depot, ou version
+% allegee a partager), definir \NOPAPERS avant ce fichier, p.ex. en ligne de
+% commande: latexmk -usepretex='\def\NOPAPERS{1}' dissertation.tex
+% (voir la cible `just build-nopapers`). La table des matieres et les
+% \label{paper:...}/\paperpage restent inchanges: seul \includepdf est saute,
+% donc la pagination du memoire se decale par rapport a la version complete.
+\newif\ifjoinedpapers
+\joinedpaperstrue
+\ifdefined\NOPAPERS\joinedpapersfalse\fi
 \newcommand{\joinedpapers}[1]{%
   \cleardoublepage
   \phantomsection
@@ -333,7 +349,7 @@
   \if\relax\detokenize{#1}\relax\else\label{paper:#1}\fi
   \addcontentsline{toc}{subsection}{#2}%
   \tikzifexternalizing{}{%
-    \includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#3}%
+    \ifjoinedpapers\includepdf[pages=-,pagecommand={\thispagestyle{empty}}]{#3}\fi
   }%
 }
 % Renvoi vers un article reproduit: \paperpage{SP24} -> le folio de sa premiere page.

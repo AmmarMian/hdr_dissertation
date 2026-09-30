@@ -4,9 +4,9 @@
 \label{sec:detection-introduction}
 
 
-Ce chapitre reprend et reformule, tout en établissant des liens, un ensemble de résultats obtenus aux cours de deux collaborations différentes. 
+Ce chapitre reprend et reformule, tout en établissant des liens, un ensemble de résultats obtenus aux cours de deux collaborations différentes sur des problématiques de déteciton robuste. L'objet d'étude, la matrice de covariance, apparait comme un paramètre d'un problème où il faut décider entre deux alternatives dans le cadre classique Neyman-Pearson.
 
-La première partie concerne la détection multivariée robuste dans un système  SONAR à multiples antennes, dont les résultats ont été obtenus dans la cadre de la thèse d'Olivier Lerda, que j'ai co-dirigé en compagnie de Guillaume Ginolhac et Jean-Philippe Ovarlez. Il s'agit de porter au monde de la détection SONAR les développements de la détection robuste pour les systèmes RADAR à multiples antennes\footnote{On pourra à se sujet se référer aux travaux de la thèse de Chin Yuan Chong \cite{chong:tel-00772006} pour un travail similaire effectué dans le monde RADAR à multiples antennes.}, tout en explorant de nouvelles directions sur la détection basée sur le test de Rao ou bien la détection par sous-espaces.
+La première partie concerne la détection multivariée robuste dans un système SONAR à multiples antennes, dont les résultats ont été obtenus dans la cadre de la thèse d'Olivier Lerda, que j'ai co-dirigé en compagnie de Guillaume Ginolhac et Jean-Philippe Ovarlez. Il s'agit de porter au monde de la détection SONAR les développements de la détection robuste pour les systèmes RADAR à multiples antennes\footnote{On pourra à se sujet se référer aux travaux de la thèse de Chin Yuan Chong \cite{chong:tel-00772006} pour un travail similaire effectué dans le monde RADAR à multiples antennes.}, tout en explorant de nouvelles directions sur la détection basée sur le test de Rao ou bien la détection par sous-espaces.
 
 
 La deuxième partie concerne une extension de mes travaux de thèse sur la détection de changements en imagerie RSO basées sur des tests d'égalité de matrices de covariances \cite{Mian_2019}. Avec la même équipe qu'à l'époque\footnote{Florent Bouchard et Gauillaume Ginolhac}, nous avons considéré une extension des travaux initiés dans \cite{Bouchard_2020} sur la détection de changements robuste en-ligne dans les séries temporelles d'images RSO. Encore non appliquée en pratique à l'époque, nous avons pu considérer une nouvelle modélisation du problème qui permet de diminuer le nombre de données nécéssaires à l'estimation des paramètres du problèmes, ce qui autorise une application sur données réelles.
@@ -67,6 +67,9 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
 %     trois recettes de construction, et le prix de l'estimation.
 % ====================================================================================
 
+L'ensemble des travaux présentés dans ce chapitre repose sur un cadre commun : la détection robuste en environnement non-gaussien. Il s'agit à partir d'un modèle probabilites sur des données observées de décider entre deux alternatives: la présence d'une cible avec un à priori - qu'il convient de modéliser - dans la \cref{sec:detection-mills-antenna} et la possibilité d'un changement entre deux dates dans la \cref{sec:detection-online-change-detection}. La difficulté intervient dans le choix d'une modélisation plus large à base de distributions elliptiques qui introduit une batterie d'outils pour l'estimation qu'il convient d'adapter à la particularité des problématiques rencontrées. Commençons par introduire ce modèle commun dans cette section pour ensuite développer les applications dans les sections suivantes lorsqu'une structure supplémentaire spécifique est ajoutée au modèle.
+
+
 \subsection{Modèle d'observation}
 \label{subsec:detection-modele}
 
@@ -83,32 +86,23 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
 %    observation par observation.
 % ====================================================================================
 
+%TODO : trouver des citations
+\'Etant donné un ensemble d'observations $\{\x_1,\dots,\x_\Nobs\}$, où $\forall \iobs,\, \x_\iobs\in\C^\vdim$ obtenues à travers de la mesure d'antennes sonar ou radar, il est courant de poser un modèle gaussien en vertu du fait que chaque observation résulte de la somme des echos présents dans une cellule de résolution. Toutefois, comme étudié dans [?,?], à haute résolution le nombre de diffuseurs chute et le simple modèle gaussien ne permet plus de représenter la dynamique des données. Un choix de modélisation qui fonctionne alors est le modèle dit de mélange d'échelles gaussiennes :
+
 \begin{definition}[{Mélange d'échelles gaussiennes}]
 \label{def:detection-msg}
   Un vecteur $\z\in\C^{\vdim}$ suit un mélange d'échelles gaussiennes (\emph{mixture of scaled Gaussian}, msg) lorsqu'il admet la représentation
   \begin{equation}
     \z \overset{d}{=} \sqrt{\texture}\,\speckle,
     \qquad
-    \speckle\sim\cgaussian\left(\vector{0},\,\powerscale^2\MScatter\right),
-    \label{eq:detection-msg}
+    \speckle\sim\cgaussian\left(\vector{0},\,\powerscale^2\MCov\right),
+    \label{eq:detection-msg-modele}
   \end{equation}
-  où le \emph{speckle} $\speckle$ est un vecteur gaussien complexe circulaire de matrice de dispersion $\MScatter\in\HPD{\vdim}$, et où la \emph{texture} $\texture\in\R_*^+$ est un paramètre déterministe inconnu, propre à chaque observation.
+  où le \emph{speckle} $\speckle$ est un vecteur gaussien complexe circulaire de matrice de covariance $\MCov\in\HPD{\vdim}$, et où la \emph{texture} $\texture\in\R_*^+$ est un paramètre déterministe inconnu, propre à chaque observation.
 \end{definition}
 
-% ======================= TODO texte (remarque, ~5 lignes) ==========================
-% Ecrire une remarque qui situe ce modele. Trois points, dans cet ordre:
-%  1. c'est le modele de gaussienne composee deterministe deja rencontre en
-%     \cref{def:context-distributions-detcompoundgaussian}, transpose au cas
-%     complexe de la \cref{sec:context-distributions-complex}: la texture n'est
-%     pas tiree selon une loi a priori mais traitee comme un parametre de
-%     nuisance, un par observation;
-%  2. la denomination « msg » est celle en usage dans la communaute sonar
-%     \sidecite{Ollila2012,Hippertferrer2022}; on la conserve ici pour rester
-%     lisible par rapport aux articles dont le chapitre rend compte;
-%  3. l'interet du choix deterministe plutot que stochastique: aucune d.d.p de
-%     texture n'est postulee, donc rien a mal specifier sur ce point --- c'est
-%     la forme de robustesse retenue dans tout le chapitre.
-% ====================================================================================
+L'avantage de cette modélisation est double : au prix de l'introduction de paramètres supplémentaires, on permet une échelle différente à chaque observation tout en gardant l'idée d'une structure de corrélation commune entre les variables permettant de définir la covariance des données comme celle de la variable gaussienne sous-jacente commune à toutes les observations. On parle alors d'hétérogénéité de la puissance et deux variantes existent :
+
 
 \begin{definition}[{Hétérogénéité et homogénéité partielle}]
 \label{def:detection-heterogeneite}
@@ -144,10 +138,15 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
 % Preciser que le premier archetype gouverne les deux sections sonar et le
 % second la section RSO.
 % ====================================================================================
+%
 
+Le modèle des données étant posé, on peut s'intéresser aux deux problèmes qui nous intéressent dans ce chapitre : la détection de cible et la détection de changements.
+
+
+La détection de cible dans un bruit non-gaussien se formule de la façon suivante :
 \begin{definition}[{Détection d'une cible en présence de données secondaires}]
 \label{def:detection-archetype-cible}
-  Étant données une observation testée $\x\in\C^{\vdim}$ et $\Nobs$ données secondaires $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$ i.i.d, sans signal, disponibles sous les deux hypothèses, le problème s'écrit
+Étant données une observation testée $\x\in\C^{\vdim}$ et $\Nobs$ données secondaires $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$ i.i.d, sans signal, disponibles sous les deux hypothèses. Supposant le modèle statistique des données secondaires étant régit par \cref{eq:detection-msg-modele}, le problème s'écrit :
   \begin{equation}
     \left\{
     \begin{array}{lll}
@@ -160,19 +159,42 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
   où $\amplitude\in\C$ est une amplitude complexe déterministe inconnue et $\steering(\doa)\in\C^{\vdim}$ le vecteur directionnel, supposé connu, associé à la direction d'arrivée $\doa$.
 \end{definition}
 
-\begin{definition}[{Test d'égalité de dispersions}]
+%TODO : citer forster et un livre
+C'est un problème très connu de la détection RADAR, et on pourra par exemple se référer à [] pour explorer les nombreuses dérivations et détecteurs qui permettent de décider entre les deux hypothèses.
+%TODO : peut etre ajotuer un peu plsu de contexte
+
+\begin{remark}[{Le modèle de cible}]
+  Dans la définition de ce problème en \cref{eq:detection-test}, l'à-priori que nous posons sur la cible est la connaissance exacte de ses composantes $\steering$ à un facteur d'amplitude complexe près donc il faudrait tester toutes les directions en faisant une grille sur les angles. On peut aussi comme on verra spécifiquement dans la \cref{subsec:detection-fls-sousespace} relacher cette définition en introduisant une notion de sous-espace à laquelle la cible appartient.
+\end{remark}
+
+
+Le deuxième problème que l'on rencontre est le test d'égalité de matrices de covariances comme suit :
+\begin{definition}[{Test d'égalité de covariances}]
 \label{def:detection-archetype-egalite}
-  Étant donnés $\Ntime$ groupes d'observations, chacun de dispersion $\MScatter_\itime$, le problème s'écrit
+  Étant donnés $\Ntime$ groupes d'observations, chacun de covariances $\MCov_\itime$, le problème s'écrit
   \begin{equation}
     \left\{
     \begin{array}{lll}
-      \hypothesis_0: & \MScatter_\itime = \MScatter, & \forall \itime\in\intrange{1}{\Ntime} \\[2pt]
-      \hypothesis_1: & \exists\,(\itime_1,\itime_2)\ /\ \MScatter_{\itime_1}\neq\MScatter_{\itime_2}. &
+      \hypothesis_0: & \MCov_\itime = \MCov_1, & \forall \itime\in\intrange{2}{\Ntime} \\[2pt]
+      \hypothesis_1: & \exists\,(\itime_1,\itime_2)\ /\ \MCov_{\itime_1}\neq\MCov_{\itime_2}. &
     \end{array}
     \right.
     \label{eq:detection-test-egalite}
   \end{equation}
 \end{definition}
+
+%TODO: citations
+Il s'agit ici de tester si statistiquement, les données observées entre les divers groupe correspondent à la même information. C'est une formulation qui prends particulièrement son sens dans le cadre de l'imagerie RSO sur une fenêtre de données évoluant au cours du temps où la détection correspond à une notion de changements non-spécifiée. C'est par ailleurs le problème de détection auquel j'ai consacré une partie de ma thèse \sidecite{THESE19}  à l'époque.\\
+
+
+Les deux problèmes cités ici, même s'ils diffèrent par leur formulation, reposent sur une modélisation commune : le modèle msg. La différence se joue dans nature du parmètre testé et le rôle de la covariance:
+\begin{itemize}
+  \item Dans le cas de la détection de cible, la matrice de covariance joue le rôle d'un paramètre de nuisance qui corrèle le bruit de fond sans cible et complique la détection. Son estimation permet alors de distinguer la cible du \emph{clutter}.
+  \item Dans le deuxième cas, c'est précisément cette structure de corrélation entre variables qui nous intéresse : un changement dans celle ci indique l'idée qu'il s'est passé quelque chose.
+\end{itemize}
+
+Tout le jeu des recherches dans ce domaine est de trouver une statistique des données $\DetectorStat(\x_1,\dots,\x_\Nobs)$ dont la propriété est d'être faible sous hypothèse $\hypothesis_0$ et grande sous hypothèse $\hypothesis_1$. De plus, dans le cadre Neyman-Pearson, on cherche à caractériser la distribution sous hypothèse nulle de celle-ci afin de pouvoir choisir un seuil garantissant une fausse alarme et maximisant la probabilité de détection dans le cas positif \sidecite{Kay1998}. Il est toutefois souvent, notemment dans le cadre robuste, difficile de caractériser totalement la distribution de la statistique de test et on se contente des la notion de taux de fausse alarme constante :
+
 
 % ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
 % C'est la remarque qui porte l'unification du chapitre: a ecrire avec soin.
@@ -196,6 +218,8 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
   Une statistique de test $\DetectorStat$ est dite \emph{texture-cfar} si sa loi sous $\hypothesis_0$ ne dépend pas des textures, \emph{matrice-cfar} si elle ne dépend pas de la dispersion $\MScatter$, et \emph{cfar} au sens fort si elle ne dépend d'aucun paramètre inconnu du problème.
 \end{definition}
 
+Cette propriété si non-garantie annule totalement l'intérêt pratique d'une statistique de décision : si la distribution dépends des paramètres du problème inconnu, il est impossible d'estimer un seuil.
+
 % ======================= TODO texte (~4 lignes) ====================================
 % Dire pourquoi cette propriete est centrale et non decorative: c'est elle qui
 % permet de fixer une fois pour toutes le seuil $\DetectorTreshold$ associe a
@@ -205,7 +229,7 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
 % normalisees a des statistiques d'energie.
 % ====================================================================================
 
-\subsection{Trois constructions de test: glrt, Rao et Wald}
+\subsection{Trois constructions de test: trvg, Rao et Wald}
 \label{subsec:detection-glrt-rao-wald}
 
 % ============================ TODO texte (~1 paragraphe) ============================
@@ -216,43 +240,77 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
 % choix entre elles interessant, cf. la remarque sur le test de Rao plus bas.
 % ====================================================================================
 
-Écrivons le vecteur des paramètres sous la forme $\param=(\paramtest,\paramnuis)$, où $\paramtest\in\R^{n_{\mathrm{r}}}$ rassemble les paramètres testés et $\paramnuis$ les paramètres de nuisance, de sorte que les deux archétypes \cref{eq:detection-test,eq:detection-test-egalite} s'écrivent
+Ayant caractérisé ce que l'on cherche a trouvé par ses propriétés désirables ne nous avance pas quant à la recherche d'une statistique sur les données. Notemment dans le cadre de ces deux tests qui nous préoccupe, les hypothèses sont composites (il y a des paramètres inconnus sous les deux hypothèses) et il en résulte que le cadre de Neyman-Pearson \sidecite{Neyman_1933} ne fournit pas de test optimal \sidecite[-3cm]{Lehmann_2022}.
+
+Dans ce cas, une option est de construire une statistique en analysant les invariances inhérentes au problème, comme c'est par exemple fait dans les travaux des équipes italiennes \sidecite[1cm]{De_Maio_2015}, \sidecite[3cm]{Ciuonzo_2016}. De l'autre, il existe des stratégies qui permettent de dériver systématiquement des statistiques de décision en partant de la formulation du problème : les tests dits du TRVG (Test du Ratio de Vraisemblances Généralisé), de Rao, de Wald ou bien encore le gradient de Terell. Le plus connu étant évidemment est le TRVG qui est a onnu des succès en détection RADAR ou SONAR.
+% TODO: ajouter des citations
+
+
+
+Écrivons le vecteur des paramètres sous la forme $\param=(\paramtest,\paramnuis)$, où $\paramtest$ rassemble les paramètres testés et $\paramnuis$ les paramètres de nuisance, de sorte que les deux archétypes \cref{eq:detection-test,eq:detection-test-egalite} s'écrivent pour des observations $\{\x_1, \dots, \x_\Nobs\}$ i.i.d d'une variable $\Variable\sim\ddp{\Variable}(\x; \paramtest,\paramnuis)$ :
 \begin{equation}
   \left\{
   \begin{array}{ll}
-    \hypothesis_0: & \paramtest = \vector{0},\ \paramnuis \\
-    \hypothesis_1: & \paramtest \neq \vector{0},\ \paramnuis.
+    \hypothesis_0: & \paramtest = \vector{0},\  \\
+    \hypothesis_1: & \paramtest \neq \vector{0}.
   \end{array}
   \right.
   \label{eq:detection-test-parametre}
 \end{equation}
 
+Dans le cas de la détection, on obtiens aisément cette reformulation pour $\paramtest=\{\amplitude\}$ et $\paramnuis=\{\vech(\MCov)\}$. En ce qui concerne le problème de détection, la reformulation se fait au prix d'une écriture plus lourde introduite par \sidecite{Ciuonzo2017} en définissant le paramètre de nuisance comme la covariance à la première date $\paramnuis=\{\vech(\MCov_0)\}$ et les paramètres de tests comme les différences suivantes : $\paramtest = \{\vech(\MCov_2-\MCov_1), \dots, \vech(\MCov_\Ntime-\MCov_1)\}$.
+
+Une fois cette forme canonique définie, les même recettes permettent d'obtenir une statistique de décision :
+
 \begin{definition}[{Rapport de vraisemblance généralisé}]
 \label{def:detection-glrt}
-  Le glrt substitue aux paramètres inconnus leur estimée au sens du maximum de vraisemblance sous chaque hypothèse \sidecite[-0.5cm]{Kay1998}:
+Le trvg se construit comme un rapport de vraisemblances $\likelihood_{\Variable}$ sous chaque hypothèses où l'on substitue aux paramètres inconnus leur estimée au sens du maximum de vraisemblance :
   \begin{equation}
     \statGLRT(\x)
     =
-    \frac{\displaystyle\max_{\paramtest,\,\paramnuis}\ \ddp{\x}(\x;\paramtest,\paramnuis)}
-         {\displaystyle\max_{\paramnuis}\ \ddp{\x}(\x;\vector{0},\paramnuis)}
+    \frac{\displaystyle\max_{\paramtest,\,\paramnuis}\ \likelihood_{\Variable}(\{\x_1,\dots,\x_\Nobs\};\paramtest,\paramnuis)}
+         {\displaystyle\max_{\paramnuis}\ \likelihood_{\Variable}(\{\x_1,\dots,\x_\Nobs\};\vector{0},\paramnuis)}
     \detect.
     \label{eq:detection-glrt}
   \end{equation}
 \end{definition}
 
+Cette dernière formule comble la non connaissance des paramètres du problèmes par un problème d'estimation au sens du maximum de vraisemblance sous les deux hypothèses. Notamment dans le cas positif $\hypothesis_1$, la résolution du problème d'optimisation peut se révéler ardue et on peut lui préférer une alternative qui ne demandent pas cet effort :
+
+
+% TODO: vérifier la notaiton ell = likelihood et non score partout
 \begin{definition}[{Test de Rao}]
 \label{def:detection-rao}
-  En notant $\likelihood(\param)=\ln\ddp{\x}(\x;\param)$ et $\Fisher(\param)$ la matrice d'information de Fisher, partitionnée conformément à $\param=(\paramtest,\paramnuis)$, le test de Rao s'écrit
+  En notant $\likelihood(\param)=\ln\ddp{\x}(\x;\param)$ et , partitionnée conformément à $\param=(\paramtest,\paramnuis)$, le test de Rao s'écrit
   \begin{equation}
     \statRao(\x)
     =
-    \left.\frac{\partial\likelihood}{\partial\paramtest}\right|_{\hat{\param}_0}^{\T}
+    \left.\frac{\partial\ln \likelihood}{\partial\paramtest^\T}\right|_{\hat{\param}_0}^{\T}
     \left[\inv{\Fisher}(\hat{\param}_0)\right]_{\paramtest\paramtest}
-    \left.\frac{\partial\likelihood}{\partial\paramtest}\right|_{\hat{\param}_0}
+    \left.\frac{\partial\ln\likelihood}{\partial\conj{\paramtest}}\right|_{\hat{\param}_0}
     \detect,
     \label{eq:detection-rao}
   \end{equation}
-  où $\hat{\param}_0=(\vector{0},\hat{\paramnuis}_0)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_0$, et où le bloc pertinent de l'inverse de l'information est le complément de Schur
+  où $\hat{\param}_0=(\vector{0},\hat{\paramnuis}_0)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_0$, $\Fisher(\param)$ la matrice d'information de Fisher du problème :
+
+\begin{equation}
+  \begin{aligned}
+    \Fisher(\param) &= \E\left\{  \conj{\begin{bmatrix}
+\frac{\partial\ln \likelihood}{\partial\paramtest}\\
+\frac{\partial\ln \likelihood}{\partial\paramnuis}
+\end{bmatrix}}  \begin{bmatrix}
+\frac{\partial\ln \likelihood}{\partial\paramtest}\\
+\frac{\partial\ln \likelihood}{\partial\paramnuis}
+\end{bmatrix}^\T \right\}\\
+& = \begin{bmatrix}
+  \Fisher_{\paramtest\paramtest} & \Fisher_{\paramtest\paramnuis}\\
+  \Fisher_{\paramnuis\paramtest} & \Fisher_{\paramnuis\paramnuis}
+\end{bmatrix}
+\end{aligned}
+\label{eq:fim_detection}
+\end{equation}
+
+  et le bloc pertinent de l'inverse de l'information est le complément de Schur :
   \begin{equation}
     \left[\inv{\Fisher}\right]_{\paramtest\paramtest}
     =
@@ -264,24 +322,39 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
   \end{equation}
 \end{definition}
 
+Le test de Rao permet ainsi de dériver une statistique de décision au prix du calcul de la matrice d'information de Fisher et peut être préférable dans certains
+
+
+D'autres approches existent bien évidemment, telles que le gradient de Terell \cite{terrell2002gradient}, ou le plsu connu test de Wald :
+
 \begin{definition}[{Test de Wald}]
 \label{def:detection-wald}
   Le test de Wald mesure l'écart de l'estimée non contrainte à l'origine, dans la métrique de l'information:
   \begin{equation}
     \statWald(\x)
     =
-    \hat{\paramtest}_1^{\T}
+  (\hat{\paramtest}_1 - \hat{\paramtest}_0)^{\herm}
     \left(\left[\inv{\Fisher}(\hat{\param}_1)\right]_{\paramtest\paramtest}\right)^{-1}
-    \hat{\paramtest}_1
+    \left(\left[\inv{\Fisher}(\hat{\param}_1)\right]_{\paramtest\paramtest}\right)
     \detect,
     \label{eq:detection-wald}
   \end{equation}
-  où $\hat{\param}_1=(\hat{\paramtest}_1,\hat{\paramnuis}_1)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_1$.
+  où $\hat{\param}_1=(\hat{\paramtest}_1,\hat{\paramnuis}_1)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_1$ et similairement $\hat{\param}_0$ est l'estimée sous $\hypothesis_0$.
 \end{definition}
+
+Le test de Wald est en pratique le plus compliqué à mettre en oeuvre de manière générale : on peut par exmeple se référer à la dérivation du test de détection de changements en environnement gaussien dans \sidecite{Ciuonzo2017} su rplusieurs pages et faisant intervenir plusieurs astuces de calcul non-triviales.
+
+
+\begin{remark}[Tests complexe]
+  On remarquera que ces trois derniers tests sont posés dans leur forme complexe et font ainsi intervenir des opérateurs conjugués. Loin d'être une formulation triviale, ces formes sont obtenues récemment par \sidecite[.75cm]{Sun_2022}, qui les dérive pour être la contrepartie du test pris en concaténant les parties réelles et imaginaires des paramètres.
+\end{remark}
+
+
+Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résultat suivant et qui montre l'intérêt de ces tests dans un régime asymptotique où le nombre de données est grand au regard de la dimension.
 
 \begin{proposition}[{Équivalence asymptotique}]
 \label{prop:detection-equivalence}
-  Sous les conditions de régularité usuelles \sidecite[-1cm]{Kay1998}, les trois statistiques \cref{eq:detection-glrt,eq:detection-rao,eq:detection-wald} sont asymptotiquement équivalentes:
+  Sous des conditions de régularité usuelles \sidecite[2cm]{Kay1998}, les trois statistiques \cref{eq:detection-glrt,eq:detection-rao,eq:detection-wald} sont asymptotiquement équivalentes:
   \begin{equation}
     2\ln\statGLRT,\ \statRao,\ \statWald
     \xrightarrow{d}
@@ -293,134 +366,26 @@ La deuxième partie concerne une extension de mes travaux de thèse sur la déte
     \right.
     \label{eq:detection-equivalence}
   \end{equation}
-  avec le même paramètre de décentrage $\eta$.
+  où $n_r=2*\mathrm{card}(\paramtest)$ est le nombre de paramètres réels testés, avec le même paramètre de décentrage $\eta$ pour les trois tests. 
 \end{proposition}
 
-% ========= TODO texte (remarque, ~12 lignes) --- LE POINT A NUANCER ================
-% Poser le label rem:detection-pourquoi-rao (il est appele depuis la
-% \cref{sec:detection-fls} et depuis le bilan).
-% Partir de la \cref{prop:detection-equivalence}: elle pourrait laisser croire
-% que le choix entre les trois constructions est affaire de commodite
-% algebrique. Dire que non, et donner les trois arguments dans cet ordre:
-%
-%  1. COUT. La statistique \cref{eq:detection-rao} ne fait intervenir que
-%     l'estimee sous $\hypothesis_0$. Or celle-ci ne depend pas de la direction
-%     testee $\doa$: dans un balayage angulaire, ou la meme cellule de distance
-%     est interrogee dans plusieurs centaines de directions, une seule
-%     estimation des nuisances sert toutes les voies, la ou le glrt en reclame
-%     une par direction. Sur un sonar d'imagerie, ce n'est pas un detail
-%     d'implementation.
-%
-%  2. OPTIMALITE. Le test de Rao est construit sur le score evalue en
-%     $\paramtest=\vector{0}$: il est donc, par construction, localement le plus
-%     puissant, c'est-a-dire optimal dans la limite des faibles rapports signal
-%     a bruit \sidecite{Kay1998,Kay2016} --- precisement le regime qui nous
-%     interesse. Le glrt, lui, n'a aucune propriete d'optimalite en general:
-%     c'est une recette, pas un test optimal.
-%
-%  3. SELECTIVITE. Face a un signal mal specifie (cible dont la reponse ne
-%     coincide pas exactement avec $\steering(\doa)$), les tests se comportent
-%     tres differemment: le test de Rao rejette plus vigoureusement les signaux
-%     desalignes que le glrt \sidecite{Bandiera2009}. Cela dessine un axe de
-%     conception du plus selectif au plus robuste, sur lequel le test de Rao et
-%     les detecteurs par sous-espaces de la \cref{sec:detection-fls} occupent
-%     les deux extremites et le glrt une position intermediaire. Choisir un
-%     test, c'est choisir un point sur cet axe selon ce que l'on redoute le
-%     plus: manquer une cible legerement desalignee, ou alarmer sur un lobe
-%     secondaire.
-%
-% Conclure: la contribution n'est donc pas « on a aussi derive le Rao », mais
-% « on a instrumente cet axe selectivite/robustesse pour le sonar a croix de
-% Mills ».
-% ====================================================================================
 
-\subsection{L'approche en deux étapes et le prix de l'estimation}
-\label{subsec:detection-deuxetapes}
+\subsection{Le cas de la détection de cible en RADAR}
+\label{subsec:detection radar}
+%CLAUDE : écrit moi comment on arrive à l'AMF/Kelly/ANMF à partir du LRT+plugin et GLRT dans les cas gaussien puis non-gaussien ou le GLRT on y arrive pas. Il faut s'inspirer du papeir Forster et adapter aux notaitons ici, pas de démos mais des phrases de lien. donner des noms qui font sens.
+%Ajouter le test de rao gaussien si'l a été fait 
 
-% ============================ TODO texte (~3 lignes) ===============================
-% Transition: les trois recettes ci-dessus supposent la dispersion connue, ce
-% qu'elle n'est jamais. D'ou la demarche suivante, universelle dans la
-% litterature radar et sonar.
-% ====================================================================================
 
-\begin{definition}[{Approche en deux étapes}]
-\label{def:detection-deuxetapes}
-  L'approche en deux étapes consiste à (i) dériver la statistique de test en supposant la dispersion $\MScatter$ connue, puis (ii) y substituer un estimateur $\widehat{\MScatter}$ construit sur les données secondaires. Le détecteur résultant est dit \emph{adaptatif}.
-\end{definition}
 
-\begin{proposition}[{Filtre adapté normalisé}]
-\label{prop:detection-anmf}
-  Sous le modèle \cref{eq:detection-msg} et pour un signal de rang $\Nrank=1$, l'approche en deux étapes appliquée au glrt conduit au filtre adapté normalisé (\emph{adaptive normalized matched filter}, anmf) \sidecite[-1cm]{Conte1995,Kraut1999,Ovarlez2016}:
-  \begin{equation}
-    \statANMF(\x,\doa)
-    =
-    \frac{\abs{\steering(\doa)^\herm\inv{\widehat{\MScatter}}\x}^2}
-         {\left(\steering(\doa)^\herm\inv{\widehat{\MScatter}}\steering(\doa)\right)
-          \left(\x^\herm\inv{\widehat{\MScatter}}\x\right)}
-    \detect.
-    \label{eq:detection-anmf}
-  \end{equation}
-\end{proposition}
 
-% ======================= TODO texte (remarque, ~5 lignes) ==========================
-% Lire la formule: la double normalisation du denominateur repond exactement
-% aux deux ecarts de la \cref{def:detection-heterogeneite} --- le terme
-% $\x^\herm\inv{\widehat{\MScatter}}\x$ annule la texture de la donnee testee,
-% le terme $\steering^\herm\inv{\widehat{\MScatter}}\steering$ annule
-% l'indetermination d'echelle sur l'estimee. La statistique est donc invariante
-% par $(\x,\widehat{\MScatter})\mapsto(c_1\x,c_2\widehat{\MScatter})$ pour tous
-% $c_1,c_2>0$: c'est un cosinus au carre entre la donnee et la reponse cible,
-% dans la geometrie induite par $\inv{\widehat{\MScatter}}$.
-% ====================================================================================
+\subsection{Le cas de la détection de changements}
+\label{subsec:change detection}
 
-\begin{definition}[{Estimateur de Tyler}]
-\label{def:detection-tyler}
-  L'estimateur employé dans tout ce chapitre pour l'étape (ii) est celui de Tyler \sidecite[-0.5cm]{Tyler1987,Pascal08a}, solution de l'équation de point fixe
-  \begin{equation}
-    \Tyler
-    =
-    \frac{\vdim}{\Nobs}\sum_{\iobs=1}^{\Nobs}
-    \frac{\x_\iobs\x_\iobs^\herm}{\quadraticH{\x_\iobs}{\Tyler}},
-    \label{eq:detection-tyler}
-  \end{equation}
-  assortie de la normalisation $\trace{\Tyler}=\vdim$.
-\end{definition}
+% CLAUDE : écrire de la même façon le glrt gaussien, rao et wald de cionzo avec notaitons biens. De plus ajouter les détecteurs de ma thèse en texture + covariance GLRT
 
-% ======================= TODO texte (remarque, ~4 lignes) ==========================
-% Rappeler en deux phrases *pourquoi* c'est cet estimateur et pas un autre, de
-% sorte que le lecteur familier n'ait pas a revenir en partie 2: il ne fait
-% intervenir les observations que par leur direction, donc sa loi ne depend pas
-% du generateur de densite (propriete distribution-free,
-% \cref{prop:context-complex-tylerdf}), et c'est le mle de la matrice de forme
-% sous le modele \cref{eq:detection-msg} quelles que soient les textures. Pour
-% le detail de ses proprietes statistiques, renvoyer a la
-% \cref{subsec:context-complex-mestimation}.
-% ====================================================================================
 
-\begin{property}[{Loi sous $\hypothesis_0$ à dispersion connue}]
-\label{prop:detection-pfa}
-  Lorsque $\widehat{\MScatter}=\MScatter$, la statistique \cref{eq:detection-anmf} suit sous $\hypothesis_0$ une loi Bêta de paramètres $(1,\vdim-1)$, indépendamment de $\MScatter$ et des textures, de sorte que
-  \begin{equation}
-    \pfa(\DetectorTreshold)
-    =
-    \Prob\left(\statANMF>\DetectorTreshold\mid\hypothesis_0\right)
-    =
-    \left(1-\DetectorTreshold\right)^{\vdim-1}.
-    \label{eq:detection-pfa}
-  \end{equation}
-\end{property}
 
-% ======================= TODO texte (remarque, ~5 lignes) ==========================
-% Dire ce que cette propriete devient en pratique: elle est perdue des que
-% $\MScatter$ est remplacee par une estimee. La loi de la statistique
-% adaptative depend alors de $\Nobs$ et de l'estimateur employe; elle n'est
-% connue en forme close que dans quelques cas (scm sous modele gaussien) et
-% doit sinon etre obtenue par simulation --- ce qui est fait systematiquement
-% dans ce chapitre, et justifie les courbes « seuil vs $\pfa$ » qui suivent.
-% Decision prise: on garde la figure seuil/Pfa (voir bloc ci-dessous), elle
-% justifie tous les seuils utilises ensuite.
-% ====================================================================================
-
+% CLAUDE : IGNORER la suite pour le moment
 % CONVENTION FIGURES DU CHAPITRE (cf. discussion): une figure issue d'une
 % experience qanat porte ses macros \prov... de provenance, comme en partie 2;
 % une figure reprise telle quelle d'un article porte une citation a la place.
