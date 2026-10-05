@@ -9,7 +9,7 @@ Ce chapitre reprend et reformule, tout en établissant des liens, un ensemble de
 La première partie concerne la détection multivariée robuste dans un système SONAR à multiples antennes, dont les résultats ont été obtenus dans la cadre de la thèse d'Olivier Lerda, que j'ai co-dirigé en compagnie de Guillaume Ginolhac et Jean-Philippe Ovarlez. Il s'agit de porter au monde de la détection SONAR les développements de la détection robuste pour les systèmes RADAR à multiples antennes\footnote{On pourra à se sujet se référer aux travaux de la thèse de Chin Yuan Chong \cite{chong:tel-00772006} pour un travail similaire effectué dans le monde RADAR à multiples antennes.}, tout en explorant de nouvelles directions sur la détection basée sur le test de Rao ou bien la détection par sous-espaces.
 
 
-La deuxième partie concerne une extension de mes travaux de thèse sur la détection de changements en imagerie RSO basées sur des tests d'égalité de matrices de covariances \cite{Mian_2019}. Avec la même équipe qu'à l'époque\footnote{Florent Bouchard et Gauillaume Ginolhac}, nous avons considéré une extension des travaux initiés dans \cite{Bouchard_2020} sur la détection de changements robuste en-ligne dans les séries temporelles d'images RSO. Encore non appliquée en pratique à l'époque, nous avons pu considérer une nouvelle modélisation du problème qui permet de diminuer le nombre de données nécéssaires à l'estimation des paramètres du problèmes, ce qui autorise une application sur données réelles.
+La deuxième partie concerne une extension de mes travaux de thèse sur la détection de changements en imagerie RSO basées sur des tests d'égalité de matrices de covariances \cite{Mian_2019}. Avec la même équipe qu'à l'époque\footnote{Florent Bouchard et Gauillaume Ginolhac}, nous avons considéré une extension des travaux initiés dans \cite{Bouchard_2020} sur la détection de changements robuste en-ligne dans les séries temporelles d'images RSO. Encore non appliquée en pratique à l'époque, nous avons pu considérer une nouvelle modélisation du problème qui permet de diminuer le nombre de données nécéssaires à l'estimation des paramètres du problème, ce qui autorise une application sur données réelles.
 
 \begin{contributions}
   Ce chapitre rend compte des travaux suivants, dont les versions publiées sont
@@ -240,9 +240,9 @@ Cette propriété si non-garantie annule totalement l'intérêt pratique d'une s
 % choix entre elles interessant, cf. la remarque sur le test de Rao plus bas.
 % ====================================================================================
 
-Ayant caractérisé ce que l'on cherche a trouvé par ses propriétés désirables ne nous avance pas quant à la recherche d'une statistique sur les données. Notemment dans le cadre de ces deux tests qui nous préoccupe, les hypothèses sont composites (il y a des paramètres inconnus sous les deux hypothèses) et il en résulte que le cadre de Neyman-Pearson \sidecite{Neyman_1933} ne fournit pas de test optimal \sidecite[-3cm]{Lehmann_2022}.
+Ayant caractérisé ce que l'on cherche a trouver par ses propriétés désirables ne nous avance pas quant à la recherche d'une statistique sur les données. Notemment dans le cadre de ces deux tests qui nous préoccupent, les hypothèses sont composites (il y a des paramètres inconnus sous les deux hypothèses) et il en résulte que le cadre de Neyman-Pearson \sidecite{Neyman_1933} ne fournit pas de test optimal \sidecite[-3cm]{Lehmann_2022}.
 
-Dans ce cas, une option est de construire une statistique en analysant les invariances inhérentes au problème, comme c'est par exemple fait dans les travaux des équipes italiennes \sidecite[1cm]{De_Maio_2015}, \sidecite[3cm]{Ciuonzo_2016}. De l'autre, il existe des stratégies qui permettent de dériver systématiquement des statistiques de décision en partant de la formulation du problème : les tests dits du TRVG (Test du Ratio de Vraisemblances Généralisé), de Rao, de Wald ou bien encore le gradient de Terell. Le plus connu étant évidemment est le TRVG qui est a onnu des succès en détection RADAR ou SONAR.
+Dans ce cas, une option est de construire une statistique en analysant les invariances inhérentes au problème, comme c'est par exemple fait dans les travaux des équipes italiennes \sidecite[1cm]{De_Maio_2015}, \sidecite[3cm]{Ciuonzo_2016}. De l'autre, il existe des stratégies qui permettent de dériver systématiquement des statistiques de décision en partant de la formulation du problème : les tests dits du TRVG (Test du Ratio de Vraisemblances Généralisé), de Rao, de Wald ou bien encore le gradient de Terell. Le plus connu étant évidemment est le TRVG qui est a connu des succès en détection RADAR ou SONAR.
 % TODO: ajouter des citations
 
 
@@ -275,7 +275,7 @@ Le trvg se construit comme un rapport de vraisemblances $\likelihood_{\Variable}
   \end{equation}
 \end{definition}
 
-Cette dernière formule comble la non connaissance des paramètres du problèmes par un problème d'estimation au sens du maximum de vraisemblance sous les deux hypothèses. Notamment dans le cas positif $\hypothesis_1$, la résolution du problème d'optimisation peut se révéler ardue et on peut lui préférer une alternative qui ne demandent pas cet effort :
+Cette dernière formule comble la non connaissance des paramètres du problème par un problème d'estimation au sens du maximum de vraisemblance sous les deux hypothèses. Notamment dans le cas positif $\hypothesis_1$, la résolution du problème d'optimisation peut se révéler ardue et on peut lui préférer une alternative qui ne demandent pas cet effort :
 
 
 % TODO: vérifier la notaiton ell = likelihood et non score partout
@@ -325,7 +325,7 @@ Cette dernière formule comble la non connaissance des paramètres du problèmes
 Le test de Rao permet ainsi de dériver une statistique de décision au prix du calcul de la matrice d'information de Fisher et peut être préférable dans certains
 
 
-D'autres approches existent bien évidemment, telles que le gradient de Terell \cite{terrell2002gradient}, ou le plsu connu test de Wald :
+D'autres approches existent bien évidemment, telles que le gradient de Terell \cite{terrell2002gradient}, ou le plus connu test de Wald \sidecite[3cm]{Wald_1943}:
 
 \begin{definition}[{Test de Wald}]
 \label{def:detection-wald}
@@ -342,7 +342,7 @@ D'autres approches existent bien évidemment, telles que le gradient de Terell \
   où $\hat{\param}_1=(\hat{\paramtest}_1,\hat{\paramnuis}_1)$ est l'estimée du maximum de vraisemblance sous $\hypothesis_1$ et similairement $\hat{\param}_0$ est l'estimée sous $\hypothesis_0$.
 \end{definition}
 
-Le test de Wald est en pratique le plus compliqué à mettre en oeuvre de manière générale : on peut par exmeple se référer à la dérivation du test de détection de changements en environnement gaussien dans \sidecite{Ciuonzo2017} su rplusieurs pages et faisant intervenir plusieurs astuces de calcul non-triviales.
+Le test de Wald est en pratique le plus compliqué à mettre en oeuvre de manière générale : on peut par exemple se référer à la dérivation du test de détection de changements en environnement gaussien dans \sidecite[-1.5cm]{Ciuonzo2017} sur plusieurs pages et faisant intervenir plusieurs astuces de calcul non-triviales.
 
 
 \begin{remark}[Tests complexe]
@@ -372,17 +372,183 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
 
 \subsection{Le cas de la détection de cible en RADAR}
 \label{subsec:detection radar}
-%CLAUDE : écrit moi comment on arrive à l'AMF/Kelly/ANMF à partir du LRT+plugin et GLRT dans les cas gaussien puis non-gaussien ou le GLRT on y arrive pas. Il faut s'inspirer du papeir Forster et adapter aux notaitons ici, pas de démos mais des phrases de lien. donner des noms qui font sens.
-%Ajouter le test de rao gaussien si'l a été fait 
 
+Le problème de la \cref{def:detection-archetype-cible} a été très largement étudié en détection RADAR, et les détecteurs que nous proposerons dans les sections suivantes en sont des extensions. Pour les situer, il est commode de suivre la démarche suivante : on part du cas où tout est connu sur le bruit, puis on retire progressivement de l'information en regardant à chaque fois quel détecteur on obtient avec les constructions de la \cref{subsec:detection-glrt-rao-wald}. Nous ne donnons ici aucune démonstration, le lecteur pourra se reporter aux articles cités pour celles-ci.
 
+Considérons d'abord le cas où la matrice de covariance $\MCov$ du bruit est connue. Le seul paramètre inconnu est alors l'amplitude $\amplitude$, dont l'estimée au sens du maximum de vraisemblance vaut $\hat{\amplitude}=\steering^\herm\inv{\MCov}\x/(\steering^\herm\inv{\MCov}\steering)$. En la substituant dans le rapport de vraisemblance, on obtient le filtre adapté (\emph{matched filter}, \detname{mf}) :
+\begin{equation}
+  \DetectorStat_{\detname{mf}}(\x)
+  =
+  \frac{\abs{\steering^\herm\inv{\MCov}\x}^2}{\steering^\herm\inv{\MCov}\steering}
+  \detect,
+  \label{eq:detection-mf}
+\end{equation}
+qui correspond à l'énergie de l'observation blanchie dans la direction testée. Sous $\hypothesis_0$, cette statistique suit une loi du $\chisquared$ à deux degrés de liberté (à un facteur $1/2$ près), ce qui donne directement le seuil en fonction de la fausse alarme : $\DetectorTreshold=-\ln\pfa$.
+
+% TODO: vérif la citation
+Supposons maintenant que la covariance n'est connue qu'à un facteur de puissance près : $\MCov=\powerscale^2\MScatter$ avec $\MScatter$ connue et $\powerscale^2$ inconnu. Le trvg demande alors de maximiser en $\powerscale^2$ sous les deux hypothèses, ce qui revient à normaliser la statistique précédente par l'énergie blanchie de l'observation \sidecite{Scharf1994}. On obtient le filtre adapté normalisé (\emph{normalized matched filter}, \detname{nmf}) :
+\begin{equation}
+  \DetectorStat_{\detname{nmf}}(\x)
+  =
+  \frac{\abs{\steering^\herm\inv{\MScatter}\x}^2}
+       {\left(\steering^\herm\inv{\MScatter}\steering\right)\left(\x^\herm\inv{\MScatter}\x\right)}
+  \detect.
+  \label{eq:detection-nmf}
+\end{equation}
+Géométriquement, il s'agit du carré du cosinus de l'angle entre $\x$ et $\steering$ dans le produit scalaire induit par $\inv{\MScatter}$. Sous $\hypothesis_0$, sa loi est une $\mathrm{Beta}(1,\vdim-1)$, d'où $\DetectorTreshold=1-\pfa^{1/(\vdim-1)}$, et le seuil ne dépend donc pas de $\powerscale^2$. On remarquera que sous le modèle msg de la \cref{def:detection-msg}, la texture $\texture$ de l'observation testée joue exactement le même rôle que $\powerscale^2$ : le \detname{nmf} est donc aussi le trvg à dispersion connue en environnement non gaussien \sidecite{Conte1995}. C'est par ce biais que la robustesse aux textures entre dans les détecteurs de cible.
+
+En pratique, la covariance est inconnue et doit être estimée à partir des $\Nobs$ données secondaires, avec par exemple la scm $\SCM=\frac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\x_\iobs\x_\iobs^\herm$ (\cref{eq:context-complex-covscm}). Dans ce cas, les trois constructions de la \cref{subsec:detection-glrt-rao-wald} ne donnent plus le même détecteur :
+\begin{itemize}
+  \item le trvg, où $\MCov$ est estimée conjointement sur la donnée primaire et les données secondaires sous chaque hypothèse, a été obtenu par \sidecite{Kelly1986} :
+  \begin{equation}
+    \DetectorStat_{\detname{kelly}}(\x)
+    =
+    \frac{\abs{\steering^\herm\inv{\SCM}\x}^2}
+         {\left(\steering^\herm\inv{\SCM}\steering\right)\left(\Nobs+\x^\herm\inv{\SCM}\x\right)}
+    \detect;
+    \label{eq:detection-kelly}
+  \end{equation}
+  \item l'approche dite en deux étapes consiste à dériver le test à covariance connue, puis à y remplacer $\MCov$ par une estimée issue des données secondaires. Appliquée au \detname{mf} avec la scm, elle donne l'\detname{amf} (\emph{adaptive matched filter}) de \sidecite{Robey1992}\footnote{Le même détecteur s'obtient également comme test de Wald du problème complet \cite{DeMaio2004}.};
+  \item le test de Rao ne demande l'estimation de la covariance que sous $\hypothesis_0$, où la donnée primaire ne contient que du bruit et peut donc être incluse dans l'estimation. En notant $\Smat=\Nobs\SCM+\x\x^\herm$, on obtient \sidecite{DeMaio2007} :
+  \begin{equation}
+    \statRao(\x)
+    =
+    \frac{\abs{\steering^\herm\inv{\Smat}\x}^2}{\steering^\herm\inv{\Smat}\steering}
+    \detect.
+    \label{eq:detection-rao-gaussien}
+  \end{equation}
+  Il s'agit donc d'un \detname{amf} où la matrice estimée contient aussi l'observation testée. En pratique, ce détecteur rejette mieux les signaux qui ne sont pas alignés avec $\steering$, au prix d'une légère perte lorsque la cible est parfaitement alignée.
+\end{itemize}
+
+On a ici un exemple concret de ce que dit la \cref{prop:detection-equivalence} : les trois tests sont asymptotiquement équivalents, mais ils diffèrent à $\Nobs$ fini. Ils sont par ailleurs tous les trois matrice-cfar, le détecteur de Kelly suivant par exemple une loi $\mathrm{Beta}(1,\Nobs-\vdim+1)$ sous $\hypothesis_0$. Enfin, ils sont soumis à la règle de \sidecite{Reed1974} : il faut de l'ordre de $\Nobs\simeq2\vdim$ données secondaires pour ne perdre que 3~dB par rapport au détecteur à covariance connue.
+
+Lorsque l'environnement est partiellement homogène (\cref{def:detection-heterogeneite}), la même approche en deux étapes appliquée au \detname{nmf} donne l'\detname{anmf} (\emph{adaptive normalized matched filter}), c'est-à-dire \cref{eq:detection-nmf} où l'on remplace $\MScatter$ par $\SCM$. \sidecite{Kraut1999} ont montré que c'est aussi le trvg de ce problème, et qu'il est cfar vis-à-vis de $\powerscale^2$ et de $\MScatter$.
+
+Le cas qui nous intéresse dans ce chapitre est celui où chaque donnée secondaire suit le modèle msg avec sa propre texture. Dans ce cadre, le trvg complet n'est plus accessible : sous $\hypothesis_1$, l'estimée de $\MScatter$ est solution d'une équation de point fixe couplée à l'amplitude inconnue de la cible, et on ne sait pas l'exprimer en forme close. L'approche en deux étapes reste en revanche utilisable. On garde le \detname{nmf}, déjà insensible à la texture de l'observation testée, et on remplace la scm par l'estimateur de Tyler, qui ne dépend pas des textures des données secondaires \cite{Conte2002,Gini2002,Pascal08a}. On obtient ainsi :
+\begin{equation}
+  \statANMF(\x)
+  =
+  \frac{\abs{\steering^\herm\inv{\Tyler}\x}^2}
+       {\left(\steering^\herm\inv{\Tyler}\steering\right)\left(\x^\herm\inv{\Tyler}\x\right)}
+  \detect,
+  \label{eq:detection-anmf-tyler}
+\end{equation}
+où:
+\begin{equation*}
+  \Tyler
+  =
+  \frac{\Nvar}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \frac{\x_\iobs\x_\iobs^\T}{\quadratic{\x_\iobs}{\Tyler}}.
+\end{equation*}
+
+Ce détecteur est texture-cfar par construction, puisque la statistique est homogène en $\x$ et que $\Tyler$ est invariant à un changement d'échelle de chaque $\x_\iobs$ (\cref{prop:context-complex-tylerdf}). Il est également matrice-cfar, et sa relation entre $\pfa$ et seuil est celle de l'\detname{anmf} avec la scm, à condition de remplacer $\Nobs$ par $\Nobs'=\frac{\vdim}{\vdim+1}\Nobs$ \sidecite{Ovarlez2016}\footnote{Autrement dit, sous modèle gaussien, utiliser l'estimateur de Tyler plutôt que la scm revient à perdre environ une donnée secondaire sur $\vdim+1$.}.
+
+Enfin, lorsque la réponse de la cible n'est connue qu'à un sous-espace de dimension $\Nrank$ près, on remplace $\steering$ par la projection de $\x$ sur ce sous-espace, ce qui mène aux détecteurs par sous-espaces \cite{Scharf1994,Kraut2001}. Nous y reviendrons en \cref{subsec:detection-fls-sousespace}. L'ensemble de ces détecteurs est résumé dans le \cref{tab:detection-genealogie}.
+
+\begin{table}[h]
+  \centering
+  \footnotesize
+  \begin{tabular}{llll}
+    \toprule
+    Connaissance du bruit & Construction & Détecteur & Invariance \\
+    \midrule
+    $\MCov$ connue & trvg & \detname{mf} \cref{eq:detection-mf} & --- \\
+    $\MScatter$ connue, échelle inconnue & trvg & \detname{nmf} \cref{eq:detection-nmf} & échelle, texture \\
+    $\MCov$ inconnue, gaussien & trvg & Kelly \cref{eq:detection-kelly} & matrice \\
+     & deux étapes / Wald & \detname{amf} & matrice \\
+     & Rao & \cref{eq:detection-rao-gaussien} & matrice \\
+    homogénéité partielle & trvg (= deux étapes) & \detname{anmf}-scm & échelle, matrice \\
+    msg, textures inconnues & deux étapes & \detname{anmf}-Tyler \cref{eq:detection-anmf-tyler} & texture, matrice \\
+    \bottomrule
+  \end{tabular}
+  \caption{Détecteurs de cible adaptatifs classiques, du cas où le bruit est entièrement connu au cas msg.}
+  \label{tab:detection-genealogie}
+\end{table}
+
+Tous ces détecteurs sont dérivés pour une seule antenne, avec une texture par observation, une cible de rang un et une dimension $\vdim$ petite devant le nombre de données secondaires homogènes disponibles. Les deux sections sonar qui suivent reviennent chacune sur l'une de ces hypothèses. Dans le cas de la croix de Mills (\cref{sec:detection-mills-antenna}), on dispose de deux antennes corrélées dont les textures n'ont pas de raison d'être identiques, et aucun des détecteurs du tableau ne s'applique directement. Dans le cas du sonar frontal multi-pings (\cref{sec:detection-fls}), la dimension est multipliée par le nombre de pings, et la règle $\Nobs\simeq2\vdim$ ne peut plus être respectée sans exploiter une structure de la covariance.
 
 
 \subsection{Le cas de la détection de changements}
 \label{subsec:change detection}
 
-% CLAUDE : écrire de la même façon le glrt gaussien, rao et wald de cionzo avec notaitons biens. De plus ajouter les détecteurs de ma thèse en texture + covariance GLRT
+Intéressons nous maintenant au second problème (\cref{def:detection-archetype-egalite}). On observe à chaque date $\itime\in\intrange{1}{\Ntime}$ une fenêtre de $\Nobs$ pixels $\{\x_\iobs^{(\itime)}\}_{\iobs=1}^{\Nobs}$, avec $\x_\iobs^{(\itime)}\in\C^{\vdim}$. On note $\Smat_\itime=\sum_{\iobs}\x_\iobs^{(\itime)}\x_\iobs^{(\itime)\herm}$ et $q(\x,\MCov)=\x^\herm\inv{\MCov}\x$.
 
+Dans le cas gaussien, l'estimée de la covariance sous $\hypothesis_1$ est la scm de chaque date, $\SCM_\itime=\Smat_\itime/\Nobs$, et sous $\hypothesis_0$ c'est la scm calculée sur l'ensemble des dates, $\SCM_0=\frac{1}{\Ntime}\sum_\itime\SCM_\itime$. Ce problème est classique en statistique multivariée \cite{anderson1958introduction}, et \sidecite{Ciuonzo2017} en ont dérivé les trois tests. Le trvg s'écrit comme un rapport de déterminants, utilisé notamment en imagerie RSO polarimétrique par \sidecite{Conradsen_2016} :
+\begin{equation}
+  \DetectorStat_{\gaussian}
+  =
+  \frac{\Det\left(\SCM_0\right)^{\Ntime\Nobs}}{\prod_{\itime=1}^{\Ntime}\Det\left(\SCM_\itime\right)^{\Nobs}}
+  \detect.
+  \label{eq:detection-cd-glrt-gaussien}
+\end{equation}
+Le test de Rao, qui coïncide ici avec le test du gradient de Terrell, prend la forme suivante \cite{Ciuonzo2017} :
+\begin{equation}
+  \statRao
+  =
+  \Nobs\sum_{\itime=1}^{\Ntime}
+  \norm{\SCM_0^{-1/2}\,\SCM_\itime\,\SCM_0^{-1/2}-\Id{\vdim}}_F^2
+  \detect.
+  \label{eq:detection-cd-rao}
+\end{equation}
+Pour chaque date, on mesure donc l'écart entre la covariance de la date et la covariance commune, après blanchiment par cette dernière. On peut noter que cette quantité correspond au développement au second ordre de la distance affine-invariante vue en \cref{sec:context-riemann-spd}, alors que le trvg \cref{eq:detection-cd-glrt-gaussien} fait intervenir le logarithme des valeurs propres des mêmes matrices blanchies. Les deux tests se comportent donc de la même façon au voisinage de $\hypothesis_0$, ce qui est cohérent avec la \cref{prop:detection-equivalence}.
+
+Le test de Wald prend quant à lui la première date comme référence, puisque le paramètre de nuisance est $\MCov_1$ dans la formulation de la \cref{subsec:detection-glrt-rao-wald} :
+\begin{equation}
+  \begin{aligned}
+  \statWald
+  ={}&
+  \Nobs\sum_{\itime=2}^{\Ntime}\trace{\left(\Id{\vdim}-\SCM_1\inv{\SCM_\itime}\right)^2}
+  \\
+  &- \vecop\left(\sum_{\itime=2}^{\Ntime}\mat{\Upsilon}_\itime\right)^{\herm}
+    \left(\Nobs\sum_{\itime=1}^{\Ntime}\SCM_\itime^{-\T}\otimes\inv{\SCM_\itime}\right)^{-1}
+    \vecop\left(\sum_{\itime=2}^{\Ntime}\mat{\Upsilon}_\itime\right)
+  \detect,
+  \end{aligned}
+  \label{eq:detection-cd-wald}
+\end{equation}
+avec $\mat{\Upsilon}_\itime=\Nobs\left(\inv{\SCM_\itime}-\inv{\SCM_\itime}\SCM_1\inv{\SCM_\itime}\right)$. Contrairement aux deux précédents, ce test ne traite pas toutes les dates de la même façon et demande l'inversion d'une matrice de taille $\vdim^2\times\vdim^2$. Les trois statistiques sont cfar, ce que \citet{Ciuonzo2017} montrent à l'aide d'arguments d'invariance.
+
+Pour des images à haute résolution, la puissance varie d'un pixel à l'autre et d'une date à l'autre, et le modèle gaussien n'est plus adapté. Au cours de ma thèse \sidecite[1.5cm]{TSP19}, nous avons donc considéré le modèle msg $\x_\iobs^{(\itime)}\sim\cgaussian(\vector{0},\texture_\iobs^{(\itime)}\MScatter_\itime)$, avec des textures déterministes et une matrice normalisée en trace. Le modèle ayant deux familles de paramètres, plusieurs problèmes de test sont possibles selon les paramètres que l'on teste. Nous en retenons deux :
+\begin{itemize}
+  \item on teste conjointement la matrice et les textures. Un changement de puissance est alors considéré comme un changement, comme dans le cas gaussien où la puissance est testée à travers $\MCov_\itime$ ;
+  \item on teste la matrice seule, les textures étant libres à chaque date. On ne teste alors que la structure de corrélation, ce qui rend le détecteur insensible aux différences d'étalonnage entre les acquisitions.
+\end{itemize}
+Contrairement à la détection de cible, le trvg peut ici être calculé : sous chaque hypothèse, le maximum de vraisemblance est la solution d'une équation de point fixe de type Tyler, et il n'y a pas de paramètre de signal pour les coupler. En notant $\Tyler_\itime$ l'estimateur de Tyler calculé sur la date $\itime$ (\cref{def:context-complex-tyler}), on obtient pour le premier problème :
+\begin{equation}
+  \DetectorStat_{\detname{mt}}
+  =
+  \frac{\Det\left(\Tyler_0^{\detname{mt}}\right)^{\Ntime\Nobs}}{\prod_{\itime}\Det\left(\Tyler_\itime\right)^{\Nobs}}
+  \prod_{\iobs=1}^{\Nobs}
+  \frac{\left(\sum_{\itime}q\left(\x_\iobs^{(\itime)},\Tyler_0^{\detname{mt}}\right)\right)^{\Ntime\vdim}}
+       {\Ntime^{\Ntime\vdim}\prod_{\itime}q\left(\x_\iobs^{(\itime)},\Tyler_\itime\right)^{\vdim}},
+  \label{eq:detection-cd-glrt-mt}
+\end{equation}
+où
+\begin{equation*}
+  \Tyler_0^{\detname{mt}}
+  =
+  \frac{\vdim}{\Nobs}\sum_{\iobs=1}^{\Nobs}
+  \frac{\sum_{\itime}\x_\iobs^{(\itime)}\x_\iobs^{(\itime)\herm}}{\sum_{\itime}q\left(\x_\iobs^{(\itime)},\Tyler_0^{\detname{mt}}\right)},
+\end{equation*}
+et pour le second :
+\begin{equation}
+  \DetectorStat_{\detname{mat}}
+  =
+  \frac{\Det\left(\Tyler_0^{\detname{mat}}\right)^{\Ntime\Nobs}}{\prod_{\itime}\Det\left(\Tyler_\itime\right)^{\Nobs}}
+  \prod_{\iobs,\itime}
+  \left(\frac{q\left(\x_\iobs^{(\itime)},\Tyler_0^{\detname{mat}}\right)}{q\left(\x_\iobs^{(\itime)},\Tyler_\itime\right)}\right)^{\vdim},
+  \label{eq:detection-cd-glrt-mat}
+\end{equation}
+où
+\begin{equation*}
+  \Tyler_0^{\detname{mat}}
+  =
+  \frac{\vdim}{\Ntime\Nobs}\sum_{\iobs,\itime}
+  \frac{\x_\iobs^{(\itime)}\x_\iobs^{(\itime)\herm}}{q\left(\x_\iobs^{(\itime)},\Tyler_0^{\detname{mat}}\right)}.
+\end{equation*}
+On retrouve dans les deux cas le rapport de déterminants du cas gaussien, où la scm est remplacée par des estimateurs de type Tyler. La première statistique contient en plus un rapport de formes quadratiques qui compare la puissance relative des dates. Les deux sont texture-cfar et matrice-cfar, et l'existence des points fixes sous $\hypothesis_0$ découle de la convexité géodésique de la vraisemblance \cite{TSP19}.
+
+Ces détecteurs ont toutefois deux limitations. D'une part, $\Tyler_0$ est un point fixe calculé sur toutes les dates à la fois, qui ne peut pas être mis à jour simplement lorsqu'une nouvelle image arrive. D'autre part, il faut $\Nobs>\vdim$ pixels homogènes par fenêtre, alors que $\vdim$ augmente rapidement dès que l'on combine la polarisation avec une diversité spectrale. Nous verrons en \cref{sec:detection-online-change-detection} comment lever la première par une estimation récursive sur la variété, et la seconde par une structure de Kronecker, dans le cadre du premier problème (matrice et textures communes sous $\hypothesis_0$).
 
 
 % CLAUDE : IGNORER la suite pour le moment
@@ -407,24 +573,24 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
 % grandeur au-dessus des autres et ecrasent les courbes glrt). Le remettre
 % supposerait un troisieme panneau; a trancher.
 % ====================================================================================
-\begin{figure}[h]
-  \centering
-  \input{gfx/generated/sonar_pfa_threshold/seuil-pfa/plot.tex}
-  \provSeuilPfaQR[1cm]
-  \caption{Relation entre $\pfa$ et seuil de detection, en fouillis gaussien, pour
-  $m=64$ capteurs par antenne et $\Nobs=2\times2m=256$ donnees secondaires. À
-  gauche le test de Rao \eqref{eq:detection-mills-rao}, à droite le glrt
-  \eqref{eq:detection-mills-glrt}. Dans chaque panneau, la courbe à dispersion
-  connue (bleu) est la reference; les versions adaptatives, construites sur la
-  scm (rouge) et sur l'estimateur à deux textures (orange), s'en ecartent vers
-  la droite: à $\pfa$ egale, il faut un seuil plus eleve, et c'est exactement le
-  prix de l'estimation. Le panneau de gauche porte en outre le filtre adapte
-  mimo à covariance connue (gris pointille), reference gaussienne. Les deux
-  panneaux ont des echelles de seuil distinctes: les statistiques ne partagent
-  pas d'unite, le glrt etant un rapport de produits d'echelles voisin de 1.
-  \provSeuilPfa}
-  \label{fig:detection-seuil-pfa}
-\end{figure}
+% \begin{figure}[htbp]
+%   \centering
+%   \input{gfx/generated/sonar_pfa_threshold/seuil-pfa/plot.tex}
+%   \provSeuilPfaQR[1cm]
+%   \caption{Relation entre $\pfa$ et seuil de detection, en fouillis gaussien, pour
+%   $m=64$ capteurs par antenne et $\Nobs=2\times2m=256$ donnees secondaires. À
+%   gauche le test de Rao \eqref{eq:detection-mills-rao}, à droite le glrt
+%   \eqref{eq:detection-mills-glrt}. Dans chaque panneau, la courbe à dispersion
+%   connue (bleu) est la reference; les versions adaptatives, construites sur la
+%   scm (rouge) et sur l'estimateur à deux textures (orange), s'en ecartent vers
+%   la droite: à $\pfa$ egale, il faut un seuil plus eleve, et c'est exactement le
+%   prix de l'estimation. Le panneau de gauche porte en outre le filtre adapte
+%   mimo à covariance connue (gris pointille), reference gaussienne. Les deux
+%   panneaux ont des echelles de seuil distinctes: les statistiques ne partagent
+%   pas d'unite, le glrt etant un rapport de produits d'echelles voisin de 1.
+%   \provSeuilPfa}
+%   \label{fig:detection-seuil-pfa}
+% \end{figure}
 
 % ============ TODO texte (~1 paragraphe) --- ANNONCE DU PLAN =======================
 % Conclure la section par le prix de l'estimation et les deux leviers. Matiere
@@ -453,40 +619,33 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
   Cette section reprend \fullcite{JOE24} et la communication \fullcite{GRETSI23a}.
 \end{contributions}
 
-% ============================ TODO texte (~2 paragraphes) ==========================
-% Poser le contexte, avant toute equation:
-%  1. le systeme: SEAPIX (Exail), sondeur multifaisceaux a croix de Mills, deux
-%    antennes lineaires orthogonales de 64 capteurs, l'une en emission l'autre
-%    en reception. Dire a quoi il sert (halieutique, bathymetrie, detection
-%    d'objets) et pourquoi la detection y est difficile;
-%  2. le cadre de la collaboration: these d'Olivier Lerda, co-encadrement avec
-%    Guillaume Ginolhac et Jean-Philippe Ovarlez, partenariat industriel;
-%  3. ce qui distingue le probleme du cas radar deja traite dans la
-%    litterature (renvoyer en note a la these de Chin Yuan Chong): bande
-%    relative large, reverberation dominante, pas de mouvement de plateforme a
-%    exploiter, et surtout deux antennes dont les statistiques n'ont aucune
-%    raison d'etre identiques --- c'est ce dernier point qui motive tout ce qui
-%    suit.
-% ====================================================================================
+Les travaux de cette section et de la suivante ont été menés dans le cadre de la thèse d'Olivier Lerda, soutenue en décembre 2024, que j'ai co-encadrée avec Guillaume Ginolhac, Jean-Philippe Ovarlez et Didier Charlot (Exail). Le point de départ est un système industriel, le sondeur multifaisceaux SEAPIX développé par Exail, principalement utilisé en halieutique et en hydrographie. Sa particularité est de disposer de deux antennes linéaires uniformes de $\Nsensor=64$ capteurs, orthogonales et disposées en croix de Mills \sidecite{Mills1953}, qui peuvent être utilisées indifféremment en émission ou en réception (\cref{fig:detection-mills-systeme}).
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.3\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/Sonar_antennas.png}
+  \end{minipage}
+  \hspace{1cm}
+  \begin{minipage}{0.4\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/SPX_and_DriX.png}
+  \end{minipage}
+  \caption{À gauche: face active du SEAPIX, les deux antennes linéaires de 64 capteurs se croisent en leur centre. À droite: le sonar installé dans la gondole du drone de surface DriX, en configuration de sonar frontal. Figures reprises de \cite{JOE24}.}
+  \label{fig:detection-mills-systeme}
+\end{figure}
+
+Dans le cadre de la thèse, le SEAPIX est utilisé comme sonar frontal (\emph{forward-looking sonar}, FLS) à bord du drone de surface DriX, la face active orientée vers l'avant et inclinée de $20^\circ$. L'antenne verticale émet un faisceau large de $9^\circ$ en élévation par $120^\circ$ en azimut, puis les deux antennes reçoivent simultanément: l'antenne horizontale forme des voies en azimut et l'antenne verticale des voies en élévation. Les données utilisées ont été acquises en baie de La Ciotat en 2021 et 2022, par 50~m de fond, avec une sphère métallique de 71~cm immergée à 25~m comme cible de référence.
+
+Le problème posé est alors celui de la \cref{def:detection-archetype-cible}: détecter une cible ponctuelle dans la réverbération du milieu. Deux constats sur les données réelles orientent le travail. D'une part, la réverbération n'est pas gaussienne: sur les premières centaines de mètres, la distribution de l'amplitude est proche d'une loi K de paramètre de forme $\nu\simeq3$, et elle ne redevient proche d'une loi normale qu'en fin de portée, là où le bruit ambiant domine \cite{JOE24}. Le modèle msg de la \cref{def:detection-msg} et les détecteurs robustes de la \cref{subsec:detection radar} sont donc le bon point de départ. D'autre part, on dispose de deux antennes qui observent la même scène, et il est naturel de se demander ce que l'on gagne à les traiter conjointement.
 
 \subsection{Modèle de données à deux antennes}
 \label{subsec:detection-mills-modele}
 
-% FIGURE 2/9 --- reprise de l'article \cite{JOE24}
-% Schema de la geometrie du systeme: deux antennes lineaires uniformes
-% orthogonales de $\Nsensor=64$ capteurs, l'une en emission l'autre en
-% reception, et le volume insonifie. Le lecteur ne peut pas se representer une
-% croix de Mills a partir du texte seul: cette figure doit venir AVANT la
-% \cref{def:detection-mills-modele}.
-% TODO decision: reprendre la figure de l'article (Multiswath_diagram_*.png) ou
-% la redessiner en TikZ pour l'homogeneite avec le reste du memoire ?
-% \begin{figure}[h]
-%   \begin{center}
-%     \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/mills_cross.png}
-%   \end{center}
-%   \caption{TODO}
-%   \label{fig:detection-mills-systeme}
-% \end{figure}
+Considérons d'abord chaque antenne séparément. Après formation des données en bande de base et compression d'impulsion, l'antenne $\iarray\in\{1,2\}$ fournit à chaque case distance un vecteur $\x_\iarray\in\C^{\Nsensor}$, et une cible ponctuelle vue dans la direction $\doa_\iarray$ s'écrit $\x_\iarray=\amplitude_\iarray\steering_\iarray+\z_\iarray$, avec $\steering_\iarray=\steering(\doa_\iarray)$ le vecteur directionnel de l'antenne. C'est exactement le problème de la \cref{def:detection-archetype-cible}, et l'on peut appliquer sur chaque antenne l'\detname{anmf} construit sur l'estimateur de Tyler \cref{eq:detection-anmf-tyler}. C'est ce qui est fait en pratique sur ce type de système, et c'est la référence à laquelle nous nous comparerons.
+
+Ce traitement antenne par antenne a toutefois un défaut, lié à la corrélation de la réverbération. Chaque antenne présente une zone de moindre détectabilité autour de $0^\circ$ dans sa propre direction, et comme elle ne voit rien de l'autre direction, cette zone s'étend à toute une bande de l'espace: une bande verticale pour l'antenne horizontale, une bande horizontale pour l'antenne verticale. En combinant les deux antennes, une cible n'est aveugle que si elle est mal placée pour les deux à la fois. Pour exploiter cette complémentarité, on concatène les observations:
 
 \begin{definition}[{Modèle à deux antennes}]
 \label{def:detection-mills-modele}
@@ -511,6 +670,8 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
   \end{equation}
 \end{definition}
 
+Les amplitudes $\amplitude_1$ et $\amplitude_2$ sont laissées libres, puisque les deux antennes n'ont ni la même ouverture ni le même gain. Reste à décrire le bruit $\z$. Dans la littérature radar, les détecteurs multi-antennes existants supposent soit un fouillis gaussien homogène sur toutes les antennes \sidecite{Chong201004}, soit des antennes non corrélées entre elles \cite{Chong201003}. Aucune de ces deux hypothèses ne convient ici. Les deux antennes n'observent pas la même portion de fond et leurs réverbérations n'ont pas de raison de fluctuer ensemble, mais elles partagent leur capteur central, si bien que les blocs d'intercorrélation ne sont pas nuls. La \cref{fig:detection-mills-covariance} le montre sur une scm estimée sur données réelles. D'où le modèle suivant:
+
 \begin{definition}[{Modèle multi-textures}]
 \label{def:detection-mills-multitexture}
   Chaque antenne porte sa propre texture et son propre facteur d'échelle. En posant $\escale_\iarray = \powerscale_\iarray\sqrt{\texture_\iarray}$ et
@@ -534,31 +695,30 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
   \end{equation}
 \end{definition}
 
-% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
-% C'est ici qu'il faut dire ce que ce modele apporte, car c'est l'apport
-% principal de la section. Points a faire, dans l'ordre:
-%  - le modele autorise deux antennes de statistiques *dissemblables*: on peut
-%    modeliser une premiere antenne gaussienne ($\texture_1=1$) et homogene
-%    ($\powerscale_1=1$), et une seconde K-distribuee et non homogene. Le
-%    modele mono-texture usuel l'interdit;
-%  - c'est physiquement fonde ici: les deux antennes n'observent pas la meme
-%    portion de fond, n'ont pas la meme ouverture, et leurs reverberations
-%    respectives n'ont aucune raison de fluctuer de concert;
-%  - au regard de la \cref{def:detection-heterogeneite}, il s'agit d'une
-%    heterogeneite *par bloc*, intermediaire entre le cas homogene (une seule
-%    texture pour tout le vecteur) et le cas degenere ou chaque capteur aurait
-%    la sienne (auquel cas plus rien n'est identifiable);
-%  - $\MScatter_{12}$ est conserve: c'est lui qui porte le gain de
-%    l'exploitation conjointe des deux antennes, et c'est ce qui distingue ce
-%    travail d'un traitement antenne par antenne.
-% ====================================================================================
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}{0.45\linewidth}
+    \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/SCM_example.pdf}
+  \end{minipage}
+  \begin{minipage}{0.45\linewidth}
+    \includegraphics[width=\linewidth]{gfx/chapter-detection/sonar/Covariance_model.pdf}
+  \end{minipage}
+  \caption{À gauche: scm estimée sur données réelles SEAPIX dans une zone homogène entre 265~m et 328~m (en dB). Les blocs diagonaux correspondent à chaque antenne, les blocs hors diagonale à leur intercorrélation, qui n'est pas nulle. À droite: le modèle de covariance utilisé en simulation, $[\MScatter]_{jl}=\beta\rho_1^{\abs{j_1-l_1}}\rho_2^{\abs{j_2-l_2}}$ avec $\beta=3\times10^{-4}$, $\rho_1=0{,}4$ et $\rho_2=0{,}9$. Figures reprises de \cite{JOE24}.}
+  \label{fig:detection-mills-covariance}
+\end{figure}
 
-\subsection{Détecteurs à dispersion connue}
+\begin{remark}[{Ce que le modèle autorise}]
+  Ce modèle permet de décrire deux antennes de statistiques différentes: on peut par exemple avoir une première antenne gaussienne ($\texture_1=1$) et homogène ($\powerscale_1=1$), et une seconde K-distribuée et partiellement homogène. Au sens de la \cref{def:detection-heterogeneite}, il s'agit d'une hétérogénéité \emph{par blocs}, intermédiaire entre le modèle usuel à une seule texture pour tout le vecteur et le cas où chaque capteur aurait la sienne, où plus rien ne serait identifiable. Le bloc $\MScatter_{12}$ est conservé, et c'est lui qui distingue ce modèle d'un traitement antenne par antenne.
+\end{remark}
+
+\subsection{Le trvg et l'apparition d'un terme croisé}
 \label{subsec:detection-mills-tests}
 
-\begin{proposition}[{glrt à deux textures}]
+Suivons la démarche en deux étapes de la \cref{subsec:detection radar}: on suppose d'abord $\MScatter$ connue, on dérive le test, puis on remplace $\MScatter$ par une estimée. À $\MScatter$ connue, les paramètres inconnus sont les amplitudes $\Vamplitude$ et les deux échelles $\escale_1,\escale_2$. Le trvg s'obtient en maximisant la vraisemblance en ces paramètres sous chaque hypothèse, et on obtient le résultat suivant \cite{JOE24}:
+
+\begin{proposition}[{trvg à deux textures}]
 \label{prop:detection-mills-glrt}
-  Le glrt du problème \cref{eq:detection-mills-test} à $\MScatter$ connue s'écrit comme le quotient des échelles estimées sous chaque hypothèse:
+  Le trvg du problème \cref{eq:detection-mills-test} à $\MScatter$ connue s'écrit comme le quotient des échelles estimées sous chaque hypothèse:
   \begin{equation}
     \statGLRT(\x)
     =
@@ -588,11 +748,25 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
   \end{equation}
 \end{proposition}
 
-% TODO decision (notation): dans l'article, $\mathbf{M}_{12}^{-1}$ designe le
-% bloc $(1,2)$ de $\mathbf{M}^{-1}$ et non l'inverse du bloc $\mathbf{M}_{12}$.
-% J'ai leve l'ambiguite en ecrivant $[\inv{\MScatter}]_{12}$, mais je n'ai pas
-% pu verifier les annexes A et D: merci de confirmer sur la version publiee
-% avant que ces expressions ne soient figees.
+Le détecteur est donc un rapport des puissances résiduelles estimées sans et avec la cible, comme le \detname{nmf} en mono-antenne. La nouveauté est dans \cref{eq:detection-mills-sigma0}: en plus des deux formes quadratiques propres à chaque antenne apparaît le terme croisé $\Realp(\x_1^\herm[\inv{\MScatter}]_{12}\x_2)$, qui fait intervenir la corrélation entre les deux antennes dans l'estimation de leurs échelles. C'est ce terme qui permet de situer le détecteur par rapport à ceux de la littérature:
+\begin{itemize}
+  \item pour une seule antenne, \cref{eq:detection-mills-glrt} se ramène, à une transformation monotone près, au \detname{nmf} \cref{eq:detection-nmf};
+  \item lorsque les antennes sont décorrélées, $[\inv{\MScatter}]_{12}=\mat{0}$, le terme croisé disparaît et l'on retrouve le détecteur \textsc{mimo} de \citet{Chong201003}, c'est-à-dire un produit de deux \detname{nmf};
+  \item lorsque les deux échelles sont égales, on retrouve la version par sous-espace de l'\textsc{ace} \cite{Raghavan2016}.
+\end{itemize}
+Le trvg à deux textures est donc une généralisation bi-antenne du \detname{nmf}, que l'on notera \detname{m-nmf-g}, et sa version adaptative une généralisation de l'\detname{anmf}.
+
+\begin{property}[{Invariance aux textures}]
+\label{prop:detection-mills-cfar}
+  La statistique \cref{eq:detection-mills-glrt} est texture-cfar au sens de la \cref{def:detection-cfar}: sa loi sous $\hypothesis_0$ ne dépend ni de $\texture_1$ ni de $\texture_2$.
+\end{property}
+
+\subsection{Pourquoi passer au test de Rao}
+\label{subsec:detection-mills-rao}
+
+Le trvg \cref{eq:detection-mills-glrt} présente deux inconvénients pratiques. Le premier est son coût: les échelles sous $\hypothesis_1$ font intervenir le projecteur $\projspace{\MScatter}$, qui dépend de la direction testée $(\doa_1,\doa_2)$. Il faut donc les recalculer pour chaque couple de directions, alors que le balayage porte sur $64\times64$ couples par case distance. Le second est sa loi: si l'on dispose d'une relation $\pfa$-seuil exacte à $\MScatter$ connue, les simulations montrent que la version adaptative n'est plus matrice-cfar lorsque la fausse alarme visée est faible \cite{JOE24}, ce qui empêche de fixer un seuil une fois pour toutes.
+
+Le test de Rao répond aux deux. Il ne demande l'estimation des paramètres de nuisance que sous $\hypothesis_0$, et sous $\hypothesis_0$ les échelles estimées \cref{eq:detection-mills-sigma0} ne dépendent pas de $\Steermat$: une seule estimation par case distance sert à tout le balayage angulaire. En écrivant le problème sous la forme \cref{eq:detection-test-parametre} avec $\paramtest=[\Realp(\Vamplitude)^\T,\operatorname{Im}(\Vamplitude)^\T]^\T\in\R^4$ et $\paramnuis=[\escale_1,\escale_2]^\T$, on obtient \sidecite{GRETSI23a}:
 
 \begin{proposition}[{Test de Rao à deux textures}]
 \label{prop:detection-mills-rao}
@@ -606,35 +780,39 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
     \detect,
     \label{eq:detection-mills-rao}
   \end{equation}
-  où $\widehat{\MCov}_0 = \widehat{\Scalemat}_0\,\MScatter\,\widehat{\Scalemat}_0$ et où $\widehat{\Scalemat}_0$ rassemble les échelles estimées sous $\hypothesis_0$ au sens de \cref{eq:detection-mills-sigma0}.
+  où $\widehat{\MCov}_0 = \widehat{\Scalemat}_0\,\MScatter\,\widehat{\Scalemat}_0$, les échelles de $\widehat{\Scalemat}_0$ valant
+  \begin{equation}
+    \hat{\escale}_{1,0}^2 = s_1 + \sqrt{\frac{s_1}{s_2}}\,s_{12},
+    \qquad
+    \hat{\escale}_{2,0}^2 = s_2 + \sqrt{\frac{s_2}{s_1}}\,s_{12},
+    \label{eq:detection-mills-echelles-h0}
+  \end{equation}
+  avec $s_\iarray = \x_\iarray^\herm[\inv{\MScatter}]_{\iarray\iarray}\x_\iarray/\Nsensor$ et $s_{12}=\Realp(\x_1^\herm[\inv{\MScatter}]_{12}\x_2)/\Nsensor$.
 \end{proposition}
 
-\begin{property}[{Invariance aux textures}]
-\label{prop:detection-mills-cfar}
-  Les statistiques \cref{eq:detection-mills-glrt,eq:detection-mills-rao} sont texture-cfar au sens de la \cref{def:detection-cfar}: leur loi sous $\hypothesis_0$ ne dépend ni de $\texture_1$ ni de $\texture_2$.
-\end{property}
+On reconnaît dans \cref{eq:detection-mills-rao} le filtre adapté \textsc{mimo} de \sidecite{Chong201004}, qui est le détecteur optimal en fouillis gaussien homogène à covariance connue, évalué ici en une covariance dont les échelles de chaque antenne ont été estimées sur l'observation elle-même. On retrouve aussi le terme croisé $s_{12}$, cette fois dans l'estimation des échelles. Le test est texture-cfar, et sa forme d'énergie projetée donne directement sa loi sous $\hypothesis_0$:
 
-% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
-% Comparer les deux detecteurs, c'est le coeur de l'apport de la section:
-%  - le glrt \cref{eq:detection-mills-glrt} est un *rapport d'echelles*: il
-%    mesure de combien la prise en compte du signal reduit la puissance
-%    residuelle estimee;
-%  - le Rao \cref{eq:detection-mills-rao} est une *energie projetee* sur le
-%    sous-espace signal, evaluee avec les seules nuisances de $\hypothesis_0$;
-%  - renvoyer a la \cref{rem:detection-pourquoi-rao} pour la lecture
-%    selectivite/robustesse, et annoncer que les courbes de la
-%    \cref{subsec:detection-mills-perf} confirment le comportement attendu:
-%    performances comparables sur cible alignee, ecart net des que la reponse
-%    s'ecarte du modele;
-%  - dire aussi le gain pratique deja evoque: $\widehat{\MCov}_0$ ne depend pas
-%    de la direction testee, une seule estimation sert donc tout le balayage.
-% TODO decision: placer les preuves (annexes A a D de l'article) en annexe de
-% chapitre, ou renvoyer au pdf joint ? Mon avis: annexe de chapitre pour le
-% Rao, dont la derivation est la contribution la moins accessible.
-% ====================================================================================
+\begin{proposition}[{Relation $\pfa$-seuil du test de Rao}]
+\label{prop:detection-mills-rao-pfa}
+  Sous $\hypothesis_0$, $\statRao$ suit asymptotiquement (en $\Nsensor$) une loi du $\chisquared$ à quatre degrés de liberté, d'où
+  \begin{equation}
+    \pfa = \exp\left(-\frac{\DetectorTreshold}{2}\right)\left(1+\frac{\DetectorTreshold}{2}\right),
+    \label{eq:detection-mills-rao-pfa}
+  \end{equation}
+  qui ne dépend ni des textures ni de $\MScatter$.
+\end{proposition}
+
+En simulation, le régime asymptotique est atteint dès $\Nsensor=64$, ce qui est le cas du SEAPIX, et la relation \cref{eq:detection-mills-rao-pfa} reste vérifiée en version adaptative pour des matrices de covariance très différentes \cite{JOE24}. C'est la raison principale pour laquelle nous privilégions le test de Rao, que l'on notera \detname{m-nmf-r}.
+
+\begin{remark}[{Pourquoi le test de Rao}]
+\label{rem:detection-pourquoi-rao}
+  Le test de Rao est souvent présenté comme une approximation du trvg, plus simple à calculer. Ici, il présente trois avantages qui dépassent la simplicité de calcul. D'abord, l'estimée sous $\hypothesis_0$ ne dépend pas de la direction testée, ce qui rend le balayage angulaire peu coûteux. Ensuite, sa loi sous $\hypothesis_0$ est connue en forme close et ne dépend pas de la covariance pour $\Nsensor$ grand, ce qui permet de régler le seuil sans simulation. Enfin, comme il est construit au voisinage de $\hypothesis_0$, il ne cherche pas à expliquer l'observation par un signal quelconque, et il est plus sélectif vis-à-vis des signaux qui ne correspondent pas à la direction testée. Ce dernier point sera mis en regard, en \cref{sec:detection-fls}, du choix inverse que font les détecteurs par sous-espaces.
+\end{remark}
 
 \subsection{Estimation robuste sous textures multiples}
 \label{subsec:detection-mills-estimation}
+
+Reste la seconde étape: remplacer $\MScatter$ par une estimée issue de $\Nobs$ données secondaires. En fouillis gaussien, la scm convient, mais en fouillis msg elle est dominée par les données de forte puissance. Il faut donc un estimateur de Tyler adapté au modèle à deux textures. En maximisant la vraisemblance des données secondaires sous le modèle de la \cref{def:detection-mills-multitexture}, on obtient \sidecite{JOE24}:
 
 \begin{proposition}[{Estimateur de Tyler à deux textures}]
 \label{prop:detection-mills-tyler}
@@ -648,79 +826,21 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
     \widehat{\mat{T}}_\iobs = \Diag\left(\sqrt{\hat{\texture}_{1,\iobs}},\sqrt{\hat{\texture}_{2,\iobs}}\right)\otimes\Id{\Nsensor},
     \label{eq:detection-mills-tyler}
   \end{equation}
-  où les textures estimées valent
-  \begin{equation}
-    \hat{\texture}_{1,\iobs} = t_1 + \sqrt{\frac{t_1}{t_2}}\,t_{12},
-    \qquad
-    \hat{\texture}_{2,\iobs} = t_2 + \sqrt{\frac{t_2}{t_1}}\,t_{12},
-    \label{eq:detection-mills-textures}
-  \end{equation}
-  avec
-  \begin{equation}
-    t_\iarray = \frac{\x_{\iarray,\iobs}^\herm\left[\inv{\widehat{\MScatter}}\right]_{\iarray\iarray}\x_{\iarray,\iobs}}{\Nsensor},
-    \qquad
-    t_{12} = \frac{\Realp\left(\x_{1,\iobs}^\herm\left[\inv{\widehat{\MScatter}}\right]_{12}\x_{2,\iobs}\right)}{\Nsensor}.
-    \label{eq:detection-mills-tk}
-  \end{equation}
+  où les textures $\hat{\texture}_{1,\iobs}$ et $\hat{\texture}_{2,\iobs}$ sont données par \cref{eq:detection-mills-echelles-h0} appliquée à $\x_\iobs$ et à $\widehat{\MScatter}$.
 \end{proposition}
 
-\begin{algorithm}[h]
-\caption{Estimation robuste à deux textures}
-\label{alg:detection-mills-tyler}
-\begin{algorithmic}[1]
-  \Require $\{\x_\iobs\}_{\iobs=1}^{\Nobs}$, initialisation $\widehat{\MScatter}^{(0)}=\Id{\Narray\Nsensor}$
-  \State $\iiter \gets 0$
-  \While{convergence non atteinte}
-    \State calculer $\{t_1,t_2,t_{12}\}$ par \cref{eq:detection-mills-tk} à partir de $\widehat{\MScatter}^{(\iiter)}$
-    \State former $\widehat{\mat{T}}_\iobs^{(\iiter)}$ par \cref{eq:detection-mills-textures}, $\iobs\in\intrange{1}{\Nobs}$
-    \State $\widehat{\MScatter}^{(\iiter+1)} \gets \dfrac{1}{\Nobs}\sum_{\iobs=1}^{\Nobs}\inv{\left(\widehat{\mat{T}}_\iobs^{(\iiter)}\right)}\x_\iobs\x_\iobs^\herm\inv{\left(\widehat{\mat{T}}_\iobs^{(\iiter)}\right)}$
-    \State $\iiter \gets \iiter+1$
-  \EndWhile
-\end{algorithmic}
-\end{algorithm}
+On retrouve la structure de l'estimateur de Tyler (\cref{def:context-complex-tyler}): chaque donnée est normalisée par sa propre puissance avant d'être moyennée, ce qui rend l'estimée indépendante des textures. La différence est que la normalisation se fait par bloc, et que la texture d'une antenne est estimée en tenant compte, à travers le terme croisé, de ce qu'observe l'autre. L'estimateur se calcule par un algorithme de point fixe, dont la convergence est rapide en pratique\footnote{L'existence et l'unicité de la solution ne sont en revanche pas établies. Voir l'annexe~D de l'article reproduit p.~\paperpage{JOE24} pour la dérivation et l'algorithme.}. En remplaçant $\MScatter$ par $\widehat{\MScatter}$ dans \cref{eq:detection-mills-glrt,eq:detection-mills-rao}, on obtient les versions adaptatives des deux détecteurs.
 
-% ======================= TODO texte (remarque, ~6 lignes) ==========================
-% Trois choses a dire sur cet estimateur:
-%  - il ne depend pas des textures, donc il est distribution-free par le meme
-%    mecanisme que l'estimateur de Tyler standard
-%    (\cref{eq:detection-tyler,prop:context-complex-tylerdf}): c'est une
-%    generalisation *multi-textures* de l'estimateur du point fixe de
-%    \sidecite{Pascal08a};
-%  - le terme croise $t_{12}$ est ce qui distingue reellement
-%    \cref{eq:detection-mills-textures} d'une estimation antenne par antenne:
-%    la texture d'une antenne est estimee en tenant compte de ce que l'autre
-%    observe;
-%  - ATTENTION, a formuler honnetement: l'existence et l'unicite de la solution
-%    de \cref{eq:detection-mills-tyler} ne sont pas etablies analytiquement.
-%    L'article ne les valide que *numeriquement* (convergence observee sur
-%    500 iterations, ecart relatif sous $10^{-6}$ des l'iteration 20, quelle
-%    que soit l'initialisation). A presenter comme une question ouverte, et
-%    eventuellement a renvoyer aux perspectives du bilan.
-% ====================================================================================
-
-\subsection{Invariance, robustesse et sélectivité en simulation}
+\subsection{Ce que la fusion des antennes apporte}
 \label{subsec:detection-mills-perf}
-% TODO decision: titre de sous-section a valider --- il annonce desormais ce que
-% les courbes montrent plutot que le mot neutre « Performances ».
 
-% ============================ TODO texte + figures =================================
-% Trois figures retenues pour cette section (voir le plan de simulations).
-%
-\wipfig{FIGURE 3/9}{Carte 2-D + coupe 1-D. Rien n'est encore tracé. Expérience: sonar\_pd\_angle.}
-
-% FIGURE 3/9 --- reproductible (qanat: sonar_pd_angle) --- LA FIGURE DE LA SECTION
-% $\pdet$ en fonction du desalignement angulaire, a $\pfa$ fixee, pour le glrt
-% \cref{eq:detection-mills-glrt}, le test de Rao \cref{eq:detection-mills-rao} et
-% l'anmf mono-antenne en reference. C'est elle qui *mesure* la selectivite
-% annoncee en \cref{rem:detection-pourquoi-rao}.
-% IMPORTANT: memes axes et memes unites que la figure de rang variable en
-% \cref{subsec:detection-fls-perf}, faute de quoi l'axe selectivite/robustesse
-% reste une affirmation au lieu d'etre une mesure.
-%
-% FIGURE 6/9 --- reprise de l'article \cite{JOE24}
-% Sorties des detecteurs sur donnees reelles SEAPIX. Non reproductible: les
-% donnees ne sont pas distribuables, et c'est a dire explicitement.
-% ====================================================================================
+Les simulations de \cite{JOE24} utilisent le modèle de covariance de la \cref{fig:detection-mills-covariance}, $\Nobs=2\times2\Nsensor=256$ données secondaires et $\pfa=10^{-2}$. On peut en retenir les éléments suivants:
+\begin{itemize}
+  \item à covariance connue, en fouillis gaussien, les détecteurs bi-antennes gagnent environ 2,5~dB et 2~dB par rapport aux \detname{nmf} de chacune des antennes, à $\pdet=0{,}8$, et ne sont qu'à 0,2~dB du filtre adapté \textsc{mimo} qui connaît toute la covariance;
+  \item le gain se lit surtout dans le plan azimut-élévation: là où l'antenne horizontale seule a une probabilité de détection de 0,17 sur toute la bande $\doa_1=0^\circ$, et l'antenne verticale 0,03 sur la bande $\doa_2=0^\circ$, le test de Rao dépasse 0,8 dès que $\abs{\doa_2}>10{,}5^\circ$. La zone aveugle se réduit à un voisinage du centre;
+  \item en fouillis gaussien partiellement homogène, le filtre adapté \textsc{mimo} adaptatif ne contrôle plus la fausse alarme et devient moins bon que l'\detname{anmf} mono-antenne, alors que les détecteurs proposés ne sont pas affectés, étant invariants aux échelles;
+  \item en fouillis K-distribué ($\nu=0{,}5$), l'estimateur à deux textures apporte environ 1,2~dB par rapport à la scm, et 3~dB par rapport au meilleur des détecteurs concurrents.
+\end{itemize}
 
 % ============================== FIGURE 4/9 =========================================
 % ATTENTION: RUN DEBUG (n_h0 = n_h1 = 200, 12 points de rsb au lieu de 150).
@@ -741,7 +861,7 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
 % l'article. A trancher: axe commun (honnete mais different de l'article) ou
 % convention de l'article (comparable mais a expliquer en note).
 % ====================================================================================
-\begin{figure}[h]
+\begin{figure}[htbp]
   \centering
   \input{gfx/generated/sonar_pd_snr/pd-rsb/plot.tex}
   \provPdRsbQR[1cm]
@@ -755,40 +875,16 @@ Cette dernière remarque permet alors d'obtenir dans ce cas complexe le résulta
   \label{fig:detection-mills-pd-rsb}
 \end{figure}
 
-% ============================== FIGURE 5/9 =========================================
-% ATTENTION: RUN DEBUG (64 tirages). Version definitive:
-%   uv run qanat experiment run sonar_tyler_conv --n-trials 1000
-%
-% Ce que la figure montre: une decroissance geometrique jusqu'a la precision
-% machine --- 1e-3 des la neuvieme iteration, 1e-6 a la vingtieme, 1e-15 vers la
-% cinquantieme. C'est le comportement attendu d'un point fixe de type Tyler.
-%
-% ATTENTION, ne pas reprendre la lecture precedente. Une premiere version de
-% cette figure montrait une decroissance sous-lineaire bloquee vers 1e-3, et
-% j'en avais tire un argument sur la question d'unicite. C'etait un artefact:
-% la fonction qui tracait la convergence etait une SECONDE COPIE de l'iteration,
-% restee a la version non corrigee de l'estimateur (mise a jour conjuguee,
-% normalisation en trace dont le determinant sous-deborde a 2m=128). La copie a
-% ete supprimee, le trace passe desormais par l'estimateur lui-meme.
-%
-% La figure ne dit donc RIEN sur l'unicite: elle montre que l'algorithme
-% converge vite et proprement. Si l'on veut parler d'unicite, il faut un autre
-% argument --- par exemple faire varier l'initialisation et verifier que le
-% point fixe atteint est le meme, ce qui n'est pas encore fait.
-% TODO: relancer avec plusieurs initialisations pour appuyer ou non l'unicite.
-% ====================================================================================
-\begin{figure}[h]
+\wipfig{FIGURE 3/9}{Carte $\pdet(\doa_1,\doa_2)$ pour \detname{nmf} 1, \detname{nmf} 2 et le test de Rao à covariance connue, RSB $=-12$~dB. Expérience: sonar\_pd\_angle.}
+
+Sur données réelles, la cible de référence est correctement localisée en azimut et en élévation par les deux détecteurs. L'intérêt de l'estimateur robuste apparaît lorsque les données secondaires sont contaminées: en ajoutant une cible synthétique à 100 cases distance de la cible réelle, le test de Rao construit sur la scm ne permet plus de distinguer la cible et place son maximum au mauvais endroit, alors que la version construite sur l'estimateur à deux textures reste exploitable (\cref{fig:detection-mills-contamination}).
+
+\begin{figure}[htbp]
   \centering
-  \input{gfx/generated/sonar_tyler_conv/convergence-tyler/plot.tex}
-  \provConvergenceTylerQR[.5cm]
-  \caption{Convergence de l'\cref{alg:detection-mills-tyler}: ecart relatif
-  $\|\widehat{\MScatter}_{k+1}-\widehat{\MScatter}_k\|_F/\|\widehat{\MScatter}_k\|_F$
-  entre iterees successives, moyenne sur les tirages, pour $m=64$ et
-  $\Nobs=256$. La decroissance est geometrique et atteint la precision machine:
-  $10^{-3}$ des la neuvieme iteration, $10^{-6}$ a la vingtieme. Le point fixe
-  est donc atteint bien avant les cent iterations usuellement allouees.
-  \provConvergenceTyler}
-  \label{fig:detection-mills-convergence}
+  \includegraphics[width=0.49\linewidth]{gfx/chapter-detection/sonar/M_ANMF_R_SCM_corrupted_output.pdf}
+  \includegraphics[width=0.49\linewidth]{gfx/chapter-detection/sonar/M_ANMF_R_TYL_corrupted_output.pdf}
+  \caption{Sortie du test de Rao adaptatif sur données réelles SEAPIX lorsque les données secondaires sont contaminées par une seconde cible. À gauche avec la scm, à droite avec l'estimateur à deux textures \cref{eq:detection-mills-tyler}, tous deux sur 256 données secondaires. Figures reprises de \cite{JOE24}, les données n'étant pas diffusables.}
+  \label{fig:detection-mills-contamination}
 \end{figure}
 
 \section{Détection multi-pings et sous-espaces pour un sonar frontal}
@@ -1195,7 +1291,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 %TODO: trouver références images
 À titre de comparaison, effectuons une simulation sur une scène plus petite sur 4 dates en mesurant le temps de calcul total d'une carte de détection de changements à l'aide des deux détecteurs $\DetectorStat_\gaussian$ et $\DetectorStat_\compoundgaussian$. Pour une mesure significative, nous effectuons 15 détections successives (5 pour le temps de chauffe pour éliminer les optimisations liées au système d'exploitation et 10 pour la mesure) et présentons en Figure \ref{fig:benchmark_sar_offline}, les résultats.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
   \input{gfx/chapter-detection/sar/benchmarks/benchmark_chart_gaussian.tex}
   \input{gfx/chapter-detection/sar/benchmarks/benchmark_chart_compoundgaussian.tex}
   \caption{Comparaison des temps de calculs sur CPU et GPU des cartes de détection de changements sur la Scene 1 avec ($\vdim=12$) ou sans ($\vdim=3$) la décomposition en ondelettes \cite{Mian_wavelet_2019}. Nombre de répétions : 10 (après 5 répétitions de chauffe).}
@@ -1491,7 +1587,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 % Le code de \cref{eq:detection-online-icrb-composantes} implemente les formules
 % corrigees; verifier que les equations du memoire les reprennent.
 % ====================================================================================
-\begin{figure}[h]
+\begin{figure}[htbp]
   \centering
   \input{gfx/generated/sar_mc_kron_mse/mse-icrb/plot.tex}
   \provMseIcrbQR[1cm]
@@ -1522,7 +1618,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 % Le gain mesure va de 5,9 a $\Nobs=4$ jusqu'a 2,3 a $\Nobs=70$: la structure
 % achete d'autant plus que la fenetre est petite.
 % ====================================================================================
-\begin{figure}[h]
+\begin{figure}[htbp]
   \centering
   \input{gfx/generated/sar_mc_kron_struct/structure-vs-n/plot.tex}
   \provStructureVsNQR[.5cm]
@@ -1559,7 +1655,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 % premiers pas de gradient degradent avant que le moyennage en $\alpha_0/\Ntime$
 % ne reprenne la main.
 % ====================================================================================
-\begin{figure}[h]
+\begin{figure}[htbp]
   \centering
   \input{gfx/generated/sar_mc_power/puissance-k/plot.tex}
   \provPuissanceKQR[.5cm]
@@ -1592,7 +1688,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 % Tant que ce n'est pas tranche, presenter la figure comme une observation, pas
 % comme une propriete du detecteur.
 % ====================================================================================
-\begin{figure}[h]
+\begin{figure}[htbp]
   \centering
   \input{gfx/generated/sar_mc_power/puissance-gaussien/plot.tex}
   \provPuissanceGaussienQR[.5cm]
@@ -1626,7 +1722,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 
 \wip{Bilan ch. détection: la science}{Quatre points: ce qui circule entre les deux moitiés du chapitre (la même estimation de matrice de forme, contrainte tantôt statistiquement tantôt géométriquement); l'axe sélectivité/robustesse comme grille de lecture; les points ouverts assumés (unicité, seuils en forme close, aucun travail ne combine en-ligne et structure); la transition vers le chapitre SPDnet. Environ 1 page.}
 
-\wip{Bilan ch. détection: les six mouvements}{À placer AVANT la transition. Nommer les personnes avec les dates --- aucun nom n'apparaît aujourd'hui dans ce chapitre; l'application qui a unifié le travail; ce qui a été construit, en clair; pointer les articles reproduits par leur folio (\texttt{\textbackslash paperpage\{JOE24\}} p.~\pageref{paper:JOE24}, JOE26 p.~\pageref{paper:JOE26}, SP24 p.~\pageref{paper:SP24}); dire que le travail excède les articles joints; dire où cela continue. Puis 3 ou 4 perspectives propres au chapitre en paragraphes à titre courant.}
+\wip{Bilan ch. détection: les six mouvements}{À placer AVANT la transition. Nommer les personnes avec les dates --- aucun nom n'apparaît aujourd'hui dans ce chapitre; l'application qui a unifié le travail; ce qui a été construit, en clair; pointer les articles reproduits par leur folio (\texttt{\textbackslash paperpage\{JOE24\}} p.~\paperpage{JOE24}, JOE26 p.~\pageref{paper:JOE26}, SP24 p.~\pageref{paper:SP24}); dire que le travail excède les articles joints; dire où cela continue. Puis 3 ou 4 perspectives propres au chapitre en paragraphes à titre courant.}
 
 % ============================ TODO texte (~1 page) =================================
 % Quatre choses a dire, dans cet ordre:
