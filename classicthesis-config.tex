@@ -144,6 +144,7 @@
 \usepackage{etoolbox}
 \usepackage{xparse}
 \usepackage{fontawesome5} % the book glyph marking a margin citation
+\usepackage{placeins} % \FloatBarrier, to keep a section's figures before the next one
 
 % ---------- Which margin are we in? ----------
 % marginnote calls \raggedleftmarginnote when it \llap's the note, i.e. when the
@@ -203,6 +204,13 @@
   \marginnote{#1}[\sidecite@shift]%
 }
 \makeatother
+% Margin pointer back to the context part, so that a contribution chapter can
+% recall where a tool was introduced without sending the reader there.
+% Same look as a margin citation, with a back arrow in place of the book glyph.
+% Usage: \sideref[shift]{label}{what is recalled}
+\NewDocumentCommand{\sideref}{O{0pt} m m}{%
+  \marginnote{\leavevmode\vbox{\fontsize{7.5pt}{8.5pt}\selectfont\baselineskip=8.5pt\noindent\ctmarginragged\hbadness=10000{\color{ctcite}\ctmarginrule}{\color{ctcite}\fontsize{6pt}{6pt}\selectfont\faReply}\hspace{0.4em}#3: \cref{#2}, p.~\pageref{#2}.\par}}[#1]%
+}
 % Les citations dans le corps du texte sont toujours parenthesees, de maniere a
 % rester coherentes avec le rendu de \sidecite ci-dessus, qui s'appuie sur
 % \parencite. \citet et \citep (mode natbib) ne sont pas affectes.

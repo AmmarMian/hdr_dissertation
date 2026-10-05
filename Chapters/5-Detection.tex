@@ -1160,25 +1160,12 @@ Sur données réelles, la cible de référence est correctement localisée en az
 \label{sec:detection-online-change-detection}
 
 \begin{contributions}
-  Cette section reprend \fullcite{SP24}.
+  Cette section reprend \fullcite{SP24}. Elle partage avec \fullcite{EUSIPCO21} la géométrie de la structure de Kronecker et le schéma d'estimation récursive, mais pas le modèle: les données y suivent une loi de Student, d'où un gradient et une borne différents.
 \end{contributions}
 
-% ============================ TODO decision ========================================
-% \fullcite{EUSIPCO21} partage la machinerie (estimation en ligne d'une
-% covariance a structure de Kronecker par gradient riemannien) mais *pas* le
-% modele: t de Student la, gaussienne a echelle (ccg) ici. Ne pas presenter
-% l'un comme le prolongement de l'autre. Deux options:
-%  (a) le citer dans cet encadre en disant explicitement ce qui est commun (la
-%      geometrie et le schema recursif) et ce qui differe (le modele, donc le
-%      gradient et la borne);
-%  (b) ne le citer qu'en passant dans le texte, au moment ou le schema recursif
-%      est introduit.
-% ====================================================================================
+La section précédente a montré qu'une structure de la matrice de covariance permet de réduire le nombre d'échantillons nécessaires à son estimation. Un problème commun à tous les détecteurs robustes vus jusqu'ici reste cependant entier: l'estimation passe par la résolution d'une équation de point fixe, dont le coût devient vite limitant lorsque l'on souhaite améliorer une estimation précédente en y ajoutant de nouvelles données. C'est précisément la situation de la détection de changements sur une série temporelle d'images RSO, où chaque nouvelle acquisition oblige à recalculer l'estimée sous $\hypothesis_0$ sur l'ensemble des dates. Dans ce contexte, la géométrie riemannienne permet de considérer un cadre d'estimation en ligne basé sur un algorithme de descente de gradient stochastique \cite{Zhou_2019}, pour lequel une seule itération suffit à chaque nouvelle image\sideref{sec:context-riemann-optimization}{Optimisation riemannienne}.
 
-
-Phrase de transition sur la partie précédente.... : calculs lourds lié au point-fixe dans l'estimation qui reste un problème dans toutes les méthodes de détection robustes, notamment quand il s'agit d'ajouter des données pour améliorer une estimation précédente. Dans ce contexte, la géométrie riemannienne permet de considérer un cadre d'estimation en ligne basé sur un algorithme de décente de gradient stochastique \cite{Zhou_2019}.
-
-Blabla
+Ces travaux ont été menés avec Guillaume Ginolhac, Florent Bouchard et Arnaud Breloy. Ils combinent deux idées: supposer une structure de Kronecker pour la matrice de covariance, qui découle naturellement de la décomposition en ondelettes de \cite{Mian_wavelet_2019} appliquée aux canaux de polarisation, et mettre à jour récursivement l'estimée sous $\hypothesis_0$ par une descente de gradient naturel sur la variété des paramètres. Nous commençons par rappeler le problème et ses limitations pratiques, avant de détailler ces deux contributions puis de les illustrer sur données simulées et réelles.
 
 
 \subsection{Problématique de la détection de changements sur matrices de covariances}
@@ -1202,7 +1189,7 @@ Pour effectuer une détection de changements, on se base sur la notion de voisin
 
 
 
-\begin{figure*}[t]
+\begin{figure*}[p]
   \foreach \i in {1,...,16}{
     \includegraphics[width=0.3\textwidth]{gfx/chapter-detection/sar/sar_its/image_\i.jpg}
   }
@@ -1231,12 +1218,12 @@ En pratique, il devient difficile de mettre en place une stratégie de décision
 
 \begin{equation}
   \left\{ \begin{array}{lll} \hypothesis_0: &  \forall \itime, & \param_t = \param_1   \\ 
-  \hypothesis_1: & \exists (\itime_1, \itime_2)\, / & \param_{t_1} = \param_{\itime_2} \end{array}\right. .
+  \hypothesis_1: & \exists (\itime_1, \itime_2)\, / & \param_{\itime_1} \neq \param_{\itime_2} \end{array}\right. .
 \end{equation}
 
 Dans le cas gaussien, les données étant centrées par construction la détection se fait sur la matrice de covariance : $\param_t = \{\MCov_t\}$, ce qui revient à un problème très connu dans la littérature statistique : le test d'égalité de matrices de covariances \cite{anderson1958introduction}. Le GLRT du problème a été dérivé et se formule comme un rapport de déterminants :
 \begin{equation}
-  \DetectorStat_\gaussian \propto \dfrac{\Det(\sum_{\itime=1}^{\Ntime} \Smat_\itime)}{\prod_{\itime=1}^{\Ntime} \Det(\Smat_\itime)} \detect .
+  \DetectorStat_\gaussian = \dfrac{\Det\left(\sum_{\itime=1}^{\Ntime} \Smat_\itime\right)^{\Ntime\Nobs}}{\Ntime^{\vdim\Ntime\Nobs}\prod_{\itime=1}^{\Ntime} \Det(\Smat_\itime)^{\Nobs}} \detect .
   \label{eq:glrt_gaussian_cd}
 \end{equation}
 
@@ -1244,13 +1231,13 @@ Dans le cas gaussien, les données étant centrées par construction la détecti
 %TODO: lier à l'équation du modèle CCG en chapitre 1
 Dans le cas elliptique, la méconnaissance de la fonction génératrice de densité complique la dérivation d'un détecteur universel. Ainsi, nous avons pu proposer de passer par la modélisation en distribution gaussienne composée : $\param_t = \{\texture_{1\itime},\dots,\texture_{\Nobs\itime}, \MCov\}$. Dans ce cas, le GLRT est tractable et se formule comme \cite{Mian_2019}:
 \begin{equation}
-  \DetectorStat_\compoundgaussian \propto \dfrac{\Det(\Tyler_0)}{\prod_{\itime=1}^{\Ntime} \Det(\Tyler_t)} \prod_{\iobs=1}^{\Nobs} \dfrac{\sum_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_0}}{\prod_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_t}} \detect,
+  \DetectorStat_\compoundgaussian \propto \dfrac{\Det(\Tyler_0)^{\Ntime\Nobs}}{\prod_{\itime=1}^{\Ntime} \Det(\Tyler_t)^{\Nobs}} \prod_{\iobs=1}^{\Nobs} \dfrac{\left(\sum_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_0}\right)^{\Ntime\vdim}}{\prod_{\itime=1}^{\Ntime}\q{\x_{\iobs\itime}}{\Tyler_t}^{\vdim}} \detect,
   \label{eq:glrt_nongaussian_cd}
 \end{equation}
 
 où $\Tyler_0$ est une variante de l'estimateur de Tyler, défini comme étant la solution de l'équation de point-fixe:
 \begin{equation}
-  \Tyler_0 = \frac{\vdim}{\Nobs} \sum_{\iobs=1}^{\Nobs} \dfrac{\sum_{\itime=1}^{\Ntime} \Smat_\itime}{\sum_{\itime=1}^{\Ntime} \q{\x_{\iobs\itime}}{\Tyler_0}}.
+  \Tyler_0 = \frac{\vdim}{\Nobs} \sum_{\iobs=1}^{\Nobs} \dfrac{\sum_{\itime=1}^{\Ntime} \x_{\iobs\itime}\x_{\iobs\itime}^\herm}{\sum_{\itime=1}^{\Ntime} \q{\x_{\iobs\itime}}{\Tyler_0}}.
 \end{equation}
 
 %TODO: make sure that quadratic form q is defined well beforehand
@@ -1268,13 +1255,19 @@ L'analyse des résultats sur la série d'images précédents nous invite à cons
 La complexité dans le cas gaussien \eqref{eq:glrt_gaussian_cd} est liée au ratio de déterminants, qui sont les principales opérations couteuses dans ce cadre au regard des autres opérations linéaires. En admettant un calcul à l'aide de la décomposition de Cholesky, la complexité du déterminant est de $\bigO(\vdim^3)$, ce qui nous amène à une complexité finale $\bigO(\Ntime\vdim^3)$.
 
 Supposons maintenant que nous avons calculé une statistique $\DetectorStat_{1:\Ntime}$ à partir d'une fenêtre observée sur un horizon de $\Ntime$ dates. Pour calculer $\DetectorStat_{1:\Ntime+1}$ qui prendrait en compte une nouvelle, date, il n'est pas nécessaire d'avoir accès aux données brutes aux dates précédentes mais seulement la connaissance de $\sum_{\itime=1}^{\Ntime}\Smat_\itime$, $\Det(\sum_{\itime=1}^{\Ntime}\Smat_\itime)$ ainsi que de $\DetectorStat_{1:\Ntime}$\footnote{En pratique on stocke les logarithmes des déterminants et de la statistique car avec la dimension, la valeur numérique du déterminant peut exploser.}. En effet, on peut décomposer la statistique comme ceci\cite{Conradsen_2016}:
-$$
+\begin{equation*}
 \begin{aligned}
-  \DetectorStat_{1:\Ntime+1} &\propto \dfrac{\Det(\sum_{\itime=1}^{\Ntime+1} \Smat_\itime)}{\prod_{\itime=1}^{\Ntime+1} \Det(\Smat_\itime)} \\
-  &\propto \dfrac{\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )}{ \Det(\Smat_{\Ntime+1}) \prod_{\itime=1}^{\Ntime} \Det(\Smat_\itime)} \\
-  &\propto  \dfrac{\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )}{ \Det(\Smat_{\Ntime+1}) \Det(\sum_{\itime=1}^{\Ntime} \Smat_\itime)} \DetectorStat_{1:\Ntime}.
+  \ln\DetectorStat_{1:\Ntime+1}
+  &= (\Ntime+1)\Nobs\ln\Det\Big(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime\Big)
+     - \Nobs\sum_{\itime=1}^{\Ntime+1}\ln\Det(\Smat_\itime)
+     - \vdim(\Ntime+1)\Nobs\ln(\Ntime+1) \\
+  &= \ln\DetectorStat_{1:\Ntime}
+     + (\Ntime+1)\Nobs\ln\Det\Big(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime\Big)
+     - \Ntime\Nobs\ln\Det\Big(\sum_{\itime=1}^{\Ntime} \Smat_\itime\Big) \\
+  &\quad - \Nobs\ln\Det(\Smat_{\Ntime+1})
+     - \vdim\Nobs\left[(\Ntime+1)\ln(\Ntime+1)-\Ntime\ln\Ntime\right].
 \end{aligned}
-$$
+\end{equation*}
 
 Comme on a déjà calculé $\Det(\sum_{\itime=1}^{\Ntime}\Smat_\itime)$, il est seulement nécessaire de calculer $\Det(\Smat_{\Ntime+1} + \sum_{\itime=1}^{\Ntime} \Smat_\itime )$ ainsi que $\Det(\Smat_{\Ntime+1})$. Au regard de la complexité, le déterminant étant encore l'élément limitant, on se retrouve avec une complexité de mise à jour de $\bigO(\vdim^3)$, ce qui est pratique.
 
@@ -1300,18 +1293,10 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 
 
 
-\subsection{Estimation récursive des matrices de covariances structurées par la géométrie riemannienne}
+\subsection{Un modèle structuré par le capteur}
 \label{subsec:detection-online-riemann}
 
-% ============================ TODO texte (~1 paragraphe) ============================
-% Transition depuis l'analyse de complexite qui precede. Ce qu'il faut dire:
-%  - le verrou identifie est l'impossibilite de mettre a jour le point fixe;
-%  - la voie retenue est de changer non pas de detecteur mais de *maniere de
-%    calculer l'estimee*: si l'on sait descendre le long des geodesiques de la
-%    variete ou vit le parametre, une seule iteration par nouvelle image suffit;
-%  - annoncer le plan de la sous-section: modele structure, geometrie de la
-%    variete, gradient, algorithme recursif, borne intrinseque.
-% ====================================================================================
+Le verrou identifié dans l'analyse de complexité qui précède est l'impossibilité de mettre à jour le point fixe sous $\hypothesis_0$. Plutôt que de changer de détecteur, nous proposons de changer la manière de calculer l'estimée: si l'on sait se déplacer le long des géodésiques de la variété sur laquelle vit le paramètre, une seule itération par nouvelle image suffit. Avant d'en venir là, nous profitons de la structure particulière des données pour réduire la dimension du paramètre, ce qui sert à la fois la précision de l'estimation et le coût de chaque itération. Nous présentons d'abord le modèle et le détecteur correspondant, puis la géométrie de la variété, le gradient et l'algorithme récursif, et enfin la borne qui permet de juger l'estimateur obtenu.
 
 \begin{definition}[{Modèle gaussien à échelle et structure de Kronecker}]
 \label{def:detection-online-modele}
@@ -1327,20 +1312,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   \end{equation}
 \end{definition}
 
-% ======================= TODO texte (remarque, ~5 lignes) ==========================
-% Justifier les deux choix de modelisation, ils ne sont pas cosmetiques:
-%  - d'ou vient la structure de Kronecker ici: de la transformee en ondelettes
-%    de \sidecite{Mian_wavelet_2019}, qui combine les canaux de polarisation
-%    avec une diversite spectro-angulaire; l'un des operandes est de taille 3
-%    (polarisations), l'autre du nombre d'intervalles frequence x angle. C'est
-%    donc, comme en \cref{prop:detection-fls-kronecker}, une structure *heritee
-%    du capteur* et non postulee;
-%  - pourquoi le determinant unite plutot que la trace: c'est la contrainte qui
-%    rend la metrique de la \cref{prop:detection-online-metrique} *separable*,
-%    donc la geometrie de la variete produit calculable composante par
-%    composante. Avec la trace, elle ne l'est pas. Renvoyer a la
-%    \cref{prop:context-riemann-detun}.
-% ====================================================================================
+Les deux choix de modélisation de la \cref{def:detection-online-modele} ont chacun une raison d'être. La structure de Kronecker n'est pas postulée: elle provient de la transformée en ondelettes de \cite{Mian_wavelet_2019}, qui combine les canaux de polarisation avec une diversité spectro-angulaire. L'un des deux opérandes est alors de taille $3$, le nombre de canaux de polarisation, et l'autre de taille égale au nombre d'intervalles en fréquence et en angle retenus. Comme pour la \cref{prop:detection-fls-kronecker}, la structure est donc héritée du capteur et de la chaîne de traitement, et ses dimensions sont fixées sans paramètre de réglage, contrairement aux structures de rang faible qui demandent d'estimer un rang. La normalisation par le déterminant plutôt que par la trace est quant à elle ce qui rend la métrique de Fisher séparable, comme nous le verrons en \cref{prop:detection-online-metrique}\sideref[-1cm]{prop:context-riemann-detun}{Sous-variété à déterminant unité}.
 
 \begin{proposition}[{glrt structuré}]
 \label{prop:detection-online-glrt}
@@ -1373,7 +1345,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
 
 \begin{proposition}[{Estimateurs du maximum de vraisemblance}]
 \label{prop:detection-online-mle}
-  En notant $\obsmat_{\iobs\itime}\in\C^{\dimleft\times\dimright}$ la matrice telle que $\vecop(\obsmat_{\iobs\itime})=\x_\iobs^{(\itime)}$, les estimateurs sous $\hypothesis_0$ sont solutions du système de points fixes
+  En notant $\obsmat_{\iobs\itime}\in\C^{\dimright\times\dimleft}$ la matrice telle que $\vecop(\obsmat_{\iobs\itime})=\x_\iobs^{(\itime)}$, les estimateurs sous $\hypothesis_0$ sont solutions du système de points fixes
   \begin{equation}
     \left\{
     \begin{aligned}
@@ -1394,16 +1366,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   ceux sous $\hypothesis_1$ s'en déduisant en supprimant la sommation sur $\itime$ et les facteurs $\Ntime$ correspondants.
 \end{proposition}
 
-% ======================= TODO texte (remarque, ~4 lignes) ==========================
-% Deux points a signaler:
-%  - les estimateurs sous $\hypothesis_1$ coincident avec l'estimateur de Tyler
-%    a structure de Kronecker de \sidecite{sun2016robust} --- le meme objet que
-%    celui de la \cref{subsec:detection-fls-estimation}, a ceci pres qu'aucune
-%    contrainte Toeplitz n'est imposee ici;
-%  - ceux sous $\hypothesis_0$ en different par la sommation sur $\itime$, qui
-%    traduit le partage du parametre entre les dates. C'est cette sommation,
-%    prise dans un point fixe, qui interdit la mise a jour recursive.
-% ====================================================================================
+On remarquera que les estimateurs sous $\hypothesis_1$ coïncident avec l'estimateur de Tyler à structure de Kronecker de \sidecite{sun2016robust}, à la conjugaison près puisque nous traitons des données complexes. C'est le même objet que celui de la \cref{subsec:detection-fls-estimation}, sans la contrainte de Toeplitz. Ceux sous $\hypothesis_0$ en diffèrent par la sommation sur $\itime$, qui traduit le partage du paramètre entre les dates. C'est cette sommation, prise à l'intérieur d'un point fixe, qui interdit la mise à jour récursive:
 
 \begin{property}[{Non-récursivité du point fixe}]
 \label{prop:detection-online-nonrecursif}
@@ -1418,60 +1381,86 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   et il en va de même pour $\Kronright$ et pour les textures.
 \end{property}
 
+La structure ne lève donc pas le verrou mis en évidence pour le GLRT non-gaussien \eqref{eq:glrt_nongaussian_cd}: elle réduit le coût de chaque itération du point fixe, mais il faut toujours reprendre l'ensemble des $\Ntime+1$ dates à l'arrivée d'une nouvelle image.
+
+\subsection{La géométrie de l'information du modèle}
+
+Pour construire une mise à jour récursive\sideref{prop:context-geometry-fisherccg}{Métrique de Fisher du modèle gaussien composé}, nous avons besoin d'une géométrie sur $\Manifold$. Le choix naturel est celle induite par la métrique de Fisher du modèle, dont nous avons vu qu'elle se décompose sur une variété produit dans le cas d'une gaussienne composée sans structure. La proposition suivante étend ce résultat à la structure de Kronecker.
+
 \begin{proposition}[{Métrique de Fisher sur $\Manifold$}]
 \label{prop:detection-online-metrique}
   Pour $\param\in\Manifold$ et $\tvec=(\tvec_{\Kronleft},\tvec_{\Kronright},\tvec_{\vector{\texture}})$, $\tvecbis=(\tvecbis_{\Kronleft},\tvecbis_{\Kronright},\tvecbis_{\vector{\texture}})$ dans $\Tangent{\param}{\Manifold}$, la métrique de Fisher induite par le modèle \cref{eq:detection-online-modele} s'écrit
   \begin{equation}
-    \metric{\tvec}{\tvecbis}{\param}
-    =
-    \frac{\dimright}{\vdim}\trace{\inv{\Kronleft}\tvec_{\Kronleft}\inv{\Kronleft}\tvecbis_{\Kronleft}}
-    + \frac{\dimleft}{\vdim}\trace{\inv{\Kronright}\tvec_{\Kronright}\inv{\Kronright}\tvecbis_{\Kronright}}
-    + \frac{1}{\Nobs}\left(\tvec_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right)^\T
-      \left(\tvecbis_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right),
+    \begin{aligned}
+      \metric{\tvec}{\tvecbis}{\param}
+      ={}&
+      \frac{\dimright}{\vdim}\trace{\inv{\Kronleft}\tvec_{\Kronleft}\inv{\Kronleft}\tvecbis_{\Kronleft}}
+      + \frac{\dimleft}{\vdim}\trace{\inv{\Kronright}\tvec_{\Kronright}\inv{\Kronright}\tvecbis_{\Kronright}}
+      \\
+      &+ \frac{1}{\Nobs}\left(\tvec_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right)^\T
+        \left(\tvecbis_{\vector{\texture}}\had\hadinv{\vector{\texture}}\right),
+    \end{aligned}
     \label{eq:detection-online-metrique}
   \end{equation}
   où $\had$ désigne le produit de Hadamard. Les espaces tangents aux deux facteurs matriciels sont
   \begin{equation}
     \Tangent{\Kronleft}{\HPDdet{\dimleft}}
-    = \left\{\tvec_{\Kronleft}\in\Herm{\dimleft}\ :\ \trace{\inv{\Kronleft}\tvec_{\Kronleft}}=0\right\}.
+    = \left\{\tvec_{\Kronleft}\in\Herm{\dimleft}\ :\ \trace{\inv{\Kronleft}\tvec_{\Kronleft}}=0\right\},
     \label{eq:detection-online-tangent}
   \end{equation}
+  et de même pour $\Kronright$.
 \end{proposition}
+
+La métrique \cref{eq:detection-online-metrique} est la somme de deux métriques affines invariantes, pondérées par $\dimright/\vdim$ et $\dimleft/\vdim$, et d'un terme sur les textures. Il n'y a aucun terme croisé entre les trois facteurs, ce qui n'aurait pas été le cas avec une normalisation par la trace. La géométrie de $\Manifold$ s'obtient alors en combinant celle de chaque facteur:
 
 \begin{property}[{Exponentielle et distance}]
 \label{prop:detection-online-expdist}
   La métrique \cref{eq:detection-online-metrique} étant séparable, l'exponentielle riemannienne et la distance géodésique se calculent composante par composante:
   \begin{equation}
-    \exp_{\param}(\tvec)
-    =
-    \left(
-      \Kronleft\,\expm\left(\inv{\Kronleft}\tvec_{\Kronleft}\right),\
-      \Kronright\,\expm\left(\inv{\Kronright}\tvec_{\Kronright}\right),\
-      \vector{\texture}\had\exp\left(\hadinv{\vector{\texture}}\had\tvec_{\vector{\texture}}\right)
-    \right),
+    \begin{aligned}
+      \exp_{\param}(\tvec)
+      ={}&
+      \Big(
+        \Kronleft\,\expm\left(\inv{\Kronleft}\tvec_{\Kronleft}\right),\
+        \Kronright\,\expm\left(\inv{\Kronright}\tvec_{\Kronright}\right),
+      \\
+      &\phantom{\Big(}\vector{\texture}\had\exp\big(\hadinv{\vector{\texture}}\had\tvec_{\vector{\texture}}\big)
+      \Big),
+    \end{aligned}
     \label{eq:detection-online-exp}
   \end{equation}
   \begin{equation}
-    \geodist^2_{\Manifold}(\param_0,\param_1)
-    =
-    \frac{\dimright}{\vdim}\geodist^2_{\HPD{\dimleft}}(\Kronleft_0,\Kronleft_1)
-    + \frac{\dimleft}{\vdim}\geodist^2_{\HPD{\dimright}}(\Kronright_0,\Kronright_1)
-    + \frac{1}{\Nobs}\norm{\ln\left(\hadinv{\vector{\texture}_0}\had\vector{\texture}_1\right)}_2^2.
+    \begin{aligned}
+      \geodist^2_{\Manifold}(\param_0,\param_1)
+      ={}&
+      \frac{\dimright}{\vdim}\geodist^2_{\HPD{\dimleft}}(\Kronleft_0,\Kronleft_1)
+      + \frac{\dimleft}{\vdim}\geodist^2_{\HPD{\dimright}}(\Kronright_0,\Kronright_1)
+      \\
+      &+ \frac{1}{\Nobs}\norm{\ln\left(\hadinv{\vector{\texture}_0}\had\vector{\texture}_1\right)}_2^2.
+    \end{aligned}
     \label{eq:detection-online-dist}
   \end{equation}
 \end{property}
 
+\subsection{Pourquoi un gradient naturel stochastique}
+
+Disposant de la géométrie de $\Manifold$, il reste à choisir comment mettre à jour l'estimée sous $\hypothesis_0$ à l'arrivée d'une nouvelle fenêtre $\Xset_{\Ntime+1}$. L'idée est de ne faire qu'un pas de gradient riemannien\sideref[-0.8cm]{def:context-riemann-gradient}{Gradient riemannien}, calculé sur la seule vraisemblance de la nouvelle fenêtre, au lieu de résoudre à nouveau le point fixe sur toutes les dates. Rappelons que l'algorithme de point fixe d'un M-estimateur est lui-même une descente de gradient riemannienne à pas constant\sideref[0.4cm]{prop:context-riemann-pointfixe}{Le point fixe comme descente de gradient}: le schéma proposé n'en est donc qu'une version stochastique, où chaque date apporte un pas dont la taille décroît en $1/\Ntime$.
+
 \begin{proposition}[{Gradient riemannien}]
 \label{prop:detection-online-gradient}
-  Le gradient riemannien de la vraisemblance de la seule nouvelle fenêtre $\likelihood^{(\Ntime+1)}$, au sens de la métrique \cref{eq:detection-online-metrique}, vaut
+  Le gradient riemannien de la log-vraisemblance de la seule nouvelle fenêtre $\likelihood^{(\Ntime+1)}$, au sens de la métrique \cref{eq:detection-online-metrique}, vaut
   \begin{equation}
     \Rgrad\likelihood^{(\Ntime+1)}(\param)
     =
-    \left(
-      -\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronleft}\left(\obsmat_\iobs^\T\Kronright^{-\T}\conj{\obsmat_\iobs}\right)}{\dimright\texture_\iobs},\
-      -\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronright}\left(\obsmat_\iobs\Kronleft^{-\T}\obsmat_\iobs^\herm\right)}{\dimleft\texture_\iobs},\
-      \Nobs\left(\vector{q}^{(\Ntime+1)}-\vdim\,\vector{\texture}\right)
-    \right),
+    \left(\mat{G}_{\Kronleft},\,\mat{G}_{\Kronright},\,\vector{g}_{\vector{\texture}}\right),
+    \qquad
+    \left\{
+    \begin{aligned}
+      \mat{G}_{\Kronleft} &= \frac{\vdim}{\dimright}\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronleft}\left(\obsmat_\iobs^\T\Kronright^{-\T}\conj{\obsmat_\iobs}\right)}{\texture_\iobs},\\
+      \mat{G}_{\Kronright} &= \frac{\vdim}{\dimleft}\sum_{\iobs=1}^{\Nobs}\frac{\projman_{\Kronright}\left(\obsmat_\iobs\Kronleft^{-\T}\obsmat_\iobs^\herm\right)}{\texture_\iobs},\\
+      \vector{g}_{\vector{\texture}} &= \Nobs\left(\vector{q}^{(\Ntime+1)}-\vdim\,\vector{\texture}\right),
+    \end{aligned}
+    \right.
     \label{eq:detection-online-gradient}
   \end{equation}
   où $\vector{q}^{(\Ntime+1)}$ rassemble les formes quadratiques $q_\iobs^{(\Ntime+1)}(\Kronleft,\Kronright)$ et où la projection sur l'espace tangent \cref{eq:detection-online-tangent} s'écrit
@@ -1483,7 +1472,7 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   \end{equation}
 \end{proposition}
 
-\begin{definition}[{Descente de gradient naturel stochastique}]
+\begin{definition}[{Montée de gradient naturel stochastique}]
 \label{def:detection-online-sgd}
   L'estimée sous $\hypothesis_0$ est mise à jour, à l'arrivée de la fenêtre $\Xset_{\Ntime+1}$, par une unique itération
   \begin{equation}
@@ -1491,40 +1480,43 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
     =
     \exp_{\hat{\param}^{(0)}_{\Xset_{1:\Ntime}}}
     \left(
-      -\frac{\alpha_0}{\Ntime}\,\Rgrad\likelihood^{(\Ntime+1)}\left(\hat{\param}^{(0)}_{\Xset_{1:\Ntime}}\right)
-    \right).
+      \frac{\alpha_0}{\Ntime}\,\Rgrad\likelihood^{(\Ntime+1)}\left(\hat{\param}^{(0)}_{\Xset_{1:\Ntime}}\right)
+    \right),
+    \qquad
+    \alpha_0=\frac{1}{\vdim\Nobs}.
     \label{eq:detection-online-sgd}
   \end{equation}
 \end{definition}
 
-\begin{algorithm}[h]
+Le choix $\alpha_0=1/(\vdim\Nobs)$ se lit directement sur la composante des textures. Au premier ordre, la mise à jour \cref{eq:detection-online-sgd} donne en effet
+\begin{equation*}
+  \hat{\texture}_\iobs^{(0)} \leftarrow \hat{\texture}_\iobs^{(0)} + \frac{1}{\Ntime}\left(\frac{q_\iobs^{(\Ntime+1)}}{\vdim}-\hat{\texture}_\iobs^{(0)}\right),
+\end{equation*}
+c'est-à-dire une moyenne courante des estimées de texture date par date, ce qui est exactement la forme de $\hat{\texture}_\iobs^{(0)}$ dans \cref{eq:detection-online-mle}. Il en va de même pour $\Kronleft$ et $\Kronright$, dont le pas est la projection sur l'espace tangent de l'écart entre le terme du point fixe calculé sur la nouvelle fenêtre et l'estimée courante. La procédure complète est résumée dans l'\cref{alg:detection-online}.
+
+\begin{algorithm}[htbp]
 \caption{Détection de changements en ligne}
 \label{alg:detection-online}
 \begin{algorithmic}[1]
   \Require $\hat{\param}^{(0)}$ initialisée sur la première fenêtre, statistique courante $\ln\DetectorStat^{(\Ntime)}$
   \For{chaque nouvelle image $\Ntime+1$}
     \State calculer $\Rgrad\likelihood^{(\Ntime+1)}(\hat{\param}^{(0)})$ par \cref{eq:detection-online-gradient}
-    \State $\hat{\param}^{(0)} \gets \exp_{\hat{\param}^{(0)}}\left(-\dfrac{\alpha_0}{\Ntime}\Rgrad\likelihood^{(\Ntime+1)}(\hat{\param}^{(0)})\right)$ par \cref{eq:detection-online-exp}
+    \State $\hat{\param}^{(0)} \gets \exp_{\hat{\param}^{(0)}}\left(\dfrac{\alpha_0}{\Ntime}\Rgrad\likelihood^{(\Ntime+1)}(\hat{\param}^{(0)})\right)$ par \cref{eq:detection-online-exp}
     \State estimer $\hat{\param}^{(\Ntime+1)}$ sous $\hypothesis_1$ sur la seule fenêtre courante par \cref{eq:detection-online-mle}
     \State mettre à jour $\ln\DetectorStat^{(\Ntime+1)}$ par \cref{eq:detection-online-glrt}
   \EndFor
 \end{algorithmic}
 \end{algorithm}
 
-% ======================= TODO texte (remarque, ~6 lignes) ==========================
-% Dire les deux raisons pour lesquelles c'est le gradient *naturel* qui est
-% employe, et non une descente riemannienne quelconque:
-%  - le pas optimal s'obtient analytiquement et ne depend que des dimensions
-%    intrinseques $(\dimleft,\dimright,\Nobs)$: aucune recherche lineaire, donc
-%    un cout par image reellement constant;
-%  - la descente stochastique associee est statistiquement efficace: l'estimee
-%    recursive tend vers le mle sous $\hypothesis_0$ quand $\Ntime\to\infty$
-%    \sidecite{Zhou_2019}, donc le glrt en ligne est asymptotiquement
-%    equivalent au glrt hors ligne --- c'est ce qui autorise a remplacer l'un
-%    par l'autre sans changer la regle de decision.
-% Conclure sur le gain: le cout par nouvelle image devient constant, a comparer
-% avec le $\bigO(\Niter\Ntime\vdim^3)$ etabli plus haut.
-% ====================================================================================
+Le fait d'employer le gradient \emph{naturel}, c'est-à-dire le gradient associé à la métrique de Fisher, plutôt qu'une descente riemannienne quelconque, a deux conséquences pratiques. D'une part, le pas optimal s'obtient analytiquement et ne dépend que des dimensions intrinsèques $(\dimleft,\dimright,\Nobs)$ du problème: aucune recherche linéaire n'est nécessaire, et le coût par image est réellement constant. D'autre part, la descente stochastique associée est statistiquement efficace \cite{Zhou_2019}: l'estimée récursive tend vers l'estimateur du maximum de vraisemblance sous $\hypothesis_0$ lorsque $\Ntime\to\infty$, de sorte que le glrt en ligne est asymptotiquement équivalent au glrt hors ligne et que l'on peut remplacer l'un par l'autre sans changer la règle de décision.
+
+Plus précisément, chaque nouvelle image demande l'inversion de $\Kronleft$ et $\Kronright$, le calcul des $\Nobs$ produits $\obsmat_\iobs^\T\Kronright^{-\T}\conj{\obsmat_\iobs}$ et $\obsmat_\iobs\Kronleft^{-\T}\obsmat_\iobs^\herm$, puis deux exponentielles de matrices de tailles $\dimleft$ et $\dimright$, soit un coût en $\bigO(\Nobs\vdim(\dimleft+\dimright)+\dimleft^3+\dimright^3)$ qui ne dépend pas de $\Ntime$\footnote{Pour évaluer $\likelihood_{\hypothesis_0}$ dans \cref{eq:detection-online-glrt} sans revenir aux données passées, il suffit de conserver pour chaque pixel de la fenêtre la somme $\sum_{\itime}\x_\iobs^{(\itime)}\x_\iobs^{(\itime)\herm}$, puisque $\sum_\itime q_\iobs^{(\itime)}$ en est une fonction linéaire.}. On le comparera au $\bigO(\Niter\Ntime\vdim^3)$ établi plus haut pour la version hors ligne.
+% TODO a verifier: le cout par image ci-dessus est derive a la main (produits
+% de taille (a x b)(b x b)(b x a)), il n'est pas donne dans l'article.
+
+\subsection{Une borne pour juger l'estimateur}
+
+Pour juger de la qualité de l'estimée récursive, il reste à disposer d'une référence. La borne de Cramér-Rao intrinsèque\sideref{sec:context-geometry-icrb}{Borne de Cramér-Rao intrinsèque} s'applique ici telle quelle: la contrainte de déterminant unité et la structure de Kronecker sont portées par la variété $\Manifold$ elle-même, et il suffit de travailler dans son espace tangent. La distance \cref{eq:detection-online-dist} étant celle de la métrique de Fisher, la borne prend une forme particulièrement simple.
 
 \begin{proposition}[{Borne de Cramér-Rao intrinsèque}]
 \label{prop:detection-online-icrb}
@@ -1541,31 +1533,23 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
     \qquad
     \E\left\{\geodist^2_{\HPD{\dimright}}\right\} \geq \frac{\dimright^2-1}{\dimleft\,\Ntime\,\Nobs},
     \qquad
-    \E\left\{\geodist^2_{\Rpos{\Nobs}}\right\} \geq \frac{1}{\Ntime\,\vdim}.
+    \E\left\{\geodist^2_{\Rpos{\Nobs}}\right\} \geq \frac{\Nobs}{\Ntime\,\vdim}.
     \label{eq:detection-online-icrb-composantes}
   \end{equation}
 \end{proposition}
 
-% ============================ TODO decision --- A VERIFIER =========================
-% Attention: la version publiee (et la preprint arXiv) ecrit ces inegalites
-% dans le sens $\leq$, alors qu'une borne de Cramer-Rao *minore* l'erreur
-% quadratique: j'ai retabli $\geq$ ici pour que l'enonce soit coherent avec le
-% mot « minoree » et avec l'usage qui en est fait ensuite (les courbes de mse
-% viennent buter sur la borne par le haut). Merci de confirmer --- s'il s'agit
-% bien d'une coquille de l'article, elle merite peut-etre d'etre signalee en
-% note de bas de page.
-% ====================================================================================
+La lecture de la borne est directe. Le numérateur de \cref{eq:detection-online-icrb} compte les paramètres à estimer, soit $\dimleft^2-1$ et $\dimright^2-1$ pour les deux facteurs une fois la contrainte de déterminant prise en compte, plus les $\Nobs$ textures, et le dénominateur compte les données réelles disponibles. On retrouve donc le comptage de la \cref{prop:detection-fls-comptage}, vu cette fois du côté de l'erreur d'estimation. C'est aussi ce qui permet de mesurer ce que la structure apporte: à $\vdim=12$ et $\Nobs=13$, la borne de la dispersion structurée est plus faible d'un facteur $156/36\simeq4{,}3$ que celle d'une dispersion libre dans $\HPDdet{\vdim}$.
 
-% ======================= TODO texte (remarque, ~4 lignes) ==========================
-% Lire la borne: le numerateur est le nombre de parametres a estimer
-% ($\dimleft^2-1$ et $\dimright^2-1$ apres la contrainte de determinant, plus
-% les $\Nobs$ textures), le denominateur le nombre de donnees. C'est donc
-% exactement le comptage de la \cref{prop:detection-fls-comptage}, vu cette
-% fois du cote de l'erreur d'estimation. Annoncer que les simulations montrent
-% que l'estimateur recursif atteint cette borne.
-% ====================================================================================
+\subsection{Ce que la mise en ligne coûte et rapporte}
 
-% ============================ TODO texte + figures =================================
+Les simulations ci-dessous reprennent celles de \cite{SP24} en les complétant. Les données sont K-distribuées ($\nu=1$) ou gaussiennes, avec $\dimleft=3$, $\dimright=4$, $\Nobs=13$ et des facteurs de Toeplitz\footnote{Ce sont les paramètres des légendes de figures et du code diffusé avec \cite{SP24}; le texte de l'article annonce $\dimleft=4$, $\dimright=3$, $\Nobs=8$ et des facteurs aléatoires. Nous retenons les premiers pour que les figures restent comparables à celles de l'article.}. Elles conduisent aux constats suivants:
+\begin{itemize}
+  \item l'estimateur hors ligne suit les bornes \cref{eq:detection-online-icrb-composantes} sur toute la plage de $\Ntime$, et l'estimateur récursif, qui n'effectue qu'un pas par nouvelle image, les rejoint: à $\Ntime=10^3$, les trois composantes sont à la borne (\cref{fig:detection-online-mse-icrb});
+  \item à nombre de dates fixé, chaque estimateur atteint sa propre borne, et l'écart mesuré entre structure de Kronecker et dispersion libre est de $4{,}5$ à $\Nobs=13$, pour $4{,}3$ prédit par le rapport des dimensions. Le gain va de $5{,}9$ à $\Nobs=4$ à $2{,}3$ à $\Nobs=70$: la structure apporte d'autant plus que la fenêtre est petite (\cref{fig:detection-online-structure});
+  \item en détection, en fouillis K-distribué, le glrt structuré en ligne suit de près sa version hors ligne dès les premières dates, avec un creux transitoire vers $\Ntime=7$ dû au démarrage sur l'estimée de la première date (\cref{fig:detection-online-puissance});
+  \item en fouillis gaussien, les détecteurs en ligne rejoignent aussi leur contrepartie hors ligne, mais bien plus tard: à $\Ntime=49$, la puissance est de $0{,}981$ pour le glrt structuré en ligne contre $0{,}999$ hors ligne (\cref{fig:detection-online-puissance-gaussien}). L'article signalait déjà cette convergence plus lente en milieu quasi gaussien, que nous présentons ici comme une observation.
+\end{itemize}
+
 % ============================== FIGURE 9/9 =========================================
 % Elle porte la these de la section. Run pleine echelle (1000 tirages, T
 % jusqu'a 1000), qanat: sar_mc_kron_mse.
@@ -1702,21 +1686,23 @@ De plus dans le cas d'une mise à jour, on souffre de ne pouvoir mettre à jour 
   \label{fig:detection-online-puissance-gaussien}
 \end{figure}
 
-% ============================ TODO texte + figures =================================
-% Les benchmarks temps/memoire hors ligne vs en ligne (deja cables plus haut)
-% completent l'analyse de complexite: c'est le versant pratique de l'argument.
-%
-% Cartes de detection sur donnees UAVSAR reelles: a garder, et c'est ici que la
-% reproductibilite a le plus de valeur puisque les donnees, elles, sont
-% telechargeables (script download_sar.sh). Le volet repetition de la serie
-% (T=68, 340, 680) est deja outille: load_sits accepte --repeat-times, avec un
-% rebond palindrome plutot que la concatenation brute de l'article --- a signaler,
-% c'est une difference assumee qui evite une discontinuite a la couture.
-%
+% Les benchmarks temps/memoire hors ligne vs en ligne completent l'analyse de
+% complexite: c'est le versant pratique de l'argument.
+\wipfig{Temps de calcul en ligne}{Temps de mise à jour de la carte de détection à l'arrivée d'une nouvelle image en fonction du nombre de dates $\Ntime$, pour les quatre détecteurs (glrt hors ligne avec et sans structure de Kronecker, et leurs versions récursives), sur CPU et GPU, mêmes conventions que la \cref{fig:benchmark_sar_offline}. Attendu: croissance linéaire en $\Ntime$ hors ligne, palier constant en ligne. Expérience: à câbler à partir des benchmarks existants.}
+
+% Cartes de detection sur donnees UAVSAR reelles: les donnees sont
+% telechargeables (script download_sar.sh). La repetition de la serie
+% (T=68, 340, 680) est outillee: load_sits accepte --repeat-times, avec un
+% rebond palindrome plutot que la concatenation brute de l'article --- a
+% signaler en legende, c'est une difference assumee qui evite une discontinuite
+% a la couture.
 % ABANDONNE: les courbes roc hors ligne vs en ligne sur donnees simulees font
 % doublon avec la figure mse et les cartes reelles.
-% ====================================================================================
+\wipfig{Cartes UAVSAR hors ligne et en ligne}{Série SDelta\_28518\_02 (segment 1, $200\times200$ pixels, $\vdim=12$ après ondelettes, fenêtre $7\times7$). Quatre cartes (glrt gaussien à échelle et sa version Kronecker, hors ligne et en ligne) pour $\Ntime=68$, puis la série répétée en palindrome jusqu'à $\Ntime=340$ et $680$. Message attendu: l'écart entre version en ligne et hors ligne se referme quand $\Ntime$ croît, plus vite avec la structure de Kronecker.}
 
+\wip{Lecture des résultats sur données réelles}{Deux ou trois phrases une fois les cartes produites: en l'absence de vérité terrain, on ne juge que la proximité entre versions en ligne et hors ligne; dire à partir de quel $\Ntime$ elles se confondent, et si la structure accélère ce rapprochement comme sur données simulées.}
+
+\FloatBarrier
 \section{Bilan}
 \label{sec:detection-synthese}
 
