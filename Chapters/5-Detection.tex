@@ -164,7 +164,7 @@ C'est un problème très connu de la détection RADAR, et on pourra par exemple 
 %TODO : peut etre ajotuer un peu plsu de contexte
 
 \begin{remark}[{Le modèle de cible}]
-  Dans la définition de ce problème en \cref{eq:detection-test}, l'à-priori que nous posons sur la cible est la connaissance exacte de ses composantes $\steering$ à un facteur d'amplitude complexe près donc il faudrait tester toutes les directions en faisant une grille sur les angles. On peut aussi comme on verra spécifiquement dans la \cref{subsec:detection-fls-sousespace} relacher cette définition en introduisant une notion de sous-espace à laquelle la cible appartient.
+  Dans la définition de ce problème en \cref{eq:detection-test}, l'à-priori que nous posons sur la cible est la connaissance exacte de ses composantes $\steering$ à un facteur d'amplitude complexe près donc il faudrait tester toutes les directions en faisant une grille sur les angles. On peut aussi comme on l'évoquera en fin de \cref{sec:detection-fls} relacher cette définition en introduisant une notion de sous-espace à laquelle la cible appartient.
 \end{remark}
 
 
@@ -443,7 +443,7 @@ où:
 
 Ce détecteur est texture-cfar par construction, puisque la statistique est homogène en $\x$ et que $\Tyler$ est invariant à un changement d'échelle de chaque $\x_\iobs$ (\cref{prop:context-complex-tylerdf}). Il est également matrice-cfar, et sa relation entre $\pfa$ et seuil est celle de l'\detname{anmf} avec la scm, à condition de remplacer $\Nobs$ par $\Nobs'=\frac{\vdim}{\vdim+1}\Nobs$ \sidecite{Ovarlez2016}\footnote{Autrement dit, sous modèle gaussien, utiliser l'estimateur de Tyler plutôt que la scm revient à perdre environ une donnée secondaire sur $\vdim+1$.}.
 
-Enfin, lorsque la réponse de la cible n'est connue qu'à un sous-espace de dimension $\Nrank$ près, on remplace $\steering$ par la projection de $\x$ sur ce sous-espace, ce qui mène aux détecteurs par sous-espaces \cite{Scharf1994,Kraut2001}. Nous y reviendrons en \cref{subsec:detection-fls-sousespace}. L'ensemble de ces détecteurs est résumé dans le \cref{tab:detection-genealogie}.
+Enfin, lorsque la réponse de la cible n'est connue qu'à un sous-espace de dimension $\Nrank$ près, on remplace $\steering$ par la projection de $\x$ sur ce sous-espace, ce qui mène aux détecteurs par sous-espaces \cite{Scharf1994,Kraut2001}. Nous l'évoquerons brièvement en fin de \cref{sec:detection-fls}. L'ensemble de ces détecteurs est résumé dans le \cref{tab:detection-genealogie}.
 
 \begin{table}[h]
   \centering
@@ -806,7 +806,7 @@ En simulation, le régime asymptotique est atteint dès $\Nsensor=64$, ce qui es
 
 \begin{remark}[{Pourquoi le test de Rao}]
 \label{rem:detection-pourquoi-rao}
-  Le test de Rao est souvent présenté comme une approximation du trvg, plus simple à calculer. Ici, il présente trois avantages qui dépassent la simplicité de calcul. D'abord, l'estimée sous $\hypothesis_0$ ne dépend pas de la direction testée, ce qui rend le balayage angulaire peu coûteux. Ensuite, sa loi sous $\hypothesis_0$ est connue en forme close et ne dépend pas de la covariance pour $\Nsensor$ grand, ce qui permet de régler le seuil sans simulation. Enfin, comme il est construit au voisinage de $\hypothesis_0$, il ne cherche pas à expliquer l'observation par un signal quelconque, et il est plus sélectif vis-à-vis des signaux qui ne correspondent pas à la direction testée. Ce dernier point sera mis en regard, en \cref{sec:detection-fls}, du choix inverse que font les détecteurs par sous-espaces.
+  Le test de Rao est souvent présenté comme une approximation du trvg, plus simple à calculer. Ici, il présente trois avantages qui dépassent la simplicité de calcul. D'abord, l'estimée sous $\hypothesis_0$ ne dépend pas de la direction testée, ce qui rend le balayage angulaire peu coûteux. Ensuite, sa loi sous $\hypothesis_0$ est connue en forme close et ne dépend pas de la covariance pour $\Nsensor$ grand, ce qui permet de régler le seuil sans simulation. Enfin, comme il est construit au voisinage de $\hypothesis_0$, il ne cherche pas à expliquer l'observation par un signal quelconque, et il est plus sélectif vis-à-vis des signaux qui ne correspondent pas à la direction testée. Les détecteurs par sous-espaces, évoqués en fin de \cref{sec:detection-fls}, font le choix inverse.
 \end{remark}
 
 \subsection{Estimation robuste sous textures multiples}
@@ -887,7 +887,7 @@ Sur données réelles, la cible de référence est correctement localisée en az
   \label{fig:detection-mills-contamination}
 \end{figure}
 
-\section{Détection multi-pings et sous-espaces pour un sonar frontal}
+\section{Détection multi-pings pour un sonar frontal}
 \label{sec:detection-fls}
 
 \begin{contributions}
@@ -904,9 +904,9 @@ Sur données réelles, la cible de référence est correctement localisée en az
 %    a bruit; le prix a payer: la dimension du probleme est multipliee par
 %    $\Nping$, et le nombre de donnees secondaires necessaires avec elle. C'est
 %    exactement le probleme annonce en fin de \cref{sec:detection-cadre};
-%  - second prix a payer, moins evident et c'est le fil de la section: sommer
-%    en phase suppose de connaitre la phase. Toute erreur de recalage degrade
-%    la detection, d'ou la seconde moitie de la section sur les sous-espaces.
+%  - second prix a payer: sommer en phase suppose de connaitre la phase. Le
+%    volet sous-espace de JOE26 qui traite ce point n'est plus detaille, il
+%    est seulement evoque en fin de section (decision 2026-10-05).
 % ====================================================================================
 
 \subsection{Modèle multi-pings}
@@ -929,9 +929,8 @@ Sur données réelles, la cible de référence est correctement localisée en az
 % structure toute la section: l'operande de gauche est *interferometrique* (il
 % somme en phase les echos ping a ping), celui de droite est purement
 % *angulaire* (il somme en phase les capteurs dans la direction $\doa$). Le
-% vecteur $\vector{1}_{\Nping}$ suppose un recalage parfait --- hypothese que
-% la \cref{subsec:detection-fls-sousespace} viendra relacher, et c'est
-% precisement sur cet operande de gauche que portera le sous-espace.
+% vecteur $\vector{1}_{\Nping}$ suppose un recalage parfait --- hypothese
+% discutee dans le paragraphe de fin de section (volet sous-espace de JOE26).
 % Renvoyer au pdf joint pour la chaine de recalage elle-meme, qui n'est pas
 % reprise ici.
 % ====================================================================================
@@ -1069,66 +1068,6 @@ Sur données réelles, la cible de référence est correctement localisée en az
 %     detour par la majoration-minimisation.
 % ====================================================================================
 
-\subsection{Robustesse au désalignement: détection par sous-espace}
-\label{subsec:detection-fls-sousespace}
-
-\begin{definition}[{Sous-espace interférométrique}]
-\label{def:detection-fls-sousespace}
-  Soit $\Steerspace_{\Nrank}\in\C^{\Nsensor\Nping\times\Nrank}$, $\Nrank<\Nsensor\Nping$, de colonnes linéairement indépendantes, de la forme
-  \begin{equation}
-    \Steerspace_{\Nrank}
-    =
-    \mat{E}_{\Nrank}\otimes\steering(\doa),
-    \qquad
-    \left[\mat{E}_{\Nrank}\right]_{\iping\ivar}
-    =
-    \exp\left(-\frac{4\mathrm{j}\pi\,\xi_{\ivar,\iping}}{\wavelength}\right),
-    \label{eq:detection-fls-sousespace}
-  \end{equation}
-  où les $\xi_{\ivar,\iping}$ sont des décalages de phase ping à ping. Le signal recherché est supposé appartenir au sous-espace engendré par les colonnes de $\Steerspace_{\Nrank}$, de coordonnées inconnues.
-\end{definition}
-
-\begin{proposition}[{Détecteur par sous-espace}]
-\label{prop:detection-fls-anmf-sousespace}
-  Le détecteur exploitant conjointement la structure de la dispersion et celle de la réponse cible s'écrit \sidecite[-1cm]{Kraut2001,Raghavan2016}
-  \begin{equation}
-    \DetectorStat_{\Nrank}(\x,\doa)
-    =
-    \frac{\abs{\hat{\steerfull}_{\Nrank}^\herm\inv{\widehat{\MScatter}}\x}^2}
-         {\left(\hat{\steerfull}_{\Nrank}^\herm\inv{\widehat{\MScatter}}\hat{\steerfull}_{\Nrank}\right)
-          \left(\x^\herm\inv{\widehat{\MScatter}}\x\right)}
-    \detect,
-    \label{eq:detection-fls-anmf-sousespace}
-  \end{equation}
-  où le signal estimé est la projection oblique de l'observation sur le sous-espace, dans la métrique induite par $\inv{\widehat{\MScatter}}$:
-  \begin{equation}
-    \hat{\steerfull}_{\Nrank}
-    =
-    \Steerspace_{\Nrank}
-    \left(\Steerspace_{\Nrank}^\herm\inv{\widehat{\MScatter}}\Steerspace_{\Nrank}\right)^{-1}
-    \Steerspace_{\Nrank}^\herm\inv{\widehat{\MScatter}}\,\x.
-    \label{eq:detection-fls-projection}
-  \end{equation}
-\end{proposition}
-
-% ================= TODO texte (remarque, ~8 lignes) --- POINT CLE ==================
-% C'est le lien le plus fort entre les deux sections sonar, a ne pas manquer:
-%  - la premiere colonne de $\mat{E}_{\Nrank}$ vaut $\vector{1}_{\Nping}$: on
-%    retrouve exactement le modele \cref{eq:detection-fls-modele} d'une cible
-%    parfaitement alignee en phase, et les colonnes suivantes ajoutent des
-%    dephasages residuels;
-%  - meme si le dephasage reel n'appartient pas exactement au sous-espace,
-%    projeter sur $\Steerspace_{\Nrank}$ reduit l'angle de desadaptation par
-%    rapport au cas $\Nrank=1$, d'ou le gain de robustesse;
-%  - le rang $\Nrank$ est donc le curseur explicite de l'axe annonce en
-%    \cref{rem:detection-pourquoi-rao}: chaque degre de liberte gagne en
-%    robustesse au desalignement se paie par une perte sur cible parfaitement
-%    alignee, puisque le detecteur accepte davantage de signaux;
-%  - conclure que les deux sections sonar instrumentent ainsi le meme axe par
-%    deux moyens opposes: le test de Rao en le parcourant vers le pole selectif,
-%    le sous-espace en le parcourant vers le pole robuste.
-% ====================================================================================
-
 \subsection{Ce que la structure achète}
 \label{subsec:detection-fls-perf}
 % TODO decision: titre de sous-section a valider (cf. remarque analogue en
@@ -1144,18 +1083,12 @@ Sur données réelles, la cible de référence est correctement localisée en az
 % structure est inutilisable et le detecteur structure fonctionne. Toute la
 % section tient dans cette comparaison.
 %
-\wipfig{FIGURE 8/9}{Pd vs désadaptation de phase pour r dans {1,3,5}. RIEN N'EXISTE. CONTRAINTE FORTE: cette figure, la 7/9 et la 3/9 doivent partager axes, unités et Pfa --- c'est ce qui transforme l'axe sélectivité/robustesse d'une affirmation en une mesure.}
-
-% FIGURE 8/9 --- reproductible, A ECRIRE
-% $\pdet$ vs desadaptation de phase pour $\Nrank\in\{1,3,5\}$. Pendant exact de
-% la figure angulaire de \cref{subsec:detection-mills-perf}: memes axes, memes
-% unites, meme $\pfa$. Les deux figures lues ensemble donnent l'axe
-% selectivite/robustesse en entier, du pole selectif (Rao) au pole robuste
-% (sous-espace de rang eleve).
-%
 % Donnees reelles: sorties reprises de l'article \cite{JOE26}, non
 % reproductibles (donnees non distribuables).
 % ====================================================================================
+
+Le modèle \cref{eq:detection-fls-modele} repose enfin sur une hypothèse forte: le vecteur $\vector{1}_{\Nping}$ suppose que les échos sont parfaitement recalés en phase d'un ping à l'autre. En pratique, le mouvement du porteur et l'imprécision du recalage laissent des déphasages résiduels, et la détection se dégrade d'autant plus que l'intégration est longue. Dans \cite{JOE26}, nous traitons ce problème en remplaçant $\vector{1}_{\Nping}$ par un sous-espace engendré par quelques vecteurs de déphasages ping à ping, ce qui conduit à une version par sous-espace de l'\detname{anmf} \cite{Kraut2001,Raghavan2016}. Le détecteur gagne en robustesse au désalignement ce qu'il perd en sélectivité, puisqu'il accepte davantage de signaux: c'est le choix inverse de celui du test de Rao de la \cref{sec:detection-mills-antenna}. Nous ne détaillons pas ce volet ici et renvoyons à l'article (p.~\paperpage{JOE26}).
+
 \section{Détection de changements en-ligne pour les séries temporelles d'images RSO}
 \label{sec:detection-online-change-detection}
 
@@ -1706,7 +1639,7 @@ Les simulations ci-dessous reprennent celles de \cite{SP24} en les complétant. 
 \section{Bilan}
 \label{sec:detection-synthese}
 
-\wip{Bilan ch. détection: la science}{Quatre points: ce qui circule entre les deux moitiés du chapitre (la même estimation de matrice de forme, contrainte tantôt statistiquement tantôt géométriquement); l'axe sélectivité/robustesse comme grille de lecture; les points ouverts assumés (unicité, seuils en forme close, aucun travail ne combine en-ligne et structure); la transition vers le chapitre SPDnet. Environ 1 page.}
+\wip{Bilan ch. détection: la science}{Quatre points: ce qui circule entre les deux moitiés du chapitre (la même estimation de matrice de forme, contrainte tantôt statistiquement tantôt géométriquement); le compromis sélectivité/robustesse, porté par le test de Rao d'un côté et seulement évoqué de l'autre avec les sous-espaces de JOE26; les points ouverts assumés (unicité, seuils en forme close, aucun travail ne combine en-ligne et structure); la transition vers le chapitre SPDnet. Environ 1 page.}
 
 \wip{Bilan ch. détection: les six mouvements}{À placer AVANT la transition. Nommer les personnes avec les dates --- aucun nom n'apparaît aujourd'hui dans ce chapitre; l'application qui a unifié le travail; ce qui a été construit, en clair; pointer les articles reproduits par leur folio (\texttt{\textbackslash paperpage\{JOE24\}} p.~\paperpage{JOE24}, JOE26 p.~\pageref{paper:JOE26}, SP24 p.~\pageref{paper:SP24}); dire que le travail excède les articles joints; dire où cela continue. Puis 3 ou 4 perspectives propres au chapitre en paragraphes à titre courant.}
 
@@ -1716,16 +1649,16 @@ Les simulations ci-dessous reprennent celles de \cite{SP24} en les complétant. 
 %  1. CE QUI CIRCULE ENTRE LES DEUX MOITIES. Le meme objet --- l'estimation au
 %     sens du maximum de vraisemblance de la matrice de forme d'un modele
 %     gaussien a echelle --- traverse tout le chapitre, contraint tantot par une
-%     structure statistique (deux antennes, Kronecker, Toeplitz, sous-espace),
+%     structure statistique (deux antennes, Kronecker, Toeplitz),
 %     tantot par une structure geometrique (recursion sur la variete). Dans les
 %     deux cas c'est la contrainte qui rend le probleme faisable au $\Nobs$ dont
 %     on dispose reellement, et non un raffinement de performance.
 %
-%  2. L'AXE SELECTIVITE/ROBUSTESSE comme grille de lecture, pas comme
-%     catalogue: le test de Rao (\cref{prop:detection-mills-rao}) et les
-%     detecteurs par sous-espace (\cref{prop:detection-fls-anmf-sousespace})
-%     sont les deux poles d'un meme continuum, et le glrt s'y situe entre les
-%     deux. Renvoyer aux deux figures tracees sur les memes axes.
+%  2. LE COMPROMIS SELECTIVITE/ROBUSTESSE, en quelques lignes seulement depuis
+%     que le volet sous-espace de JOE26 n'est plus detaille (2026-10-05): le
+%     test de Rao (\cref{prop:detection-mills-rao}) en est le pole selectif,
+%     les sous-espaces evoques en fin de \cref{sec:detection-fls} le pole
+%     robuste, et le glrt se situe entre les deux.
 %
 %  3. LES POINTS OUVERTS, a assumer explicitement --- c'est ce qu'un jury
 %     d'hdr attend:
